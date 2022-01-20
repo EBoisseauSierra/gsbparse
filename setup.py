@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="gsbparse",
-    version="0.0.1.dev0",
+    version="0.1.0",
     url="https://github.com/EBoisseauSierra/gsbparse",
     description="A simple parser for your Grisbi's .gsb account files",
     long_description=long_description,
