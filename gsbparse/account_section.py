@@ -81,6 +81,16 @@ class AccountSection(metaclass=ABCMeta):
                 pd.to_numeric, downcast="integer"
             )
 
+        if self._bool_cols:
+            # Strings must be cast as integer first so that casting to bool
+            # doesn't always yield True.
+            # Cf. https://stackoverflow.com/q/52089711/5433628
+            df[self._bool_cols] = (
+                df[self._bool_cols]
+                .apply(pd.to_numeric, downcast="integer")
+                .astype("bool")
+            )
+
         if self._currency_cols:
             df[self._currency_cols] = df[self._currency_cols].apply(pd.to_numeric)
 
@@ -110,6 +120,19 @@ class GsbSectionAccount(AccountSection):
     @property
     def _int_cols(self):
         return []
+
+    @property
+    def _bool_cols(self):
+        return [
+            "Closed_account",
+            "Show_marked",
+            "Neutrals_inside_method",
+            "Ascending_sort",
+            "Column_sort",
+            "Bet_use_budget",
+            "Bet_credit_card",
+            "Bet_auto_inc_month",
+        ]
 
     @property
     def _currency_cols(self):
@@ -153,6 +176,10 @@ class GsbSectionCurrency(AccountSection):
         return ["Fl"]
 
     @property
+    def _bool_cols(self):
+        return []
+
+    @property
     def _currency_cols(self):
         return []
 
@@ -188,6 +215,10 @@ class GsbSectionParty(AccountSection):
     @property
     def _int_cols(self):
         return []
+
+    @property
+    def _bool_cols(self):
+        return ["IgnCase", "UseRegex"]
 
     @property
     def _currency_cols(self):
@@ -227,6 +258,10 @@ class GsbSectionCategory(AccountSection):
         return []
 
     @property
+    def _bool_cols(self):
+        return ["Kd"]
+
+    @property
     def _currency_cols(self):
         return []
 
@@ -261,6 +296,10 @@ class GsbSectionSubCategory(AccountSection):
 
     @property
     def _int_cols(self):
+        return []
+
+    @property
+    def _bool_cols(self):
         return []
 
     @property
@@ -301,6 +340,10 @@ class GsbSectionBudgetary(AccountSection):
         return []
 
     @property
+    def _bool_cols(self):
+        return ["Kd"]
+
+    @property
     def _currency_cols(self):
         return []
 
@@ -335,6 +378,10 @@ class GsbSectionSubBudgetary(AccountSection):
 
     @property
     def _int_cols(self):
+        return []
+
+    @property
+    def _bool_cols(self):
         return []
 
     @property
@@ -375,6 +422,10 @@ class GsbSectionTransaction(AccountSection):
         return []
 
     @property
+    def _bool_cols(self):
+        return ["Br", "Au"]
+
+    @property
     def _currency_cols(self):
         return ["Am", "Exr", "Exf"]
 
@@ -409,7 +460,15 @@ class GsbSectionPayment(AccountSection):
 
     @property
     def _int_cols(self):
-        return ["Sign", "Show_entry", "Automatic_number", "Current_number", "Account"]
+        return ["Current_number", "Account"]
+
+    @property
+    def _bool_cols(self):
+        return [
+            "Sign",
+            "Show_entry",
+            "Automatic_number",
+        ]
 
     @property
     def _currency_cols(self):
@@ -446,6 +505,10 @@ class GsbSectionFinancial_year(AccountSection):
 
     @property
     def _int_cols(self):
+        return []
+
+    @property
+    def _bool_cols(self):
         return ["Sho"]
 
     @property
@@ -484,6 +547,10 @@ class GsbSectionReconcile(AccountSection):
     @property
     def _int_cols(self):
         return ["Acc"]
+
+    @property
+    def _bool_cols(self):
+        return []
 
     @property
     def _currency_cols(self):

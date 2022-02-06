@@ -56,7 +56,7 @@ class Transactions:
     ):
         """Return all or a subset of the transactions."""
         if ignore_mother_transactions:
-            df = self._df[self._df["transaction_Br"] == "0"]
+            df = self._df[~self._df["transaction_Br"]]
         else:
             df = self._df
 
