@@ -43,19 +43,20 @@ class AccountSection(metaclass=ABCMeta):
         pass
 
     @property
-    @abstractmethod
     def _int_cols(self):
-        pass
+        return []
 
     @property
-    @abstractmethod
+    def _bool_cols(self):
+        return []
+
+    @property
     def _currency_cols(self):
-        pass
+        return []
 
     @property
-    @abstractmethod
     def _date_cols(self):
-        pass
+        return []
 
     def __init__(self, records: list[dict]):
         """Build self.df from the list of XML tags attributes values.
@@ -118,10 +119,6 @@ class GsbSectionAccount(AccountSection):
         return ["Name"]
 
     @property
-    def _int_cols(self):
-        return []
-
-    @property
     def _bool_cols(self):
         return [
             "Closed_account",
@@ -141,10 +138,6 @@ class GsbSectionAccount(AccountSection):
             "Minimum_wanted_balance",
             "Minimum_authorised_balance",
         ]
-
-    @property
-    def _date_cols(self):
-        return []
 
     def __init__(self, XML_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
@@ -175,18 +168,6 @@ class GsbSectionCurrency(AccountSection):
     def _int_cols(self):
         return ["Fl"]
 
-    @property
-    def _bool_cols(self):
-        return []
-
-    @property
-    def _currency_cols(self):
-        return []
-
-    @property
-    def _date_cols(self):
-        return []
-
     def __init__(self, XML_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
@@ -213,20 +194,8 @@ class GsbSectionParty(AccountSection):
         return ["Na"]
 
     @property
-    def _int_cols(self):
-        return []
-
-    @property
     def _bool_cols(self):
         return ["IgnCase", "UseRegex"]
-
-    @property
-    def _currency_cols(self):
-        return []
-
-    @property
-    def _date_cols(self):
-        return []
 
     def __init__(self, XML_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
@@ -254,20 +223,8 @@ class GsbSectionCategory(AccountSection):
         return ["Na"]
 
     @property
-    def _int_cols(self):
-        return []
-
-    @property
     def _bool_cols(self):
         return ["Kd"]
-
-    @property
-    def _currency_cols(self):
-        return []
-
-    @property
-    def _date_cols(self):
-        return []
 
     def __init__(self, XML_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
@@ -293,22 +250,6 @@ class GsbSectionSubCategory(AccountSection):
     @property
     def _name_col(self):
         return ["Na"]
-
-    @property
-    def _int_cols(self):
-        return []
-
-    @property
-    def _bool_cols(self):
-        return []
-
-    @property
-    def _currency_cols(self):
-        return []
-
-    @property
-    def _date_cols(self):
-        return []
 
     def __init__(self, XML_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
@@ -336,20 +277,8 @@ class GsbSectionBudgetary(AccountSection):
         return ["Na"]
 
     @property
-    def _int_cols(self):
-        return []
-
-    @property
     def _bool_cols(self):
         return ["Kd"]
-
-    @property
-    def _currency_cols(self):
-        return []
-
-    @property
-    def _date_cols(self):
-        return []
 
     def __init__(self, XML_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
@@ -376,22 +305,6 @@ class GsbSectionSubBudgetary(AccountSection):
     def _name_col(self):
         return ["Na"]
 
-    @property
-    def _int_cols(self):
-        return []
-
-    @property
-    def _bool_cols(self):
-        return []
-
-    @property
-    def _currency_cols(self):
-        return []
-
-    @property
-    def _date_cols(self):
-        return []
-
     def __init__(self, XML_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
@@ -416,10 +329,6 @@ class GsbSectionTransaction(AccountSection):
     @property
     def _name_col(self):
         return ["No"]
-
-    @property
-    def _int_cols(self):
-        return []
 
     @property
     def _bool_cols(self):
@@ -470,14 +379,6 @@ class GsbSectionPayment(AccountSection):
             "Automatic_number",
         ]
 
-    @property
-    def _currency_cols(self):
-        return []
-
-    @property
-    def _date_cols(self):
-        return []
-
     def __init__(self, XML_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
@@ -504,16 +405,8 @@ class GsbSectionFinancial_year(AccountSection):
         return ["Na"]
 
     @property
-    def _int_cols(self):
-        return []
-
-    @property
     def _bool_cols(self):
         return ["Sho"]
-
-    @property
-    def _currency_cols(self):
-        return []
 
     @property
     def _date_cols(self):
@@ -547,10 +440,6 @@ class GsbSectionReconcile(AccountSection):
     @property
     def _int_cols(self):
         return ["Acc"]
-
-    @property
-    def _bool_cols(self):
-        return []
 
     @property
     def _currency_cols(self):
