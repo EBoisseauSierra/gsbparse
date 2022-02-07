@@ -36,3 +36,8 @@ repos:
     rev: 3.8.4
     hooks:
     -   id: flake8
+-   repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v1.2.0
+    hooks:
+    -   id: conventional-pre-commit
+        stages: [commit-msg]

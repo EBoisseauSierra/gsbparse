@@ -1,0 +1,7 @@
+{
+    "tag-prefix": "",
+    "sign": true,
+    "scripts": {
+        "postchangelog": "sed -r -e 's/^#{1,3} \\[/## [/' -i CHANGELOG.md"
+    }
+}
