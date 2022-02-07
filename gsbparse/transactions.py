@@ -37,7 +37,8 @@ class Transactions:
     def _df(self) -> pd.DataFrame:
         """Return the transactions as a pd.DataFrame, with foreign keys merged."""
         return (
-            self.account_file.transaction.pipe(self._add_account_details)
+            self._format_transactions_columns(self.account_file.transaction)
+            .pipe(self._add_account_details)
             .pipe(self._add_party_details)
             .pipe(self._add_currency_details)
             .pipe(self._add_subcategory_details)
@@ -46,7 +47,6 @@ class Transactions:
             .pipe(self._add_budgetary_details)
             .pipe(self._add_financialyear_details)
             .pipe(self._add_reconcile_details)
-            .pipe(self._format_transactions_columns)
         )
 
     def get_transactions(
@@ -56,7 +56,7 @@ class Transactions:
     ):
         """Return all or a subset of the transactions."""
         if ignore_mother_transactions:
-            df = self._df[~self._df["transaction_Br"]]
+            df = self._df[~self._df[("Transaction", "Br")]]
         else:
             df = self._df
 
@@ -65,137 +65,131 @@ class Transactions:
         elif type(columns) == list:
             return df[columns]
         elif type(columns) == dict:
-            return df[columns.keys()].rename(columns=columns)
+            # “Columns name mapper doesn't relate with [index] level.”
+            # Cf. https://stackoverflow.com/a/67458211/5433628
+            cols_rename_mapping = {key[1]: value for key, value in columns.items()}
+            return df[columns.keys()].rename(columns=cols_rename_mapping)
 
     @staticmethod
-    def prefix_column_names(
-        df: pd.DataFrame, prefix: str, separator: str = "_"
+    def index_column_names(
+        df: pd.DataFrame,
+        prefix: str,
     ) -> pd.DataFrame:
         """Add a leading prefix to all columns of a dataframe."""
-        df.columns = [f"{prefix}{separator}{col}" for col in df.columns]
+        df.columns = pd.MultiIndex.from_product([[prefix], df.columns])
 
         return df
 
     def _add_account_details(self, transactions: pd.DataFrame) -> pd.DataFrame:
         return transactions.merge(
-            type(self).prefix_column_names(
-                df=self.account_file.account, prefix="account"
+            type(self).index_column_names(
+                df=self.account_file.sections["Account"].df,
+                prefix=self.account_file.sections["Account"].section,
             ),
             how="left",
-            left_on=["Ac"],
+            left_on=[("Transaction", "Ac")],
             right_index=True,
             validate="m:1",
-        ).drop(columns=["Ac"])
+        ).drop(columns=[("Transaction", "Ac")])
 
     def _add_currency_details(self, transactions: pd.DataFrame) -> pd.DataFrame:
         return transactions.merge(
-            type(self).prefix_column_names(
-                df=self.account_file.currency, prefix="currency"
+            type(self).index_column_names(
+                df=self.account_file.sections["Currency"].df,
+                prefix=self.account_file.sections["Currency"].section,
             ),
             how="left",
-            left_on=["Cu"],
+            left_on=[("Transaction", "Cu")],
             right_index=True,
             validate="m:1",
-        ).drop(columns=["Cu"])
+        ).drop(columns=[("Transaction", "Cu")])
 
     def _add_party_details(self, transactions: pd.DataFrame) -> pd.DataFrame:
         return transactions.merge(
-            type(self).prefix_column_names(df=self.account_file.party, prefix="party"),
+            type(self).index_column_names(
+                df=self.account_file.sections["Party"].df,
+                prefix=self.account_file.sections["Party"].section,
+            ),
             how="left",
-            left_on=["Pa"],
+            left_on=[("Transaction", "Pa")],
             right_index=True,
             validate="m:1",
-        ).drop(columns=["Pa"])
+        ).drop(columns=[("Transaction", "Pa")])
 
     def _add_subcategory_details(self, transactions: pd.DataFrame) -> pd.DataFrame:
         return transactions.merge(
-            type(self).prefix_column_names(
-                df=self.account_file.subcategory, prefix="subcategory"
+            type(self).index_column_names(
+                df=self.account_file.sections["Sub_category"].df,
+                prefix=self.account_file.sections["Sub_category"].section,
             ),
             how="left",
-            left_on=["Ca", "Sca"],
+            left_on=[("Transaction", "Ca"), ("Transaction", "Sca")],
             right_index=True,
             validate="m:1",
-        ).drop(columns=["Sca"])
+        ).drop(columns=[("Transaction", "Sca")])
 
     def _add_category_details(self, transactions: pd.DataFrame) -> pd.DataFrame:
         return transactions.merge(
-            type(self).prefix_column_names(
-                df=self.account_file.category, prefix="category"
+            type(self).index_column_names(
+                df=self.account_file.sections["Category"].df,
+                prefix=self.account_file.sections["Category"].section,
             ),
             how="left",
-            left_on=["Ca"],
+            left_on=[("Transaction", "Ca")],
             right_index=True,
             validate="m:1",
-        ).drop(columns=["Ca"])
+        ).drop(columns=[("Transaction", "Ca")])
 
     def _add_subbudgetary_details(self, transactions: pd.DataFrame) -> pd.DataFrame:
         return transactions.merge(
-            type(self).prefix_column_names(
-                df=self.account_file.subbudgetary, prefix="subbudgetary"
+            type(self).index_column_names(
+                df=self.account_file.sections["Sub_budgetary"].df,
+                prefix=self.account_file.sections["Sub_budgetary"].section,
             ),
             how="left",
-            left_on=["Bu", "Sbu"],
+            left_on=[("Transaction", "Bu"), ("Transaction", "Sbu")],
             right_index=True,
             validate="m:1",
-        ).drop(columns=["Sbu"])
+        ).drop(columns=[("Transaction", "Sbu")])
 
     def _add_budgetary_details(self, transactions: pd.DataFrame) -> pd.DataFrame:
         return transactions.merge(
-            type(self).prefix_column_names(
-                df=self.account_file.budgetary, prefix="budgetary"
+            type(self).index_column_names(
+                df=self.account_file.sections["Budgetary"].df,
+                prefix=self.account_file.sections["Budgetary"].section,
             ),
             how="left",
-            left_on=["Bu"],
+            left_on=[("Transaction", "Bu")],
             right_index=True,
             validate="m:1",
-        ).drop(columns=["Bu"])
+        ).drop(columns=[("Transaction", "Bu")])
 
     def _add_financialyear_details(self, transactions: pd.DataFrame) -> pd.DataFrame:
         return transactions.merge(
-            type(self).prefix_column_names(
-                df=self.account_file.financialyear, prefix="financialyear"
+            type(self).index_column_names(
+                df=self.account_file.sections["Financial_year"].df,
+                prefix=self.account_file.sections["Financial_year"].section,
             ),
             how="left",
-            left_on=["Fi"],
+            left_on=[("Transaction", "Fi")],
             right_index=True,
             validate="m:1",
-        ).drop(columns=["Fi"])
+        ).drop(columns=[("Transaction", "Fi")])
 
     def _add_reconcile_details(self, transactions: pd.DataFrame) -> pd.DataFrame:
         return transactions.merge(
-            type(self).prefix_column_names(
-                df=self.account_file.reconcile, prefix="reconcile"
+            type(self).index_column_names(
+                df=self.account_file.sections["Reconcile"].df,
+                prefix=self.account_file.sections["Reconcile"].section,
             ),
             how="left",
-            left_on=["Re"],
+            left_on=[("Transaction", "Re")],
             right_index=True,
             validate="m:1",
-        ).drop(columns=["Re"])
+        ).drop(columns=[("Transaction", "Re")])
 
     def _format_transactions_columns(self, transactions: pd.DataFrame) -> pd.DataFrame:
-        return transactions.rename(
-            columns={
-                col: f"transaction_{col}"
-                for col in [
-                    "Id",
-                    "Dt",
-                    "Dv",
-                    "Am",
-                    "Exb",
-                    "Exr",
-                    "Exf",
-                    "Br",
-                    "No",
-                    "Pn",
-                    "Pc",
-                    "Ma",
-                    "Ar",
-                    "Au",
-                    "Vo",
-                    "Ba",
-                    "Trt",
-                    "Mo",
-                ]
-            }
+        return self.index_column_names(
+            df=self.account_file.sections["Transaction"].df,
+            prefix=self.account_file.sections["Transaction"].section,
         )

@@ -66,6 +66,7 @@ class AccountSection(metaclass=ABCMeta):
             type.
         """
         self.records = records
+        self.section = type(self).section
 
     @cached_property
     def df(self):
@@ -109,6 +110,8 @@ class GsbSectionAccount(AccountSection):
     Attributes:
         df (pd.DataFrame): Attributes' values of "Account" tags.
     """
+
+    section = "Account"
 
     @property
     def _idx_col(self):
@@ -156,6 +159,8 @@ class GsbSectionCurrency(AccountSection):
         df (pd.DataFrame): Attributes' values of "Currency" tags.
     """
 
+    section = "Currency"
+
     @property
     def _idx_col(self):
         return ["Nb"]
@@ -184,6 +189,8 @@ class GsbSectionParty(AccountSection):
     Attributes:
         df (pd.DataFrame): Attributes' values of "Party" tags.
     """
+
+    section = "Party"
 
     @property
     def _idx_col(self):
@@ -214,6 +221,8 @@ class GsbSectionCategory(AccountSection):
         df (pd.DataFrame): Attributes' values of "Category" tags.
     """
 
+    section = "Category"
+
     @property
     def _idx_col(self):
         return ["Nb"]
@@ -243,6 +252,8 @@ class GsbSectionSubCategory(AccountSection):
         df (pd.DataFrame): Attributes' values of "SubCategory" tags.
     """
 
+    section = "SubCategory"
+
     @property
     def _idx_col(self):
         return ["Nbc", "Nb"]
@@ -267,6 +278,8 @@ class GsbSectionBudgetary(AccountSection):
     Attributes:
         df (pd.DataFrame): Attributes' values of "Budgetary" tags.
     """
+
+    section = "Budgetary"
 
     @property
     def _idx_col(self):
@@ -297,6 +310,8 @@ class GsbSectionSubBudgetary(AccountSection):
         df (pd.DataFrame): Attributes' values of "SubBudgetary" tags.
     """
 
+    section = "SubBudgetary"
+
     @property
     def _idx_col(self):
         return ["Nbb", "Nb"]
@@ -321,6 +336,8 @@ class GsbSectionTransaction(AccountSection):
     Attributes:
         df (pd.DataFrame): Attributes' values of "Transaction" tags.
     """
+
+    section = "Transaction"
 
     @property
     def _idx_col(self):
@@ -359,6 +376,8 @@ class GsbSectionPayment(AccountSection):
         df (pd.DataFrame): Attributes' values of "Payment" tags.
     """
 
+    section = "Payment"
+
     @property
     def _idx_col(self):
         return ["Number"]
@@ -396,6 +415,8 @@ class GsbSectionFinancial_year(AccountSection):
         df (pd.DataFrame): Attributes' values of "Financial_year" tags.
     """
 
+    section = "Financial_year"
+
     @property
     def _idx_col(self):
         return ["Nb"]
@@ -428,6 +449,8 @@ class GsbSectionReconcile(AccountSection):
     Attributes:
         df (pd.DataFrame): Attributes' values of "Reconcile" tags.
     """
+
+    section = "Reconcile"
 
     @property
     def _idx_col(self):
