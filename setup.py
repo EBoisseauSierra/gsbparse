@@ -5,9 +5,12 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open("VERSION", "r") as version_file:
+    version = version_file.read().strip()
+
 setuptools.setup(
     name="gsbparse",
-    version="0.1.0",
+    version=version,
     url="https://github.com/EBoisseauSierra/gsbparse",
     description="A simple parser for your Grisbi's .gsb account files",
     long_description=long_description,
@@ -17,6 +20,7 @@ setuptools.setup(
     maintainer="Étienne Boisseau-Sierra",
     maintainer_email="etienne.boisseau.sierra@gmail.com",
     packages=setuptools.find_packages(),
+    package_data={"static": ["VERSION"]},
     install_requires=["defusedxml", "pandas"],
     extras_require={
         "dev": ["black", "flake8", "pre-commit", "pylint"],
