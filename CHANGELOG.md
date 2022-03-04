@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/EBoisseauSierra/gsbparse/compare/0.1.0...0.2.0) (2022-03-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* **Transactions:** Use column multiIndex
+
+### Features
+
+* Cast binary columns as booleans ([313e59b](https://github.com/EBoisseauSierra/gsbparse/commit/313e59b53ffad4b533f13327a8d6595c7f1ee84f))
+* **Transactions:** Use column multiIndex ([1b904b7](https://github.com/EBoisseauSierra/gsbparse/commit/1b904b710372866f4780618885684504b9c3aa2e))
+
+
+### Bug Fixes
+
+* Dry Section definition ([401aa5d](https://github.com/EBoisseauSierra/gsbparse/commit/401aa5dde441ba763bc97deeb5e241b77f57293c))
+
 ## 0.1.0 (2022-01-20)
 
 ### Added
