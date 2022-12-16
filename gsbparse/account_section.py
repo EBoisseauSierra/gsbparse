@@ -80,7 +80,7 @@ class AccountSection(metaclass=ABCMeta):
 
         if self._int_cols:
             df[self._int_cols] = df[self._int_cols].apply(
-                pd.to_numeric, downcast="integer"
+                pd.to_numeric, downcast="integer", errors="coerce"
             )
 
         if self._bool_cols:

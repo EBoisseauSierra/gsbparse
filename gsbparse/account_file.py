@@ -14,6 +14,7 @@ from gsbparse.account_section import (
     GsbSectionCurrency,
     GsbSectionFinancial_year,
     GsbSectionParty,
+    GsbSectionPayment,
     GsbSectionReconcile,
     GsbSectionSubBudgetary,
     GsbSectionSubCategory,
@@ -82,6 +83,9 @@ class AccountFile:
         sections["Reconcile"] = GsbSectionReconcile(
             [child.attrib for child in root if child.tag == "Reconcile"]
         )
+        sections["Payment"] = GsbSectionPayment(
+            [child.attrib for child in root if child.tag == "Payment"]
+        )
 
         return sections
 
@@ -134,3 +138,8 @@ class AccountFile:
     def reconcile(self) -> pd.DataFrame:
         """Return records of the Reconcile section as a pd.DataFrame."""
         return self.sections["Reconcile"].df
+
+    @cached_property
+    def payment(self) -> pd.DataFrame:
+        """Return records of the Payment section as a pd.DataFrame."""
+        return self.sections["Payment"].df
