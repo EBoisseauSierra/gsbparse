@@ -80,7 +80,7 @@ class AccountSection(metaclass=ABCMeta):
 
         if self._int_cols:
             df[self._int_cols] = df[self._int_cols].apply(
-                pd.to_numeric, downcast="integer"
+                pd.to_numeric, downcast="integer", errors="coerce"
             )
 
         if self._bool_cols:
@@ -402,10 +402,10 @@ class GsbSectionPayment(AccountSection):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "Transaction"
+            XML_tags_attributes_values (list(dict)): Values of "Payment"
                 tags attributes.
         """
-        super(GsbSectionTransaction, self).__init__(XML_tags_attributes_values)
+        super(GsbSectionPayment, self).__init__(XML_tags_attributes_values)
 
 
 class GsbSectionFinancial_year(AccountSection):
@@ -437,7 +437,7 @@ class GsbSectionFinancial_year(AccountSection):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "Transaction"
+            XML_tags_attributes_values (list(dict)): Values of "Financial_year"
                 tags attributes.
         """
         super(GsbSectionFinancial_year, self).__init__(XML_tags_attributes_values)
@@ -476,7 +476,7 @@ class GsbSectionReconcile(AccountSection):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "Transaction"
+            XML_tags_attributes_values (list(dict)): Values of "Reconcile"
                 tags attributes.
         """
         super(GsbSectionReconcile, self).__init__(XML_tags_attributes_values)
