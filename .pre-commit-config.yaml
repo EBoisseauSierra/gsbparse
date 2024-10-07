@@ -28,12 +28,6 @@ repos:
     hooks:
       - id: bandit
         args: ["--skip", "B101"] # don't check `assert`, as all tests would then raise errors
-  - repo: https://github.com/pycqa/pydocstyle
-    rev: 6.3.0
-    hooks:
-      - id: pydocstyle
-        exclude: ^tests/ # do not force detailed docstrings in tests
-        args: [--convention=google]
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v3.4.0
     hooks:
