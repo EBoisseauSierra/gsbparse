@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      # Update minor and patch versions of Python packages together.
+      # Major version bumps are raised as separate PRs for each package.
+      python:
+        update-types:
+          - "minor"
+          - "patch"
