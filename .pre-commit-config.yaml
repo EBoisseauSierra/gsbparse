@@ -13,8 +13,13 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md] # allow markdown linebreak at EOL
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        exclude: ^gsbparse
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.6.9"
+    rev: v0.6.9
     hooks:
       - id: ruff
         name: "Ruff linting"

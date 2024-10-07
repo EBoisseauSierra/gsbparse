@@ -23,7 +23,7 @@ setuptools.setup(
     package_data={"static": ["VERSION"]},
     install_requires=["defusedxml", "pandas"],
     extras_require={
-        "dev": ["ruff", "pre-commit"],
+        "dev": ["mypy", "pre-commit", "ruff"],
         "test": ["pytest"],
     },
     classifiers=[
