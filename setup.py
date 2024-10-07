@@ -23,15 +23,15 @@ setuptools.setup(
     package_data={"static": ["VERSION"]},
     install_requires=["defusedxml", "pandas"],
     extras_require={
-        "dev": ["black", "flake8", "pre-commit", "pylint"],
-        "test": ["pytest", "pytest-cov"],
+        "dev": ["ruff", "pre-commit"],
+        "test": ["pytest"],
     },
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.12",
     ],
     license="MIT",
-    python_requires=">=3.9",
+    python_requires=">=3.12",
 )
