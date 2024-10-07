@@ -72,36 +72,42 @@ class AccountSection(metaclass=ABCMeta):
     def df(self):
         """Represent the list of records as a pd.DataFrame."""
         # Create df
-        df = pd.DataFrame.from_records(self.records)
+        dataset = pd.DataFrame.from_records(self.records)
 
         # "Improve" df by casting correct columns dtype
         if self._idx_col is not None:
-            df.set_index(self._idx_col, inplace=True)
+            dataset = dataset.set_index(self._idx_col)
 
         if self._int_cols:
-            df[self._int_cols] = df[self._int_cols].apply(
-                pd.to_numeric, downcast="integer", errors="coerce"
+            dataset[self._int_cols] = dataset[self._int_cols].apply(
+                pd.to_numeric,
+                downcast="integer",
+                errors="coerce",
             )
 
         if self._bool_cols:
             # Strings must be cast as integer first so that casting to bool
             # doesn't always yield True.
             # Cf. https://stackoverflow.com/q/52089711/5433628
-            df[self._bool_cols] = (
-                df[self._bool_cols]
+            dataset[self._bool_cols] = (
+                dataset[self._bool_cols]
                 .apply(pd.to_numeric, downcast="integer")
                 .astype("bool")
             )
 
         if self._currency_cols:
-            df[self._currency_cols] = df[self._currency_cols].apply(pd.to_numeric)
-
-        if self._date_cols:
-            df[self._date_cols] = df[self._date_cols].apply(
-                pd.to_datetime, format="%m/%d/%Y", errors="coerce"
+            dataset[self._currency_cols] = dataset[self._currency_cols].apply(
+                pd.to_numeric,
             )
 
-        return df
+        if self._date_cols:
+            dataset[self._date_cols] = dataset[self._date_cols].apply(
+                pd.to_datetime,
+                format="%m/%d/%Y",
+                errors="coerce",
+            )
+
+        return dataset
 
 
 class GsbSectionAccount(AccountSection):
@@ -142,14 +148,14 @@ class GsbSectionAccount(AccountSection):
             "Minimum_authorised_balance",
         ]
 
-    def __init__(self, XML_tags_attributes_values):
+    def __init__(self, xml_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "Account" tags
+            xml_tags_attributes_values (list(dict)): Values of "Account" tags
                 attributes.
         """
-        super(GsbSectionAccount, self).__init__(XML_tags_attributes_values)
+        super().__init__(xml_tags_attributes_values)
 
 
 class GsbSectionCurrency(AccountSection):
@@ -173,14 +179,14 @@ class GsbSectionCurrency(AccountSection):
     def _int_cols(self):
         return ["Fl"]
 
-    def __init__(self, XML_tags_attributes_values):
+    def __init__(self, xml_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "Currency" tags
+            xml_tags_attributes_values (list(dict)): Values of "Currency" tags
                 attributes.
         """
-        super(GsbSectionCurrency, self).__init__(XML_tags_attributes_values)
+        super().__init__(xml_tags_attributes_values)
 
 
 class GsbSectionParty(AccountSection):
@@ -204,14 +210,14 @@ class GsbSectionParty(AccountSection):
     def _bool_cols(self):
         return ["IgnCase", "UseRegex"]
 
-    def __init__(self, XML_tags_attributes_values):
+    def __init__(self, xml_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "Party" tags
+            xml_tags_attributes_values (list(dict)): Values of "Party" tags
                 attributes.
         """
-        super(GsbSectionParty, self).__init__(XML_tags_attributes_values)
+        super().__init__(xml_tags_attributes_values)
 
 
 class GsbSectionCategory(AccountSection):
@@ -235,14 +241,14 @@ class GsbSectionCategory(AccountSection):
     def _bool_cols(self):
         return ["Kd"]
 
-    def __init__(self, XML_tags_attributes_values):
+    def __init__(self, xml_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "Category" tags
+            xml_tags_attributes_values (list(dict)): Values of "Category" tags
                 attributes.
         """
-        super(GsbSectionCategory, self).__init__(XML_tags_attributes_values)
+        super().__init__(xml_tags_attributes_values)
 
 
 class GsbSectionSubCategory(AccountSection):
@@ -262,14 +268,14 @@ class GsbSectionSubCategory(AccountSection):
     def _name_col(self):
         return ["Na"]
 
-    def __init__(self, XML_tags_attributes_values):
+    def __init__(self, xml_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "SubCategory"
+            xml_tags_attributes_values (list(dict)): Values of "SubCategory"
                 tags attributes.
         """
-        super(GsbSectionSubCategory, self).__init__(XML_tags_attributes_values)
+        super().__init__(xml_tags_attributes_values)
 
 
 class GsbSectionBudgetary(AccountSection):
@@ -293,14 +299,14 @@ class GsbSectionBudgetary(AccountSection):
     def _bool_cols(self):
         return ["Kd"]
 
-    def __init__(self, XML_tags_attributes_values):
+    def __init__(self, xml_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "Budgetary" tags
+            xml_tags_attributes_values (list(dict)): Values of "Budgetary" tags
                 attributes.
         """
-        super(GsbSectionBudgetary, self).__init__(XML_tags_attributes_values)
+        super().__init__(xml_tags_attributes_values)
 
 
 class GsbSectionSubBudgetary(AccountSection):
@@ -320,14 +326,14 @@ class GsbSectionSubBudgetary(AccountSection):
     def _name_col(self):
         return ["Na"]
 
-    def __init__(self, XML_tags_attributes_values):
+    def __init__(self, xml_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "SubBudgetary"
+            xml_tags_attributes_values (list(dict)): Values of "SubBudgetary"
                 tags attributes.
         """
-        super(GsbSectionSubBudgetary, self).__init__(XML_tags_attributes_values)
+        super().__init__(xml_tags_attributes_values)
 
 
 class GsbSectionTransaction(AccountSection):
@@ -359,14 +365,14 @@ class GsbSectionTransaction(AccountSection):
     def _date_cols(self):
         return ["Dt", "Dv"]
 
-    def __init__(self, XML_tags_attributes_values):
+    def __init__(self, xml_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "Transaction"
+            xml_tags_attributes_values (list(dict)): Values of "Transaction"
                 tags attributes.
         """
-        super(GsbSectionTransaction, self).__init__(XML_tags_attributes_values)
+        super().__init__(xml_tags_attributes_values)
 
 
 class GsbSectionPayment(AccountSection):
@@ -398,17 +404,17 @@ class GsbSectionPayment(AccountSection):
             "Automatic_number",
         ]
 
-    def __init__(self, XML_tags_attributes_values):
+    def __init__(self, xml_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "Payment"
+            xml_tags_attributes_values (list(dict)): Values of "Payment"
                 tags attributes.
         """
-        super(GsbSectionPayment, self).__init__(XML_tags_attributes_values)
+        super().__init__(xml_tags_attributes_values)
 
 
-class GsbSectionFinancial_year(AccountSection):
+class GsbSectionFinancialYear(AccountSection):
     """Represent the <Financial_year …/> tags of a Grisbi file.
 
     Attributes:
@@ -433,14 +439,14 @@ class GsbSectionFinancial_year(AccountSection):
     def _date_cols(self):
         return ["Bdte", "Edte"]
 
-    def __init__(self, XML_tags_attributes_values):
+    def __init__(self, xml_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "Financial_year"
+            xml_tags_attributes_values (list(dict)): Values of "Financial_year"
                 tags attributes.
         """
-        super(GsbSectionFinancial_year, self).__init__(XML_tags_attributes_values)
+        super().__init__(xml_tags_attributes_values)
 
 
 class GsbSectionReconcile(AccountSection):
@@ -472,11 +478,11 @@ class GsbSectionReconcile(AccountSection):
     def _date_cols(self):
         return ["Idate", "Fdate"]
 
-    def __init__(self, XML_tags_attributes_values):
+    def __init__(self, xml_tags_attributes_values):
         """Build self.df from the list of XML tags attributes values.
 
         Args:
-            XML_tags_attributes_values (list(dict)): Values of "Reconcile"
+            xml_tags_attributes_values (list(dict)): Values of "Reconcile"
                 tags attributes.
         """
-        super(GsbSectionReconcile, self).__init__(XML_tags_attributes_values)
+        super().__init__(xml_tags_attributes_values)
