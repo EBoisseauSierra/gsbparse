@@ -62,9 +62,9 @@ class Transactions:
 
         if columns is None:
             return df
-        elif type(columns) == list:
+        elif type(columns) is list:
             return df[columns]
-        elif type(columns) == dict:
+        elif type(columns) is dict:
             # “Columns name mapper doesn't relate with [index] level.”
             # Cf. https://stackoverflow.com/a/67458211/5433628
             cols_rename_mapping = {key[1]: value for key, value in columns.items()}
