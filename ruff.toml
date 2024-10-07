@@ -1,0 +1,32 @@
+target-version = "py312"
+
+[lint]
+select = [
+    "A", # builtins
+    "B", # bugbear
+    "C4", # comprehensions
+    "COM", # comma
+    # "D", # docstring conventions
+    "E", # all pydocstyle errors
+    "F", # flake8
+    "I", # isort
+    "ICN", # import conventions
+    "ISC", # implicit string concatenation
+    "N", # PEP 8 naming conventions
+    "PD", # pandas
+    "PIE",
+    "PT", # pytest style
+    "Q", # quotes
+    "RET", # return statements
+    "RUF", # Ruff
+    "S", # bandit
+    "SIM", # simplify
+    "SLF", # self
+    "T20",
+    "TID", # tidy imports
+    "TRY", # Tryceratops
+    "UP", # use latest Python conventions
+]
+ignore = [
+    "S101", # allow use of assert
+]

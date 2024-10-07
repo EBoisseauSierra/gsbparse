@@ -1,7 +1,7 @@
 """Define a representation of transactions."""
 
 from functools import cached_property
-from typing import TextIO, Union
+from typing import TextIO
 
 import pandas as pd
 
@@ -20,7 +20,7 @@ class Transactions:
         df (pd.DataFrame): Transactions of the Grisbi file
     """
 
-    def __init__(self, source: Union[str, TextIO]) -> None:
+    def __init__(self, source: str | TextIO) -> None:
         """Create the user-friendly Transactions df from an AccountFile instance."""
         self.source = source
 
@@ -51,24 +51,30 @@ class Transactions:
 
     def get_transactions(
         self,
-        columns: Union[list, dict, None] = None,
+        columns: list | dict | None = None,
         ignore_mother_transactions: bool = False,
     ):
         """Return all or a subset of the transactions."""
         if ignore_mother_transactions:
-            df = self._df[~self._df[("Transaction", "Br")]]
+            dataset = self._df[~self._df[("Transaction", "Br")]]
         else:
-            df = self._df
+            dataset = self._df
 
         if columns is None:
-            return df
-        elif type(columns) == list:
-            return df[columns]
-        elif type(columns) == dict:
+            return dataset
+        if type(columns) is list:
+            return dataset[columns]
+        if type(columns) is dict:
             # “Columns name mapper doesn't relate with [index] level.”
             # Cf. https://stackoverflow.com/a/67458211/5433628
             cols_rename_mapping = {key[1]: value for key, value in columns.items()}
-            return df[columns.keys()].rename(columns=cols_rename_mapping)
+            return dataset[columns.keys()].rename(columns=cols_rename_mapping)
+
+        raise InvalidArgumentTypeError(
+            arg_name="columns",
+            expected_arg_type=list | dict | None,
+            actual_arg_type=type(columns),
+        )
 
     @staticmethod
     def index_column_names(
@@ -192,4 +198,19 @@ class Transactions:
         return self.index_column_names(
             df=self.account_file.sections["Transaction"].df,
             prefix=self.account_file.sections["Transaction"].section,
+        )
+
+
+class InvalidArgumentTypeError(ValueError):
+    """Raised when an invalid argument type is passed to a method."""
+
+    def __init__(
+        self,
+        arg_name: str,
+        expected_arg_type: type,
+        actual_arg_type: type,
+    ) -> None:
+        super().__init__(
+            f"'{arg_name}' arg must be a {expected_arg_type}, "
+            f"got {actual_arg_type} instead.",
         )

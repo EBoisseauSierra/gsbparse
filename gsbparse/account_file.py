@@ -2,9 +2,9 @@
 
 import logging
 from functools import cached_property
-from typing import TextIO, Union
+from typing import TextIO
 
-import defusedxml.ElementTree as ET
+import defusedxml.ElementTree as Et
 import pandas as pd
 
 from gsbparse.account_section import (
@@ -12,7 +12,7 @@ from gsbparse.account_section import (
     GsbSectionBudgetary,
     GsbSectionCategory,
     GsbSectionCurrency,
-    GsbSectionFinancial_year,
+    GsbSectionFinancialYear,
     GsbSectionParty,
     GsbSectionPayment,
     GsbSectionReconcile,
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class AccountFile:
     """Representation of a parsed `.gsb` file."""
 
-    def __init__(self, source: Union[str, TextIO]) -> None:
+    def __init__(self, source: str | TextIO) -> None:
         """Initialize an AccountFile object, given its source (file object or path)."""
         self.source = source
 
@@ -49,42 +49,42 @@ class AccountFile:
         sections = {}
 
         # Read the .gsb XML content
-        tree = ET.parse(self.source)
+        tree = Et.parse(self.source)
         root = tree.getroot()
 
         # Instantiate each GsbSection with tags of the relevant type
         sections["Account"] = GsbSectionAccount(
-            [child.attrib for child in root if child.tag == "Account"]
+            [child.attrib for child in root if child.tag == "Account"],
         )
         sections["Currency"] = GsbSectionCurrency(
-            [child.attrib for child in root if child.tag == "Currency"]
+            [child.attrib for child in root if child.tag == "Currency"],
         )
         sections["Party"] = GsbSectionParty(
-            [child.attrib for child in root if child.tag == "Party"]
+            [child.attrib for child in root if child.tag == "Party"],
         )
         sections["Category"] = GsbSectionCategory(
-            [child.attrib for child in root if child.tag == "Category"]
+            [child.attrib for child in root if child.tag == "Category"],
         )
         sections["Sub_category"] = GsbSectionSubCategory(
-            [child.attrib for child in root if child.tag == "Sub_category"]
+            [child.attrib for child in root if child.tag == "Sub_category"],
         )
         sections["Budgetary"] = GsbSectionBudgetary(
-            [child.attrib for child in root if child.tag == "Budgetary"]
+            [child.attrib for child in root if child.tag == "Budgetary"],
         )
         sections["Sub_budgetary"] = GsbSectionSubBudgetary(
-            [child.attrib for child in root if child.tag == "Sub_budgetary"]
+            [child.attrib for child in root if child.tag == "Sub_budgetary"],
         )
         sections["Transaction"] = GsbSectionTransaction(
-            [child.attrib for child in root if child.tag == "Transaction"]
+            [child.attrib for child in root if child.tag == "Transaction"],
         )
-        sections["Financial_year"] = GsbSectionFinancial_year(
-            [child.attrib for child in root if child.tag == "Financial_year"]
+        sections["Financial_year"] = GsbSectionFinancialYear(
+            [child.attrib for child in root if child.tag == "Financial_year"],
         )
         sections["Reconcile"] = GsbSectionReconcile(
-            [child.attrib for child in root if child.tag == "Reconcile"]
+            [child.attrib for child in root if child.tag == "Reconcile"],
         )
         sections["Payment"] = GsbSectionPayment(
-            [child.attrib for child in root if child.tag == "Payment"]
+            [child.attrib for child in root if child.tag == "Payment"],
         )
 
         return sections
