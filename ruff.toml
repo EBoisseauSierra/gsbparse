@@ -27,3 +27,6 @@ select = [
     "TRY", # Tryceratops
     "UP", # use latest Python conventions
 ]
+ignore = [
+    "S101", # allow use of assert
+]
