@@ -5,6 +5,19 @@ from decimal import Decimal
 from typing import Self
 from xml.etree import ElementTree as ET
 
+from gsbparse2.exceptions import XmlParsingError
+
+
+def parse_null(func):
+    "Return None early if the value is '(null)'"
+
+    def wrapper(value: str, *args, **kwargs):
+        if value == "(null)":
+            return None
+        return func(value, *args, **kwargs)
+
+    return wrapper
+
 
 @dataclass(frozen=True)
 class GsbFileSection(metaclass=ABCMeta):
@@ -13,21 +26,28 @@ class GsbFileSection(metaclass=ABCMeta):
     def from_xml(cls, element: ET.Element) -> Self: ...
 
     @staticmethod
+    @parse_null
     def parse_list_int(list_str: str, separator: str = "-") -> list[int] | None:
-        if list_str == "(null)":
-            return None
         return [int(i) for i in list_str.split(separator)]
 
     @staticmethod
+    @parse_null
     def parse_amount(amount_str: str) -> Decimal:
         return Decimal(amount_str.replace(",", "."))
 
     @staticmethod
+    @parse_null
     def parse_bool(bool_str: str) -> bool:
         return bool(int(bool_str))
 
     @staticmethod
+    @parse_null
     def parse_date(date_str: str) -> date | None:
-        if date_str == "(null)":
-            return None
-        return datetime.strptime(date_str, "%m/%d/%Y").date()
+        try:
+            parsed_date = datetime.strptime(date_str, "%m/%d/%Y").date()
+        except ValueError as e:
+            raise XmlParsingError(
+                value=date_str,
+                expected_type=date,
+            ) from e
+        return parsed_date

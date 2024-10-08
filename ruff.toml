@@ -29,4 +29,8 @@ select = [
 ]
 ignore = [
     "S101", # allow use of assert
+    "ISC001", # allow implicit string concatenation (conflict with formatter)
+    "ISC002", # allow implicit string concatenation (conflict with formatter)
+    "COM812", # trailing comma (conflicts with formatter)
+    "COM819", # forbidden trailing comma (conflicts with formatter)
 ]

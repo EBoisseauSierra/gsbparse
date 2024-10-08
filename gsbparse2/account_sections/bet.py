@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Self
 from xml.etree import ElementTree as ET
 
-from gsbparse.account_sections._abstract_section import GsbFileSection
+from gsbparse2.account_sections._abstract_section import GsbFileSection
 
 
 @dataclass(frozen=True)
@@ -13,8 +13,8 @@ class BetSection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            Ddte=int(element.attrib.get("Ddte")),
+            Ddte=int(element.attrib["Ddte"]),
             Bet_deb_cash_account_option=int(
-                element.attrib.get("Bet_deb_cash_account_option"),
+                element.attrib["Bet_deb_cash_account_option"],
             ),
         )

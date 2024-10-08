@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Self
 from xml.etree import ElementTree as ET
 
-from gsbparse.account_sections._abstract_section import GsbFileSection
+from gsbparse2.account_sections._abstract_section import GsbFileSection
 
 
 @dataclass(frozen=True)
@@ -16,9 +16,9 @@ class CurrencySection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            Nb=int(element.attrib.get("Nb")),
-            Na=element.attrib.get("Na"),
-            Co=element.attrib.get("Co"),
-            Ico=element.attrib.get("Ico"),
-            Fl=int(element.attrib.get("Fl")),
+            Nb=int(element.attrib["Nb"]),
+            Na=element.attrib["Na"],
+            Co=element.attrib["Co"],
+            Ico=element.attrib["Ico"],
+            Fl=int(element.attrib["Fl"]),
         )

@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Self
 from xml.etree import ElementTree as ET
 
-from gsbparse.account_sections._abstract_section import GsbFileSection
+from gsbparse2.account_sections._abstract_section import GsbFileSection
 
 
 @dataclass(frozen=True)
@@ -80,148 +80,148 @@ class GeneralSection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            File_version=element.attrib.get("File_version"),
-            Grisbi_version=element.attrib.get("Grisbi_version"),
-            Crypt_file=cls.parse_bool(element.attrib.get("Crypt_file")),
-            Archive_file=cls.parse_bool(element.attrib.get("Archive_file")),
-            File_title=element.attrib.get("File_title"),
-            Use_icons_file_dir=cls.parse_bool(element.attrib.get("Use_icons_file_dir")),
-            General_address=element.attrib.get("General_address"),
-            Second_general_address=element.attrib.get("Second_general_address"),
-            Date_format=element.attrib.get("Date_format"),
-            Decimal_point=element.attrib.get("Decimal_point"),
-            Thousands_separator=element.attrib.get("Thousands_separator"),
+            File_version=element.attrib["File_version"],
+            Grisbi_version=element.attrib["Grisbi_version"],
+            Crypt_file=cls.parse_bool(element.attrib["Crypt_file"]),
+            Archive_file=cls.parse_bool(element.attrib["Archive_file"]),
+            File_title=element.attrib["File_title"],
+            Use_icons_file_dir=cls.parse_bool(element.attrib["Use_icons_file_dir"]),
+            General_address=element.attrib["General_address"],
+            Second_general_address=element.attrib["Second_general_address"],
+            Date_format=element.attrib["Date_format"],
+            Decimal_point=element.attrib["Decimal_point"],
+            Thousands_separator=element.attrib["Thousands_separator"],
             Party_list_currency_number=int(
-                element.attrib.get("Party_list_currency_number"),
+                element.attrib["Party_list_currency_number"],
             ),
             Category_list_currency_number=int(
-                element.attrib.get("Category_list_currency_number"),
+                element.attrib["Category_list_currency_number"],
             ),
             Budget_list_currency_number=int(
-                element.attrib.get("Budget_list_currency_number"),
+                element.attrib["Budget_list_currency_number"],
             ),
             Navigation_list_order=cls.parse_list_int(
-                element.attrib.get("Navigation_list_order"),
+                element.attrib["Navigation_list_order"],
             ),
-            Scheduler_view=cls.parse_bool(element.attrib.get("Scheduler_view")),
+            Scheduler_view=cls.parse_bool(element.attrib["Scheduler_view"]),
             Scheduler_custom_number=cls.parse_bool(
-                element.attrib.get("Scheduler_custom_number"),
+                element.attrib["Scheduler_custom_number"],
             ),
             Scheduler_custom_menu=cls.parse_bool(
-                element.attrib.get("Scheduler_custom_menu"),
+                element.attrib["Scheduler_custom_menu"],
             ),
             Scheduler_set_default_account=cls.parse_bool(
-                element.attrib.get("Scheduler_set_default_account"),
+                element.attrib["Scheduler_set_default_account"],
             ),
             Scheduler_default_account_number=cls.parse_bool(
-                element.attrib.get("Scheduler_default_account_number"),
+                element.attrib["Scheduler_default_account_number"],
             ),
             Scheduler_set_fixed_date=cls.parse_bool(
-                element.attrib.get("Scheduler_set_fixed_date"),
+                element.attrib["Scheduler_set_fixed_date"],
             ),
             Scheduler_default_fixed_date=cls.parse_bool(
-                element.attrib.get("Scheduler_default_fixed_date"),
+                element.attrib["Scheduler_default_fixed_date"],
             ),
-            Import_interval_search=int(element.attrib.get("Import_interval_search")),
+            Import_interval_search=int(element.attrib["Import_interval_search"]),
             Import_copy_payee_in_note=cls.parse_bool(
-                element.attrib.get("Import_copy_payee_in_note"),
+                element.attrib["Import_copy_payee_in_note"],
             ),
             Import_extract_number_for_check=cls.parse_bool(
-                element.attrib.get("Import_extract_number_for_check"),
+                element.attrib["Import_extract_number_for_check"],
             ),
             Import_fusion_transactions=cls.parse_bool(
-                element.attrib.get("Import_fusion_transactions"),
+                element.attrib["Import_fusion_transactions"],
             ),
             Import_categorie_for_payee=cls.parse_bool(
-                element.attrib.get("Import_categorie_for_payee"),
+                element.attrib["Import_categorie_for_payee"],
             ),
             Import_fyear_by_value_date=cls.parse_bool(
-                element.attrib.get("Import_fyear_by_value_date"),
+                element.attrib["Import_fyear_by_value_date"],
             ),
             Import_qif_no_import_categories=cls.parse_bool(
-                element.attrib.get("Import_qif_no_import_categories"),
+                element.attrib["Import_qif_no_import_categories"],
             ),
             Import_qif_use_field_extract_method_payment=cls.parse_bool(
-                element.attrib.get("Import_qif_use_field_extract_method_payment"),
+                element.attrib["Import_qif_use_field_extract_method_payment"],
             ),
-            Export_file_format=cls.parse_bool(element.attrib.get("Export_file_format")),
+            Export_file_format=cls.parse_bool(element.attrib["Export_file_format"]),
             Export_files_traitement=cls.parse_bool(
-                element.attrib.get("Export_files_traitement"),
+                element.attrib["Export_files_traitement"],
             ),
             Export_force_US_dates=cls.parse_bool(
-                element.attrib.get("Export_force_US_dates"),
+                element.attrib["Export_force_US_dates"],
             ),
             Export_force_US_numbers=cls.parse_bool(
-                element.attrib.get("Export_force_US_numbers"),
+                element.attrib["Export_force_US_numbers"],
             ),
-            Export_quote_dates=cls.parse_bool(element.attrib.get("Export_quote_dates")),
+            Export_quote_dates=cls.parse_bool(element.attrib["Export_quote_dates"]),
             Form_date_force_prev_year=cls.parse_bool(
-                element.attrib.get("Form_date_force_prev_year"),
+                element.attrib["Form_date_force_prev_year"],
             ),
-            Form_columns_number=int(element.attrib.get("Form_columns_number")),
-            Form_lines_number=int(element.attrib.get("Form_lines_number")),
+            Form_columns_number=int(element.attrib["Form_columns_number"]),
+            Form_lines_number=int(element.attrib["Form_lines_number"]),
             Form_organization=cls.parse_list_int(
-                element.attrib.get("Form_organization"),
+                element.attrib["Form_organization"],
             ),
-            Reconcile_end_date=cls.parse_bool(element.attrib.get("Reconcile_end_date")),
-            Reconcile_sort=cls.parse_bool(element.attrib.get("Reconcile_sort")),
-            Use_logo=cls.parse_bool(element.attrib.get("Use_logo")),
-            Name_logo=element.attrib.get("Name_logo"),
+            Reconcile_end_date=cls.parse_bool(element.attrib["Reconcile_end_date"]),
+            Reconcile_sort=cls.parse_bool(element.attrib["Reconcile_sort"]),
+            Use_logo=cls.parse_bool(element.attrib["Use_logo"]),
+            Name_logo=element.attrib["Name_logo"],
             Remind_display_per_account=cls.parse_bool(
-                element.attrib.get("Remind_display_per_account"),
+                element.attrib["Remind_display_per_account"],
             ),
             Transactions_view=cls.parse_list_int(
-                element.attrib.get("Transactions_view"),
+                element.attrib["Transactions_view"],
             ),
-            Two_lines_showed=cls.parse_bool(element.attrib.get("Two_lines_showed")),
-            Three_lines_showed=cls.parse_bool(element.attrib.get("Three_lines_showed")),
+            Two_lines_showed=cls.parse_bool(element.attrib["Two_lines_showed"]),
+            Three_lines_showed=cls.parse_bool(element.attrib["Three_lines_showed"]),
             Transaction_column_width=cls.parse_list_int(
-                element.attrib.get("Transaction_column_width"),
+                element.attrib["Transaction_column_width"],
             ),
             Transaction_column_align=cls.parse_list_int(
-                element.attrib.get("Transaction_column_align"),
+                element.attrib["Transaction_column_align"],
             ),
             Scheduler_column_width=cls.parse_list_int(
-                element.attrib.get("Scheduler_column_width"),
+                element.attrib["Scheduler_column_width"],
             ),
             Combofix_mixed_sort=cls.parse_bool(
-                element.attrib.get("Combofix_mixed_sort"),
+                element.attrib["Combofix_mixed_sort"],
             ),
             Combofix_case_sensitive=cls.parse_bool(
-                element.attrib.get("Combofix_case_sensitive"),
+                element.attrib["Combofix_case_sensitive"],
             ),
             Combofix_force_payee=cls.parse_bool(
-                element.attrib.get("Combofix_force_payee"),
+                element.attrib["Combofix_force_payee"],
             ),
             Combofix_force_category=cls.parse_bool(
-                element.attrib.get("Combofix_force_category"),
+                element.attrib["Combofix_force_category"],
             ),
             Automatic_amount_separator=cls.parse_bool(
-                element.attrib.get("Automatic_amount_separator"),
+                element.attrib["Automatic_amount_separator"],
             ),
-            CSV_separator=element.attrib.get("CSV_separator"),
+            CSV_separator=element.attrib["CSV_separator"],
             CSV_force_date_valeur_with_date=cls.parse_bool(
-                element.attrib.get("CSV_force_date_valeur_with_date"),
+                element.attrib["CSV_force_date_valeur_with_date"],
             ),
             Metatree_assoc_mode=cls.parse_bool(
-                element.attrib.get("Metatree_assoc_mode"),
+                element.attrib["Metatree_assoc_mode"],
             ),
             Metatree_sort_transactions=cls.parse_bool(
-                element.attrib.get("Metatree_sort_transactions"),
+                element.attrib["Metatree_sort_transactions"],
             ),
             Metatree_unarchived_payees=cls.parse_bool(
-                element.attrib.get("Metatree_unarchived_payees"),
+                element.attrib["Metatree_unarchived_payees"],
             ),
             Add_archive_in_total_balance=cls.parse_bool(
-                element.attrib.get("Add_archive_in_total_balance"),
+                element.attrib["Add_archive_in_total_balance"],
             ),
             Bet_array_column_width=cls.parse_list_int(
-                element.attrib.get("Bet_array_column_width"),
+                element.attrib["Bet_array_column_width"],
             ),
-            Bet_capital=cls.parse_amount(element.attrib.get("Bet_capital")),
-            Bet_currency=int(element.attrib.get("Bet_currency")),
-            Bet_taux_annuel=cls.parse_amount(element.attrib.get("Bet_taux_annuel")),
-            Bet_index_duree=int(element.attrib.get("Bet_index_duree")),
-            Bet_frais=cls.parse_amount(element.attrib.get("Bet_capital")),
-            Bet_type_taux=int(element.attrib.get("Bet_type_taux")),
+            Bet_capital=cls.parse_amount(element.attrib["Bet_capital"]),
+            Bet_currency=int(element.attrib["Bet_currency"]),
+            Bet_taux_annuel=cls.parse_amount(element.attrib["Bet_taux_annuel"]),
+            Bet_index_duree=int(element.attrib["Bet_index_duree"]),
+            Bet_frais=cls.parse_amount(element.attrib["Bet_capital"]),
+            Bet_type_taux=int(element.attrib["Bet_type_taux"]),
         )
