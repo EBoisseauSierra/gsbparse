@@ -47,7 +47,7 @@ class GsbFileSection(metaclass=ABCMeta):
 
     @staticmethod
     @parse_null
-    def parse_date(date_str: str) -> date | None:
+    def parse_date(date_str: str) -> date:
         try:
             parsed_date = datetime.strptime(date_str, "%m/%d/%Y").date()
         except ValueError as e:
