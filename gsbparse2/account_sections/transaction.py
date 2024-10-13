@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from enum import Enum
 from typing import Self
 from xml.etree import ElementTree as ET
 
@@ -58,9 +59,9 @@ class TransactionSection(GsbFileSection):
             No=element.attrib["No"],
             Pn=int(element.attrib["Pn"]),
             Pc=element.attrib["Pc"],
-            Ma=int(element.attrib["Ma"]),
+            Ma=ReconcileStatus(int(element.attrib["Ma"])),
             Ar=int(element.attrib["Ar"]),
-            Au=int(element.attrib["Au"]),
+            Au=cls.parse_bool(element.attrib["Au"]),
             Re=int(element.attrib["Re"]),
             Fi=int(element.attrib["Fi"]),
             Bu=int(element.attrib["Bu"]),
@@ -70,3 +71,10 @@ class TransactionSection(GsbFileSection):
             Trt=int(element.attrib["Trt"]),
             Mo=int(element.attrib["Mo"]),
         )
+
+
+class ReconcileStatus(Enum):
+    not_reconciled = 0
+    pointed = 1
+    t = 2
+    reconciled = 3
