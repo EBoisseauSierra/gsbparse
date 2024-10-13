@@ -1,4 +1,5 @@
 from typing import Any
+from xml.etree.ElementTree import Element
 
 
 class XmlParsingError(ValueError):
@@ -23,3 +24,16 @@ class SectionNotFoundError(ValueError):
 class InvalidSectionTypeError(TypeError):
     def __init__(self, expected_type: type, actual_type: type):
         super().__init__(f"Expected {expected_type}, got {expected_type}")
+
+
+class InvalidGsbFileError(TypeError):
+    def __init__(self):
+        super().__init__(f"Root element is not an instance of {Element}")
+
+
+class InvalidGsbFileRootError(ValueError):
+    def __init__(self, tag: str):
+        super().__init__(
+            "Root element tag for the '.gsb' file must be 'Grisbi'. "
+            f"Got {tag} instead."
+        )

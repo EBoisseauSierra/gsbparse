@@ -6,8 +6,6 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Self
 
-from defusedxml import ElementTree as ET  # noqa: N817
-
 from gsbparse2.account_sections._abstract_section import GsbFileSection
 from gsbparse2.account_sections.account import AccountSection
 from gsbparse2.account_sections.bank import BankSection
@@ -28,6 +26,7 @@ from gsbparse2.exceptions import (
     InvalidElementCountError,
     SectionNotFoundError,
 )
+from gsbparse2.xml import read_file
 
 GsbSectionsToInstancesMapping = dict[type[GsbFileSection], list[GsbFileSection]]
 
@@ -102,16 +101,15 @@ class GsbFile:
             list[GsbFileSection]
         )
 
-        with open(path, encoding="utf-8") as file:
-            xml_tree = ET.parse(file)
-            root = xml_tree.getroot()
+        gsb_file = read_file(path)
 
-            for child in root:
-                try:
-                    section = cls._ELEMENT_TAG_TO_SECTION[child.tag]
-                except KeyError:
-                    cls.logger.warning(f"Unknown section: {child.tag}. Ignoring.")
-                sections[section].append(section.from_xml(child))
+        for element in gsb_file:
+            try:
+                section = cls._ELEMENT_TAG_TO_SECTION[element.tag]
+            except KeyError:
+                cls.logger.warning(f"Unknown section: {element.tag}. Ignoring.")
+                continue
+            sections[section].append(section.from_xml(element))
         return dict(sections)
 
     @staticmethod
