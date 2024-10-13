@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Self
+from typing import Literal, Self
 from xml.etree import ElementTree as ET
 
 from gsbparse2.exceptions import XmlParsingError
@@ -37,7 +37,12 @@ class GsbFileSection(metaclass=ABCMeta):
 
     @staticmethod
     @parse_null
-    def parse_bool(bool_str: str) -> bool:
+    def parse_bool(bool_str: Literal["0", "1"]) -> bool:
+        if bool_str not in {"0", "1"}:
+            raise XmlParsingError(
+                value=bool_str,
+                expected_type=Literal["0", "1"],
+            )
         return bool(int(bool_str))
 
     @staticmethod
