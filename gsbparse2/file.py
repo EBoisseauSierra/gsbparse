@@ -2,15 +2,19 @@ import logging
 from collections import defaultdict
 from collections.abc import Mapping
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path
 from types import MappingProxyType
 from typing import Self
+
+import pandas as pd
 
 from gsbparse2.account_sections._abstract_section import GsbFileSection
 from gsbparse2.account_sections.account import AccountSection
 from gsbparse2.account_sections.bank import BankSection
 from gsbparse2.account_sections.bet import BetSection
 from gsbparse2.account_sections.bet_graph import BetGraphSection
+from gsbparse2.account_sections.budgetary import BudgetarySection
 from gsbparse2.account_sections.category import CategorySection
 from gsbparse2.account_sections.currency import CurrencySection
 from gsbparse2.account_sections.general import GeneralSection
@@ -20,6 +24,7 @@ from gsbparse2.account_sections.print import PrintSection
 from gsbparse2.account_sections.reconcile import ReconcileSection
 from gsbparse2.account_sections.rgba import RGBASection
 from gsbparse2.account_sections.scheduled import ScheduledSection
+from gsbparse2.account_sections.subbudgetary import SubbudgetarySection
 from gsbparse2.account_sections.subcategory import SubcategorySection
 from gsbparse2.account_sections.transaction import TransactionSection
 from gsbparse2.exceptions import (
@@ -48,6 +53,8 @@ class GsbFile:
     Reconcile: list[ReconcileSection] | None = None
     Bet: list[BetSection] | None = None
     Bet_graph: list[BetGraphSection] | None = None
+    Budgetary: list[BudgetarySection] | None = None
+    Sub_budgetary: list[SubbudgetarySection] | None = None
 
     _ELEMENT_TAG_TO_SECTION: Mapping[str, type[GsbFileSection]] = MappingProxyType(
         {
@@ -55,6 +62,7 @@ class GsbFile:
             "Bank": BankSection,
             "Bet_graph": BetGraphSection,
             "Bet": BetSection,
+            "Budgetary": BudgetarySection,
             "Category": CategorySection,
             "Currency": CurrencySection,
             "General": GeneralSection,
@@ -64,6 +72,7 @@ class GsbFile:
             "Reconcile": ReconcileSection,
             "RGBA": RGBASection,
             "Scheduled": ScheduledSection,
+            "Sub_budgetary": SubbudgetarySection,
             "Sub_category": SubcategorySection,
             "Transaction": TransactionSection,
         }
@@ -131,3 +140,151 @@ class GsbFile:
             return elements[0]
 
         return elements
+
+    @cached_property
+    def transactions(self) -> list[dict]:
+        self._generate_sections_dicts()
+        return [
+            self._populate_transaction_details(transaction)
+            for transaction in self.Transaction
+        ]
+
+    def _generate_sections_dicts(self) -> None:
+        self._accounts = self._generate_section_dict(self.Account, "Number")
+        self._budgetary = self._generate_section_dict(self.Budgetary, "Nb")
+        self._categories = self._generate_section_dict(self.Category, "Nb")
+        self._currency = self._generate_section_dict(self.Currency, "Nb")
+        self._party = self._generate_section_dict(self.Party, "Nb")
+        self._payment = self._generate_section_dict(self.Payment, "Number")
+        self._reconcile = self._generate_section_dict(self.Reconcile, "Nb")
+        self._subbudgetary = self._generate_section_dict_multiple_keys(
+            self.Sub_budgetary, ("Nbb", "Nb")
+        )
+        self._subcategory = self._generate_section_dict_multiple_keys(
+            self.Sub_category, ("Nbc", "Nb")
+        )
+
+    @staticmethod
+    def _generate_section_dict(
+        section: type[GsbFileSection], key: str
+    ) -> dict[int, list[GsbFileSection]]:
+        if section is None:
+            return {}
+        return {getattr(element, key): element for element in section}
+
+    @staticmethod
+    def _generate_section_dict_multiple_keys(
+        section: type[GsbFileSection], keys: tuple[str, str]
+    ) -> dict[tuple[int, int], list[GsbFileSection]]:
+        main_key, sub_key = keys
+
+        if section is None:
+            return {}
+
+        return {
+            (getattr(element, main_key), getattr(element, sub_key)): element
+            for element in section
+        }
+
+    def _populate_transaction_details(self, transaction: TransactionSection) -> dict:
+        # TODO: Use namedtuples instead of dicts for better performance
+        return {
+            "id": transaction.Nb,
+            "ofx_import_id": transaction.Id,
+            "account_name": self._get_attribute(self._accounts, transaction.Ac, "Name"),
+            "account_owner": self._get_attribute(
+                self._accounts, transaction.Ac, "Owner"
+            ),
+            "account_is_closed": self._get_attribute(
+                self._accounts, transaction.Ac, "Closed_account"
+            ),
+            "date_transaction": transaction.Dt,
+            "date_value": transaction.Dv,
+            "currency_name": self._get_attribute(self._currency, transaction.Cu, "Na"),
+            "currency_symbol": self._get_attribute(
+                self._currency, transaction.Cu, "Co"
+            ),
+            "currency_iso_code": self._get_attribute(
+                self._currency, transaction.Cu, "Ico"
+            ),
+            "amount": transaction.Am,
+            "exchange_rate": transaction.Exr,
+            "exchange_fee": transaction.Exf,
+            "party": self._get_attribute(self._party, transaction.Pa, "Na"),
+            "category": self._get_attribute(self._categories, transaction.Ca, "Na"),
+            "subcategory": self._get_attribute(
+                self._subcategory, (transaction.Ca, transaction.Sca), "Na"
+            ),
+            "is_breakdown_transaction": transaction.Br,
+            "mother_transaction_id": transaction.Mo,
+            "note": transaction.No,
+            "payment_method": self._get_attribute(
+                self._payment, transaction.Pn, "Name"
+            ),
+            "payment_method_content": transaction.Pc,
+            "reconcile_status": transaction.Ma.name,
+            "reconcile": self._get_attribute(self._reconcile, transaction.Re, "Na"),
+            "archive": transaction.Ar,
+            "is_automatic": transaction.Au,
+            "fiscal_year": transaction.Fi,
+            "budgetary_line": self._get_attribute(
+                self._budgetary, transaction.Bu, "Na"
+            ),
+            "subbudgetary_line": self._get_attribute(
+                self._subbudgetary, (transaction.Bu, transaction.Sbu), "Na"
+            ),
+        }
+
+    @staticmethod
+    def _get_attribute(
+        elements: dict[int, GsbFileSection], key: int | tuple[int, int], attribute: str
+    ):
+        try:
+            element = elements[key]
+        except KeyError:
+            return None
+
+        return getattr(element, attribute)
+
+    def to_csv(self, path: str | Path) -> None:
+        import csv
+
+        with open(path, "w") as csv_file:
+            writer = csv.DictWriter(
+                csv_file,
+                fieldnames=[
+                    "id",
+                    "ofx_import_id",
+                    "account_name",
+                    "account_owner",
+                    "account_is_closed",
+                    "date_transaction",
+                    "date_value",
+                    "currency_name",
+                    "currency_symbol",
+                    "currency_iso_code",
+                    "amount",
+                    "exchange_rate",
+                    "exchange_fee",
+                    "party",
+                    "category",
+                    "subcategory",
+                    "is_breakdown_transaction",
+                    "mother_transaction_id",
+                    "note",
+                    "payment_method",
+                    "payment_method_content",
+                    "reconcile_status",
+                    "reconcile",
+                    "archive",
+                    "is_automatic",
+                    "fiscal_year",
+                    "budgetary_line",
+                    "subbudgetary_line",
+                ],
+            )
+            writer.writeheader()
+            writer.writerows(self.transactions)
+
+    def to_df(self) -> pd.DataFrame:
+        return pd.DataFrame(self.transactions)
