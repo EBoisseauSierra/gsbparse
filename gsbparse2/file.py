@@ -33,21 +33,21 @@ GsbSectionsToInstancesMapping = dict[type[GsbFileSection], list[GsbFileSection]]
 
 @dataclass
 class GsbFile:
-    General: GeneralSection | None
-    RGBA: RGBASection | None
-    Print: PrintSection | None
-    Currency: list[CurrencySection] | None
-    Account: list[AccountSection] | None
-    Payment: list[PaymentSection] | None
-    Transaction: list[TransactionSection] | None
-    Scheduled: list[ScheduledSection] | None
-    Party: list[PartySection] | None
-    Category: list[CategorySection] | None
-    Sub_category: list[SubcategorySection] | None
-    Bank: list[BankSection] | None
-    Reconcile: list[ReconcileSection] | None
-    Bet: list[BetSection] | None
-    Bet_graph: list[BetGraphSection] | None
+    General: GeneralSection | None = None
+    RGBA: RGBASection | None = None
+    Print: PrintSection | None = None
+    Currency: list[CurrencySection] | None = None
+    Account: list[AccountSection] | None = None
+    Payment: list[PaymentSection] | None = None
+    Transaction: list[TransactionSection] | None = None
+    Scheduled: list[ScheduledSection] | None = None
+    Party: list[PartySection] | None = None
+    Category: list[CategorySection] | None = None
+    Sub_category: list[SubcategorySection] | None = None
+    Bank: list[BankSection] | None = None
+    Reconcile: list[ReconcileSection] | None = None
+    Bet: list[BetSection] | None = None
+    Bet_graph: list[BetGraphSection] | None = None
 
     _ELEMENT_TAG_TO_SECTION: Mapping[str, type[GsbFileSection]] = MappingProxyType(
         {
