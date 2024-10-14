@@ -25,7 +25,7 @@ def parse_optional(func):
     def wrapper(*args, is_optional: bool = False, **kwargs):
         try:
             return func(*args, **kwargs)
-        except (XmlParsingError, KeyError, AttributeError) as e:
+        except (XmlParsingError, KeyError, AttributeError, TypeError) as e:
             if is_optional:
                 return None
             raise e  # noqa: TRY201
@@ -74,3 +74,15 @@ class GsbFileSection(metaclass=ABCMeta):
                 expected_type=date,
             ) from e
         return parsed_date
+
+    @staticmethod
+    @parse_null
+    @parse_optional
+    def parse_int(int_str: str) -> int:
+        return int(int_str)
+
+    @staticmethod
+    @parse_null
+    @parse_optional
+    def parse_str(str_str: str) -> str:
+        return str_str
