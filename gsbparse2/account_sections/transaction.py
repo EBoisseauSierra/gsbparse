@@ -78,3 +78,4 @@ class ReconcileStatus(Enum):
     pointed = 1
     t = 2
     reconciled = 3
+    error = -1

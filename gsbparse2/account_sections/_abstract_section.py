@@ -25,7 +25,7 @@ def parse_optional(func):
     def wrapper(*args, is_optional: bool = False, **kwargs):
         try:
             return func(*args, **kwargs)
-        except (XmlParsingError, KeyError) as e:
+        except (XmlParsingError, KeyError, AttributeError) as e:
             if is_optional:
                 return None
             raise e  # noqa: TRY201

@@ -11,21 +11,30 @@ import pandas as pd
 
 from gsbparse2.account_sections._abstract_section import GsbFileSection
 from gsbparse2.account_sections.account import AccountSection
+from gsbparse2.account_sections.amount_comparison import AmountComparisonSection
+from gsbparse2.account_sections.archive import ArchiveSection
 from gsbparse2.account_sections.bank import BankSection
 from gsbparse2.account_sections.bet import BetSection
+from gsbparse2.account_sections.bet_future import BetFutureSection
 from gsbparse2.account_sections.bet_graph import BetGraphSection
+from gsbparse2.account_sections.bet_historical import BetHistoricalSection
 from gsbparse2.account_sections.budgetary import BudgetarySection
 from gsbparse2.account_sections.category import CategorySection
 from gsbparse2.account_sections.currency import CurrencySection
+from gsbparse2.account_sections.currency_link import CurrencyLinkSection
+from gsbparse2.account_sections.financial_year import FinancialYearSection
 from gsbparse2.account_sections.general import GeneralSection
+from gsbparse2.account_sections.partial_balance import PartialBalanceSection
 from gsbparse2.account_sections.party import PartySection
 from gsbparse2.account_sections.payment import PaymentSection
 from gsbparse2.account_sections.print import PrintSection
 from gsbparse2.account_sections.reconcile import ReconcileSection
+from gsbparse2.account_sections.report import ReportSection
 from gsbparse2.account_sections.rgba import RGBASection
 from gsbparse2.account_sections.scheduled import ScheduledSection
 from gsbparse2.account_sections.subbudgetary import SubbudgetarySection
 from gsbparse2.account_sections.subcategory import SubcategorySection
+from gsbparse2.account_sections.text_comparison import TextComparisonSection
 from gsbparse2.account_sections.transaction import TransactionSection
 from gsbparse2.exceptions import (
     InvalidElementCountError,
@@ -42,6 +51,8 @@ class GsbFile:
     RGBA: RGBASection | None = None
     Print: PrintSection | None = None
     Currency: list[CurrencySection] | None = None
+    Currency_link: list[CurrencyLinkSection] | None = None
+    Financial_year: list[FinancialYearSection] | None = None
     Account: list[AccountSection] | None = None
     Payment: list[PaymentSection] | None = None
     Transaction: list[TransactionSection] | None = None
@@ -53,8 +64,15 @@ class GsbFile:
     Reconcile: list[ReconcileSection] | None = None
     Bet: list[BetSection] | None = None
     Bet_graph: list[BetGraphSection] | None = None
+    Bet_historical: list[BetHistoricalSection] | None = None
+    Bet_future: list[BetFutureSection] | None = None
     Budgetary: list[BudgetarySection] | None = None
     Sub_budgetary: list[SubbudgetarySection] | None = None
+    Partial_balance: list[PartialBalanceSection] | None = None
+    Report: list[ReportSection] | None = None
+    Text_comparison: list[TextComparisonSection] | None = None
+    Amount_comparison: list[AmountComparisonSection] | None = None
+    Archive: list[ArchiveSection] | None = None
 
     _ELEMENT_TAG_TO_SECTION: Mapping[str, type[GsbFileSection]] = MappingProxyType(
         {
@@ -65,6 +83,8 @@ class GsbFile:
             "Budgetary": BudgetarySection,
             "Category": CategorySection,
             "Currency": CurrencySection,
+            "Currency_link": CurrencyLinkSection,
+            "Financial_year": FinancialYearSection,
             "General": GeneralSection,
             "Party": PartySection,
             "Payment": PaymentSection,
@@ -75,6 +95,13 @@ class GsbFile:
             "Sub_budgetary": SubbudgetarySection,
             "Sub_category": SubcategorySection,
             "Transaction": TransactionSection,
+            "Partial_balance": PartialBalanceSection,
+            "Bet_historical": BetHistoricalSection,
+            "Bet_future": BetFutureSection,
+            "Report": ReportSection,
+            "Text_comparison": TextComparisonSection,
+            "Amount_comparison": AmountComparisonSection,
+            "Archive": ArchiveSection,
         }
     )
 
@@ -90,6 +117,8 @@ class GsbFile:
             RGBA=cls.get_elements(sections, RGBASection, single_element=True),  # type: ignore[arg-type]
             Print=cls.get_elements(sections, PrintSection, single_element=True),  # type: ignore[arg-type]
             Currency=cls.get_elements(sections, CurrencySection),  # type: ignore[arg-type]
+            Currency_link=cls.get_elements(sections, CurrencyLinkSection),  # type: ignore[arg-type]
+            Financial_year=cls.get_elements(sections, FinancialYearSection),  # type: ignore[arg-type]
             Account=cls.get_elements(sections, AccountSection),  # type: ignore[arg-type]
             Payment=cls.get_elements(sections, PaymentSection),  # type: ignore[arg-type]
             Transaction=cls.get_elements(sections, TransactionSection),  # type: ignore[arg-type]
@@ -101,6 +130,15 @@ class GsbFile:
             Reconcile=cls.get_elements(sections, ReconcileSection),  # type: ignore[arg-type]
             Bet=cls.get_elements(sections, BetSection),  # type: ignore[arg-type]
             Bet_graph=cls.get_elements(sections, BetGraphSection),  # type: ignore[arg-type]
+            Partial_balance=cls.get_elements(sections, PartialBalanceSection),  # type: ignore[arg-type]
+            Bet_historical=cls.get_elements(sections, BetHistoricalSection),  # type: ignore[arg-type]
+            Bet_future=cls.get_elements(sections, BetFutureSection),  # type: ignore[arg-type]
+            Report=cls.get_elements(sections, ReportSection),  # type: ignore[arg-type]
+            Budgetary=cls.get_elements(sections, BudgetarySection),  # type: ignore[arg-type]
+            Sub_budgetary=cls.get_elements(sections, SubbudgetarySection),  # type: ignore[arg-type]
+            Text_comparison=cls.get_elements(sections, TextComparisonSection),  # type: ignore[arg-type]
+            Amount_comparison=cls.get_elements(sections, AmountComparisonSection),  # type: ignore[arg-type]
+            Archive=cls.get_elements(sections, ArchiveSection),  # type: ignore[arg-type]
         )
 
     @classmethod
@@ -163,6 +201,7 @@ class GsbFile:
         self._subcategory = self._generate_section_dict_multiple_keys(
             self.Sub_category, ("Nbc", "Nb")
         )
+        self._financial_year = self._generate_section_dict(self.Financial_year, "Nb")
 
     @staticmethod
     def _generate_section_dict(
@@ -226,7 +265,9 @@ class GsbFile:
             "reconcile": self._get_attribute(self._reconcile, transaction.Re, "Na"),
             "archive": transaction.Ar,
             "is_automatic": transaction.Au,
-            "fiscal_year": transaction.Fi,
+            "financial_year": self._get_attribute(
+                self._financial_year, transaction.Fi, "Na"
+            ),
             "budgetary_line": self._get_attribute(
                 self._budgetary, transaction.Bu, "Na"
             ),
