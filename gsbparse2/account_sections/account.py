@@ -37,7 +37,7 @@ class AccountSection(GsbFileSection):
     Ascending_sort: bool
     Column_sort: int
     Sorting_kind_column: list[int] | None
-    Bet_use_budget: bool
+    Bet_use_budget: int
 
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
@@ -79,5 +79,5 @@ class AccountSection(GsbFileSection):
             Sorting_kind_column=cls.parse_list_int(
                 element.attrib["Sorting_kind_column"],
             ),
-            Bet_use_budget=cls.parse_bool(element.attrib["Bet_use_budget"]),
+            Bet_use_budget=int(element.attrib["Bet_use_budget"]),
         )
