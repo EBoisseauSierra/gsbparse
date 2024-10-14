@@ -19,6 +19,20 @@ def parse_null(func):
     return wrapper
 
 
+def parse_optional(func):
+    "Catch exception gracefully if parsing the record failed and is optional"
+
+    def wrapper(*args, is_optional: bool = False, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except (XmlParsingError, KeyError) as e:
+            if is_optional:
+                return None
+            raise e  # noqa: TRY201
+
+    return wrapper
+
+
 @dataclass(frozen=True)
 class GsbFileSection(metaclass=ABCMeta):
     @classmethod
@@ -27,16 +41,19 @@ class GsbFileSection(metaclass=ABCMeta):
 
     @staticmethod
     @parse_null
+    @parse_optional
     def parse_list_int(list_str: str, separator: str = "-") -> list[int] | None:
         return [int(i) for i in list_str.split(separator)]
 
     @staticmethod
     @parse_null
+    @parse_optional
     def parse_amount(amount_str: str) -> Decimal:
         return Decimal(amount_str.replace(",", "."))
 
     @staticmethod
     @parse_null
+    @parse_optional
     def parse_bool(bool_str: Literal["0", "1"]) -> bool:
         if bool_str not in {"0", "1"}:
             raise XmlParsingError(
@@ -47,6 +64,7 @@ class GsbFileSection(metaclass=ABCMeta):
 
     @staticmethod
     @parse_null
+    @parse_optional
     def parse_date(date_str: str) -> date:
         try:
             parsed_date = datetime.strptime(date_str, "%m/%d/%Y").date()

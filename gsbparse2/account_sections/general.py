@@ -85,7 +85,9 @@ class GeneralSection(GsbFileSection):
             Crypt_file=cls.parse_bool(element.attrib["Crypt_file"]),
             Archive_file=cls.parse_bool(element.attrib["Archive_file"]),
             File_title=element.attrib["File_title"],
-            Use_icons_file_dir=cls.parse_bool(element.attrib["Use_icons_file_dir"]),
+            Use_icons_file_dir=cls.parse_bool(
+                element.attrib.get("Use_icons_file_dir"), is_optional=True
+            ),
             General_address=element.attrib["General_address"],
             Second_general_address=element.attrib["Second_general_address"],
             Date_format=element.attrib["Date_format"],
