@@ -35,7 +35,7 @@ class AccountSection(GsbFileSection):
     Neutrals_inside_method: int
     Sort_order: list[int] | None
     Ascending_sort: bool
-    Column_sort: bool
+    Column_sort: int
     Sorting_kind_column: list[int] | None
     Bet_use_budget: bool
 
@@ -75,7 +75,7 @@ class AccountSection(GsbFileSection):
             Neutrals_inside_method=int(element.attrib["Neutrals_inside_method"]),
             Sort_order=cls.parse_list_int(element.attrib["Sort_order"], "/"),
             Ascending_sort=cls.parse_bool(element.attrib["Ascending_sort"]),
-            Column_sort=cls.parse_bool(element.attrib["Column_sort"]),
+            Column_sort=int(element.attrib["Column_sort"]),
             Sorting_kind_column=cls.parse_list_int(
                 element.attrib["Sorting_kind_column"],
             ),
