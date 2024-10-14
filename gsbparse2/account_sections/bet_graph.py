@@ -12,5 +12,5 @@ class BetGraphSection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            prefs=element.attrib["prefs"],
+            prefs=cls.parse_str(element.attrib.get("prefs")),
         )

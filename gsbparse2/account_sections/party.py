@@ -17,10 +17,10 @@ class PartySection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            Nb=int(element.attrib["Nb"]),
-            Na=element.attrib["Na"],
-            Txt=element.attrib["Txt"],
-            Search=element.attrib["Search"],
-            IgnCase=cls.parse_bool(element.attrib["IgnCase"]),
-            UseRegex=cls.parse_bool(element.attrib["UseRegex"]),
+            Nb=cls.parse_int(element.attrib.get("Nb")),
+            Na=cls.parse_str(element.attrib.get("Na")),
+            Txt=cls.parse_str(element.attrib.get("Txt")),
+            Search=cls.parse_str(element.attrib.get("Search")),
+            IgnCase=cls.parse_bool(element.attrib.get("IgnCase")),
+            UseRegex=cls.parse_bool(element.attrib.get("UseRegex")),
         )

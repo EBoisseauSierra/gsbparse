@@ -23,20 +23,22 @@ class PrintSection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            Draw_lines=cls.parse_bool(element.attrib["Draw_lines"]),
-            Draw_column=cls.parse_bool(element.attrib["Draw_column"]),
-            Draw_background=cls.parse_bool(element.attrib["Draw_background"]),
-            Draw_archives=cls.parse_bool(element.attrib["Draw_archives"]),
-            Draw_columns_name=cls.parse_bool(element.attrib["Draw_columns_name"]),
-            Draw_title=cls.parse_bool(element.attrib["Draw_title"]),
+            Draw_lines=cls.parse_bool(element.attrib.get("Draw_lines")),
+            Draw_column=cls.parse_bool(element.attrib.get("Draw_column")),
+            Draw_background=cls.parse_bool(element.attrib.get("Draw_background")),
+            Draw_archives=cls.parse_bool(element.attrib.get("Draw_archives")),
+            Draw_columns_name=cls.parse_bool(element.attrib.get("Draw_columns_name")),
+            Draw_title=cls.parse_bool(element.attrib.get("Draw_title")),
             Draw_interval_dates=cls.parse_bool(
-                element.attrib["Draw_interval_dates"],
+                element.attrib.get("Draw_interval_dates"),
             ),
             Draw_dates_are_value_dates=cls.parse_bool(
-                element.attrib["Draw_dates_are_value_dates"],
+                element.attrib.get("Draw_dates_are_value_dates"),
             ),
-            Font_transactions=element.attrib["Font_transactions"],
-            Font_title=element.attrib["Font_title"],
-            Report_font_transactions=element.attrib["Report_font_transactions"],
-            Report_font_title=element.attrib["Report_font_title"],
+            Font_transactions=cls.parse_str(element.attrib.get("Font_transactions")),
+            Font_title=cls.parse_str(element.attrib.get("Font_title")),
+            Report_font_transactions=cls.parse_str(
+                element.attrib.get("Report_font_transactions")
+            ),
+            Report_font_title=cls.parse_str(element.attrib.get("Report_font_title")),
         )

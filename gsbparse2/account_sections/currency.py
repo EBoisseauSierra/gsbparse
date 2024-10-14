@@ -16,9 +16,9 @@ class CurrencySection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            Nb=int(element.attrib["Nb"]),
-            Na=element.attrib["Na"],
-            Co=element.attrib["Co"],
-            Ico=element.attrib["Ico"],
-            Fl=int(element.attrib["Fl"]),
+            Nb=cls.parse_int(element.attrib.get("Nb")),
+            Na=cls.parse_str(element.attrib.get("Na")),
+            Co=cls.parse_str(element.attrib.get("Co")),
+            Ico=cls.parse_str(element.attrib.get("Ico")),
+            Fl=cls.parse_int(element.attrib.get("Fl")),
         )

@@ -14,7 +14,7 @@ class SubbudgetarySection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            Nbb=int(element.attrib["Nbb"]),
-            Nb=int(element.attrib["Nb"]),
-            Na=element.attrib["Na"],
+            Nbb=cls.parse_int(element.attrib.get("Nbb")),
+            Nb=cls.parse_int(element.attrib.get("Nb")),
+            Na=cls.parse_str(element.attrib.get("Na")),
         )

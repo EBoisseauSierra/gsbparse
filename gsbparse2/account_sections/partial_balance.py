@@ -17,10 +17,10 @@ class PartialBalanceSection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            Nb=int(element.attrib["Nb"]),
-            Na=element.attrib["Na"],
-            Acc=cls.parse_list_int(element.attrib["Acc"], separator=";"),
-            Kind=int(element.attrib["Kind"]),
-            Currency=int(element.attrib["Currency"]),
-            Colorise=cls.parse_bool(element.attrib["Colorise"]),
+            Nb=cls.parse_int(element.attrib.get("Nb")),
+            Na=cls.parse_str(element.attrib.get("Na")),
+            Acc=cls.parse_list_int(element.attrib.get("Acc"), separator=";"),
+            Kind=cls.parse_int(element.attrib.get("Kind")),
+            Currency=cls.parse_int(element.attrib.get("Currency")),
+            Colorise=cls.parse_bool(element.attrib.get("Colorise")),
         )

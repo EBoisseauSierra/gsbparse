@@ -20,11 +20,11 @@ class ReconcileSection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            Nb=int(element.attrib["Nb"]),
-            Na=element.attrib["Na"],
-            Acc=int(element.attrib["Acc"]),
-            Idate=cls.parse_date(element.attrib["Idate"]),
-            Fdate=cls.parse_date(element.attrib["Fdate"]),
-            Ibal=cls.parse_amount(element.attrib["Ibal"]),
-            Fbal=cls.parse_amount(element.attrib["Fbal"]),
+            Nb=cls.parse_int(element.attrib.get("Nb")),
+            Na=cls.parse_str(element.attrib.get("Na")),
+            Acc=cls.parse_int(element.attrib.get("Acc")),
+            Idate=cls.parse_date(element.attrib.get("Idate")),
+            Fdate=cls.parse_date(element.attrib.get("Fdate")),
+            Ibal=cls.parse_amount(element.attrib.get("Ibal")),
+            Fbal=cls.parse_amount(element.attrib.get("Fbal")),
         )

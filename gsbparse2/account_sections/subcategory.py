@@ -14,7 +14,7 @@ class SubcategorySection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            Nbc=int(element.attrib["Nbc"]),
-            Nb=int(element.attrib["Nb"]),
-            Na=element.attrib["Na"],
+            Nbc=cls.parse_int(element.attrib.get("Nbc")),
+            Nb=cls.parse_int(element.attrib.get("Nb")),
+            Na=cls.parse_str(element.attrib.get("Na")),
         )

@@ -18,11 +18,11 @@ class PaymentSection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            Number=int(element.attrib["Number"]),
-            Name=element.attrib["Name"],
-            Sign=int(element.attrib["Sign"]),
-            Show_entry=cls.parse_bool(element.attrib["Show_entry"]),
-            Automatic_number=cls.parse_bool(element.attrib["Automatic_number"]),
-            Current_number=element.attrib["Current_number"],
-            Account=int(element.attrib["Account"]),
+            Number=cls.parse_int(element.attrib.get("Number")),
+            Name=cls.parse_str(element.attrib.get("Name")),
+            Sign=cls.parse_int(element.attrib.get("Sign")),
+            Show_entry=cls.parse_bool(element.attrib.get("Show_entry")),
+            Automatic_number=cls.parse_bool(element.attrib.get("Automatic_number")),
+            Current_number=cls.parse_str(element.attrib.get("Current_number")),
+            Account=cls.parse_int(element.attrib.get("Account")),
         )

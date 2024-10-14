@@ -20,12 +20,12 @@ class BetHistoricalSection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            Nb=int(element.attrib["Nb"]),
-            Ac=int(element.attrib["Ac"]),
-            Ori=int(element.attrib["Ori"]),
-            Div=int(element.attrib["Div"]),
-            Edit=int(element.attrib["Edit"]),
-            Damount=cls.parse_amount(element.attrib["Damount"]),
-            SDiv=int(element.attrib["SDiv"]),
-            SDamount=cls.parse_amount(element.attrib["SDamount"]),
+            Nb=cls.parse_int(element.attrib.get("Nb")),
+            Ac=cls.parse_int(element.attrib.get("Ac")),
+            Ori=cls.parse_int(element.attrib.get("Ori")),
+            Div=cls.parse_int(element.attrib.get("Div")),
+            Edit=cls.parse_int(element.attrib.get("Edit")),
+            Damount=cls.parse_amount(element.attrib.get("Damount")),
+            SDiv=cls.parse_int(element.attrib.get("SDiv")),
+            SDamount=cls.parse_amount(element.attrib.get("SDamount")),
         )

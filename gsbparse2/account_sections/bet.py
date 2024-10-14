@@ -13,8 +13,8 @@ class BetSection(GsbFileSection):
     @classmethod
     def from_xml(cls, element: ET.Element) -> Self:
         return cls(
-            Ddte=int(element.attrib["Ddte"]),
+            Ddte=cls.parse_int(element.attrib.get("Ddte")),
             Bet_deb_cash_account_option=int(
-                element.attrib["Bet_deb_cash_account_option"],
+                element.attrib.get("Bet_deb_cash_account_option"),
             ),
         )
