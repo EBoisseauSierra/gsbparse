@@ -19,6 +19,7 @@ import functools
 import logging
 from collections.abc import Callable
 from datetime import date
+from datetime import datetime as dt
 from decimal import Decimal, InvalidOperation
 from typing import TypeVar
 
@@ -30,9 +31,9 @@ _T = TypeVar("_T")
 
 _NULL_SENTINEL = "(null)"
 
-# Date formats tried in order when parsing dates.
-# The spec says %m/%d/%Y but the example file uses %d/%m/%Y.
-_DATE_FORMATS = ("%m/%d/%Y", "%d/%m/%Y")
+# XML storage format for dates in Grisbi files.
+# Confirmed by unambiguous values in the spec (e.g. "12/31/2007" = Dec 31).
+_DATE_FORMAT = "%m/%d/%Y"
 
 
 def parse_null(fn: Callable[[str], _T]) -> Callable[[str], _T | None]:
@@ -158,31 +159,24 @@ def parse_amount(raw: str) -> Decimal:
 
 
 def parse_date(raw: str) -> date:
-    """Parse a Grisbi date string, trying multiple formats.
+    """Parse a Grisbi date string in ``MM/DD/YYYY`` format.
 
-    Grisbi files have historically used both ``%m/%d/%Y`` and ``%d/%m/%Y``.
-    Both formats are tried in order; the first successful parse wins.
+    XML storage format is ``%m/%d/%Y`` (US style), confirmed by values such
+    as ``"12/31/2007"`` which can only be December 31.
 
     Args:
-        raw: The raw XML attribute value (e.g. ``"01/15/2023"`` or
-            ``"15/01/2023"``).
+        raw: The raw XML attribute value (e.g. ``"01/15/2023"``).
 
     Returns:
         A :class:`~datetime.date` with the parsed value.
 
     Raises:
-        XmlParsingError: If the value cannot be parsed in any known format.
+        XmlParsingError: If the value cannot be parsed as a date.
     """
-    for fmt in _DATE_FORMATS:
-        try:
-            return date.fromisoformat(
-                f"{raw.split('/')[2]}-{raw.split('/')[0]:>02}-{raw.split('/')[1]:>02}"
-                if fmt == "%m/%d/%Y"
-                else f"{raw.split('/')[2]}-{raw.split('/')[1]:>02}-{raw.split('/')[0]:>02}"
-            )
-        except (ValueError, IndexError):
-            continue
-    raise XmlParsingError(f"Cannot parse {raw!r} as date: tried {_DATE_FORMATS}")
+    try:
+        return dt.strptime(raw, _DATE_FORMAT).date()
+    except ValueError as err:
+        raise XmlParsingError(f"Cannot parse {raw!r} as date ({_DATE_FORMAT!r})") from err
 
 
 def parse_list_int(raw: str, sep: str = ";") -> list[int]:
