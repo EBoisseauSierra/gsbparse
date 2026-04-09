@@ -97,6 +97,7 @@ branch = true
 
 [tool.importlinter]
 root_package = "gsbparse"
+include_external_packages = true
 
 [[tool.importlinter.contracts]]
 name = "Domain has no outward dependencies"
@@ -107,7 +108,6 @@ forbidden_modules = [
     "gsbparse.ports",
     "pandas",
     "defusedxml",
-    "xml.etree",
 ]
 
 [[tool.importlinter.contracts]]
