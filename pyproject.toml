@@ -1,0 +1,122 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gsbparse"
+dynamic = ["version"]
+description = "Parse Grisbi .gsb files into typed domain objects and pandas DataFrames"
+readme = "README.md"
+requires-python = ">=3.13"
+license = "GPL-2.0-or-later"
+authors = [{ name = "Étienne Boisseau-Sierra" }]
+keywords = ["grisbi", "gsb", "accounting", "parser", "pandas"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Office/Business :: Financial :: Accounting",
+    "Typing :: Typed",
+]
+dependencies = [
+    "defusedxml>=0.7",
+    "pandas>=2.2",
+]
+
+[project.urls]
+Homepage      = "https://github.com/etnbsd/gsbparse"
+Documentation = "https://gsbparse.readthedocs.io"
+Repository    = "https://github.com/etnbsd/gsbparse"
+Issues        = "https://github.com/etnbsd/gsbparse/issues"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "pre-commit>=3.8",
+    "conventional-pre-commit>=3.4",
+    "import-linter>=2.0",
+    "pandas-stubs",
+    "sphinx>=8",
+    "sphinx-autodoc-typehints>=2",
+    "sphinx-rtd-theme>=3.0",
+    "myst-parser>=4",
+]
+
+[tool.hatch.version]
+path = "src/gsbparse/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gsbparse"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "T20", "D", "N", "RUF"]
+ignore = [
+    "D100", "D104", "D107",   # missing module/package/__init__ docstrings
+    "N815",                   # mixedCase fields — Grisbi codes (Nb, Na, Co)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D", "S101"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_unreachable = true
+files = ["src", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["defusedxml.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=gsbparse",
+    "--cov-report=term-missing",
+]
+
+[tool.coverage.run]
+source = ["src/gsbparse"]
+branch = true
+
+[tool.importlinter]
+root_package = "gsbparse"
+
+[[tool.importlinter.contracts]]
+name = "Domain has no outward dependencies"
+type = "forbidden"
+source_modules = ["gsbparse.domain"]
+forbidden_modules = [
+    "gsbparse.adapters",
+    "gsbparse.ports",
+    "pandas",
+    "defusedxml",
+    "xml.etree",
+]
+
+[[tool.importlinter.contracts]]
+name = "Ports only import from domain"
+type = "forbidden"
+source_modules = ["gsbparse.ports"]
+forbidden_modules = ["gsbparse.adapters"]
+
+[[tool.importlinter.contracts]]
+name = "Adapters never import from each other"
+type = "independence"
+modules = ["gsbparse.adapters.xml", "gsbparse.adapters.pandas"]
