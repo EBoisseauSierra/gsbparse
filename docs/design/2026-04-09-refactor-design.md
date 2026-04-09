@@ -870,9 +870,9 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   lint-and-test:
@@ -943,7 +943,7 @@ manual:
 git commit -m "chore: Release 0.5.0"
 # 3. Tag and push:
 git tag -a v0.5.0 -m "Release 0.5.0"
-git push origin master
+git push origin main
 git push origin v0.5.0
 # 4. CI picks up the tag, publishes to PyPI, and creates a GitHub Release
 #    draft with auto-generated notes from commit messages since the last tag.
@@ -968,7 +968,7 @@ notes cover the need; a separate changelog file is redundant and drifts.
     signatures.
   - `myst-parser` — Markdown source (avoid rST where possible).
   - `sphinx.ext.intersphinx` — link to Python/pandas stdlib docs.
-- **Hosted on:** Read the Docs. `latest` tracks master, `stable` tracks the
+- **Hosted on:** Read the Docs. `latest` tracks main, `stable` tracks the
   most recent release tag. Versioned docs on every tag.
 
 ### 9.1 docs/ layout
@@ -1015,12 +1015,12 @@ sphinx:
 
 ## 10. Migration plan
 
-Trunk-based development on `master`. No long-lived branches. The current
+Trunk-based development on `main`. No long-lived branches. The current
 `restructure` branch is abandoned (its work is salvaged into the new commit
 sequence).
 
 **Acceptable broken-state window:** between the "remove legacy" commits and
-the first working end-to-end commit, master will have failing tests and a
+the first working end-to-end commit, main will have failing tests and a
 non-functional `import gsbparse`. This is fine because:
 
 - The repo is low-traffic.
@@ -1092,11 +1092,11 @@ chore: Release 1.0.0
 
 ### 10.3 PyPI release strategy
 
-- **0.3.0** — last legacy release. Frozen on master immediately before
+- **0.3.0** — last legacy release. Frozen on main immediately before
   clearing the decks. Cut from the current code state.
-- **0.4.0a1, 0.4.0a2, …** (optional) — alphas from master during the rewrite
+- **0.4.0a1, 0.4.0a2, …** (optional) — alphas from main during the rewrite
   for early adopters. Each alpha must correspond to a coherent state of
-  master (green CI, `import gsbparse` works).
+  main (green CI, `import gsbparse` works).
 - **1.0.0** — first stable release of the new API, cut after the full commit
   sequence lands.
 

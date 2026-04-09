@@ -67,7 +67,7 @@ These apply to every change in this repo. Re-read before planning or committing.
 
 ### Git workflow
 
-- **Trunk-based development.** Short-lived branches, frequent integration into `master`. Avoid long-lived feature branches. Prefer small, independently-mergeable commits.
+- **Trunk-based development.** Short-lived branches, frequent integration into `main`. Avoid long-lived feature branches. Prefer small, independently-mergeable commits.
 - **Conventional Commits** — enforced by `conventional-pre-commit` on the `commit-msg` stage.
 - **Capitalized descriptions.** House style: the description after `type(scope):` starts with a capital letter. E.g. `feat(domain): Add CurrencySection`, not `feat(domain): add CurrencySection`. `conventional-pre-commit` doesn't enforce this — it's a review-time rule.
 - **Scopes are directory-based** and match the hexagonal layout: `domain`, `domain/sections`, `adapters/xml`, `adapters/xml/sections`, `adapters/pandas`, `ports`, `lint`, etc. Omit the scope for repo-wide chores and top-level shim changes.
