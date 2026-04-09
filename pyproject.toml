@@ -63,6 +63,7 @@ select = ["E", "W", "F", "I", "B", "UP", "SIM", "T20", "D", "N", "RUF"]
 ignore = [
     "D100", "D104", "D107",   # missing module/package/__init__ docstrings
     "N815",                   # mixedCase fields — Grisbi codes (Nb, Na, Co)
+    "B024",                   # GsbFileSection is an intentional marker ABC with no abstract methods
 ]
 
 [tool.ruff.lint.per-file-ignores]
