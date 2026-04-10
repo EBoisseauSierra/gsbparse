@@ -29,37 +29,35 @@ import gsbparse
 gsb = gsbparse.read_gsb("my_accounts.gsb")
 ```
 
-### Access typed sections
+### Inspect typed sections
 
 ```python
-print(gsb.general.Ti)        # file title
+print(gsb.currencies)
+# [CurrencySection(Nb=1, Na='Pound Sterling', Co='£', Ico='GBP', Fl=2)]
 
 for account in gsb.accounts:
-    print(account.Nb, account.Na)    # id, name
-
-for currency in gsb.currencies:
-    print(currency.Na, currency.Co)  # name, ISO code
+    print(account.Number, account.Name)
+# 1  Mr. Account / HSBC [bank]
+# 2  Mrs. Account / Barclays Bank [bank]
+# ...
 ```
 
 ### Detailed transactions (foreign keys resolved)
 
 ```python
-for tx in gsb.detailed_transactions:
-    print(tx.Ac.Na, tx.Am)   # account name, amount (Decimal)
-    if tx.Pa:
-        print(tx.Pa.Na)       # party name
-    if tx.Ca:
-        print(tx.Ca.Na)       # category name
+tx = gsb.detailed_transactions[0]
+print(tx.Dt, tx.Am, tx.Ac.Name)
+# 2023-01-02  -200000.00  Real Estate Loan [liabilities]
 ```
 
 ### Convert to pandas DataFrame
 
 ```python
-from gsbparse.pandas import to_df
+import gsbparse.pandas as gsbpd
 
-accounts_df    = to_df(gsb.accounts)
-currencies_df  = to_df(gsb.currencies)
-detailed_tx_df = to_df(gsb.detailed_transactions)
+currencies_df  = gsbpd.to_df(gsb.currencies)
+accounts_df    = gsbpd.to_df(gsb.accounts)
+detailed_tx_df = gsbpd.to_df(gsb.detailed_transactions)
 ```
 
 Custom column projection:
@@ -68,13 +66,17 @@ Custom column projection:
 from gsbparse import DetailedTransactionColumn
 
 columns = [
-    DetailedTransactionColumn(path="Dt",    output_name="date"),
-    DetailedTransactionColumn(path="Am",    output_name="amount"),
-    DetailedTransactionColumn(path="Ac.Na", output_name="account"),
-    DetailedTransactionColumn(path="Pa.Na", output_name="party"),
+    DetailedTransactionColumn(path="Dt",      output_name="date"),
+    DetailedTransactionColumn(path="Am",      output_name="amount"),
+    DetailedTransactionColumn(path="Ac.Name", output_name="account"),
+    DetailedTransactionColumn(path="Pa.Na",   output_name="party"),
 ]
 
-df = to_df(gsb.detailed_transactions, columns=columns)
+df = gsbpd.to_df(gsb.detailed_transactions, columns=columns)
+print(df.head())
+#          date      amount                         account        party
+# 0  2023-01-02  -200000.00  Real Estate Loan [liabilities]  Loan Credit
+# 1  2023-01-02   200000.00       Mr. Account / HSBC [bank]  Loan Credit
 ```
 
 See the [full quickstart](https://gsbparse.readthedocs.io/en/latest/quickstart.html) and

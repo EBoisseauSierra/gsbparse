@@ -23,57 +23,74 @@ gsb = gsbparse.read_gsb("my_accounts.gsb")
 `read_gsb` returns a {class}`~gsbparse.GsbFile` — a frozen dataclass with one field per
 Grisbi section type.
 
-## Accessing sections
+## Inspecting sections
 
 Every field is either `None` (section absent from the file), a single typed object
 (singleton sections like `General`), or a `list` of typed objects:
 
 ```python
-# Singleton section
-print(gsb.general.Ti)   # file title (str)
+print(gsb.currencies)
+# [CurrencySection(Nb=1, Na='Pound Sterling', Co='£', Ico='GBP', Fl=2)]
 
-# List sections
-for account in gsb.accounts:
-    print(account.Nb, account.Na)   # id, name
+print(gsb.currencies[0].Na)
+# 'Pound Sterling'
 
-for currency in gsb.currencies:
-    print(currency.Na, currency.Co) # name, ISO code
+print(gsb.accounts[0])
+# AccountSection(Name='Mr. Account / HSBC [bank]', Id=None, Number=1,
+#   Owner='Mister', Kind=0, Currency=1, Initial_balance=Decimal('52000.00'),
+#   Closed_account=False, ...)
 ```
 
-Field names mirror the Grisbi format spec attribute codes (`Na`, `Nb`, `Co`, …) for
-faithful traceability to the source format.
+Field names mirror the Grisbi format spec attribute codes (`Na`, `Nb`, `Co`, …).
+
+### Iterating over list sections
+
+```python
+for account in gsb.accounts:
+    print(account.Number, account.Name)
+# 1  Mr. Account / HSBC [bank]
+# 2  Mrs. Account / Barclays Bank [bank]
+# 3  Savings Bank  / London Capital Credit Union [bank]
+# 4  Real Estate Loan [liabilities]
+# 5  Delayed Debit card [liabilities]
+# 6  Purse [cashier]
+```
 
 ## Detailed transactions
 
 `gsb.detailed_transactions` returns a list of {class}`~gsbparse.DetailedTransaction` objects
-where every foreign-key integer has been resolved to the referenced domain object:
+where every foreign-key integer is resolved to the referenced domain object:
 
 ```python
-for tx in gsb.detailed_transactions:
-    print(tx.Ac.Na, tx.Am)          # account name, amount
-    print(tx.Cu.Co)                 # currency ISO code
-    if tx.Pa:
-        print(tx.Pa.Na)             # party name (None if unset)
-    if tx.Ca:
-        print(tx.Ca.Na)             # category name (None if unset)
+tx = gsb.detailed_transactions[0]
+
+print(tx.Dt)        # datetime.date(2023, 1, 2)
+print(tx.Am)        # Decimal('-200000.00')
+print(tx.Ac.Name)   # 'Real Estate Loan [liabilities]'
+print(tx.Cu.Ico)    # 'GBP'
+print(tx.Pa.Na)     # 'Loan Credit'  (None when unset)
 ```
 
 ## Converting to pandas DataFrames
 
-Import the pandas adapter explicitly to keep the adapter identity visible:
+Import the pandas adapter as a module alias so the adapter identity stays visible:
 
 ```python
-from gsbparse.pandas import to_df
+import gsbparse.pandas as gsbpd
 
-accounts_df    = to_df(gsb.accounts)
-currencies_df  = to_df(gsb.currencies)
+currencies_df = gsbpd.to_df(gsb.currencies)
+print(currencies_df)
+#    Nb              Na Co  Ico  Fl
+# 0   1  Pound Sterling  £  GBP   2
+
+accounts_df = gsbpd.to_df(gsb.accounts)
 ```
 
 For detailed transactions the adapter flattens nested domain objects into columns using
 dotted-path specs:
 
 ```python
-detailed_tx_df = to_df(gsb.detailed_transactions)   # default columns
+detailed_tx_df = gsbpd.to_df(gsb.detailed_transactions)   # default columns
 ```
 
 ### Custom column projection
@@ -85,13 +102,20 @@ columns:
 from gsbparse import DetailedTransactionColumn
 
 columns = [
-    DetailedTransactionColumn(path="Dt",    output_name="date"),
-    DetailedTransactionColumn(path="Am",    output_name="amount"),
-    DetailedTransactionColumn(path="Ac.Na", output_name="account"),
-    DetailedTransactionColumn(path="Pa.Na", output_name="party"),
+    DetailedTransactionColumn(path="Dt",      output_name="date"),
+    DetailedTransactionColumn(path="Am",      output_name="amount"),
+    DetailedTransactionColumn(path="Ac.Name", output_name="account"),
+    DetailedTransactionColumn(path="Pa.Na",   output_name="party"),
 ]
 
-df = to_df(gsb.detailed_transactions, columns=columns)
+df = gsbpd.to_df(gsb.detailed_transactions, columns=columns)
+print(df.head())
+#          date      amount                         account        party
+# 0  2023-01-02  -200000.00  Real Estate Loan [liabilities]  Loan Credit
+# 1  2023-01-02   200000.00       Mr. Account / HSBC [bank]  Loan Credit
+# 2  2023-01-05    -1175.87       Mr. Account / HSBC [bank]  Loan Credit
+# 3  2023-01-05     -609.20       Mr. Account / HSBC [bank]  Loan Credit
+# 4  2023-01-05      609.20  Real Estate Loan [liabilities]  Loan Credit
 ```
 
 Paths that resolve to `None` on a given row (e.g. a transaction without a party) produce
@@ -115,11 +139,10 @@ except gsbparse.GsbParseError as exc:
 
 ## Future output adapters
 
-The `gsbparse.pandas` import pattern is intentional — swapping adapters is a one-line
-change:
+The `import gsbparse.pandas as gsbpd` pattern is intentional — swapping to a future
+adapter is a one-line change:
 
 ```python
-from gsbparse.pandas import to_df    # pandas (current)
-# from gsbparse.polars import to_df  # polars (future)
-# from gsbparse.arrow  import to_table  # arrow (future)
+import gsbparse.pandas as gsbpd    # pandas (current)
+# import gsbparse.polars as gsbpd  # polars (future)
 ```
