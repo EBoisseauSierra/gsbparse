@@ -21,13 +21,10 @@ from collections.abc import Callable
 from datetime import date
 from datetime import datetime as dt
 from decimal import Decimal, InvalidOperation
-from typing import TypeVar
 
 from gsbparse.domain.errors import XmlParsingError
 
 logger = logging.getLogger(__name__)
-
-_T = TypeVar("_T")
 
 _NULL_SENTINEL = "(null)"
 
@@ -36,7 +33,7 @@ _NULL_SENTINEL = "(null)"
 _DATE_FORMAT = "%m/%d/%Y"
 
 
-def parse_null(fn: Callable[[str], _T]) -> Callable[[str], _T | None]:
+def parse_null[T](fn: Callable[[str], T]) -> Callable[[str], T | None]:
     """Decorator: return ``None`` when the raw value is ``"(null)"``.
 
     Args:
@@ -47,7 +44,7 @@ def parse_null(fn: Callable[[str], _T]) -> Callable[[str], _T | None]:
     """
 
     @functools.wraps(fn)
-    def wrapper(raw: str) -> _T | None:
+    def wrapper(raw: str) -> T | None:
         if raw == _NULL_SENTINEL:
             return None
         return fn(raw)
@@ -55,7 +52,7 @@ def parse_null(fn: Callable[[str], _T]) -> Callable[[str], _T | None]:
     return wrapper
 
 
-def parse_optional(fn: Callable[[str], _T]) -> Callable[[str], _T | None]:
+def parse_optional[T](fn: Callable[[str], T]) -> Callable[[str], T | None]:
     """Decorator: return ``None`` when parsing raises :class:`XmlParsingError`.
 
     Use this on fields that may be absent or unparseable in some file versions.
@@ -68,7 +65,7 @@ def parse_optional(fn: Callable[[str], _T]) -> Callable[[str], _T | None]:
     """
 
     @functools.wraps(fn)
-    def wrapper(raw: str) -> _T | None:
+    def wrapper(raw: str) -> T | None:
         try:
             return fn(raw)
         except XmlParsingError:
