@@ -94,11 +94,12 @@ disallow_untyped_defs = false
 disallow_untyped_decorators = false
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "README.md"]
 addopts = [
     "-ra",
     "--strict-markers",
     "--strict-config",
+    "--doctest-glob=README.md",
     "--cov=gsbparse",
     "--cov-report=term-missing",
 ]
