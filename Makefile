@@ -1,7 +1,7 @@
-.PHONY: default install test lint format type-check import-check ci
+.PHONY: default install test lint format type-check import-check docs doctest ci
 
 default:
-	@echo "Targets: install test lint format type-check import-check ci"
+	@echo "Targets: install test lint format type-check import-check docs doctest ci"
 
 install:
 	uv sync --dev
@@ -21,4 +21,10 @@ type-check:
 import-check:
 	uv run lint-imports
 
-ci: lint format type-check import-check test
+docs:
+	uv run sphinx-build -b html docs docs/_build/html
+
+doctest:
+	uv run sphinx-build -b doctest docs docs/_build/doctest
+
+ci: lint format type-check import-check test doctest

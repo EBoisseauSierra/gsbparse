@@ -7,6 +7,7 @@ build:
   commands:
     - pip install uv
     - uv sync --dev
+    - uv run sphinx-build -b doctest docs docs/_build/doctest
     - uv run sphinx-build -b html docs $READTHEDOCS_OUTPUT/html
 
 sphinx:

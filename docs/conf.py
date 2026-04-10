@@ -4,6 +4,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 import importlib.metadata
+from pathlib import Path
 
 # -- Project information -----------------------------------------------------
 
@@ -18,6 +19,7 @@ version = ".".join(release.split(".")[:2])
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
+    "sphinx.ext.doctest",
     "sphinx_autodoc_typehints",
     "myst_parser",
 ]
@@ -37,3 +39,17 @@ html_theme = "sphinx_rtd_theme"
 autodoc_member_order = "bysource"
 autodoc_typehints = "description"
 always_document_param_types = True
+
+# -- doctest settings --------------------------------------------------------
+
+_SIMPLE_EXAMPLE = Path(__file__).parent.parent / "tests" / "assets" / "simple_example.gsb"
+
+doctest_global_setup = f"""
+import datetime
+from decimal import Decimal
+import gsbparse
+import gsbparse.pandas as gsbpd
+from gsbparse import DetailedTransactionColumn
+
+gsb = gsbparse.read_gsb(r"{_SIMPLE_EXAMPLE}")
+"""

@@ -123,6 +123,9 @@ make ci
 # Build Sphinx docs locally
 uv run sphinx-build -b html docs docs/_build/html
 
+# Run documentation doctests (also runs as part of make ci)
+uv run sphinx-build -b doctest docs docs/_build/doctest
+
 # Run pre-commit on all files
 pre-commit run --all-files
 ```
