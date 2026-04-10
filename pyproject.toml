@@ -65,6 +65,7 @@ ignore = [
     "N815",                   # mixedCase fields — Grisbi codes (Nb, Na, Co)
     "N817",                   # ET alias for ElementTree is universal Python convention
     "B024",                   # GsbFileSection is an intentional marker ABC with no abstract methods
+    "RUF022",                 # __all__ grouped by category is more readable than alphabetical sort
 ]
 
 [tool.ruff.lint.per-file-ignores]
