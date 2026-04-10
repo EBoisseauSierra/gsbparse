@@ -4,13 +4,12 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
-  - package-ecosystem: pip
+  - package-ecosystem: uv
     directory: "/"
     schedule:
       interval: weekly
     groups:
-      # Update minor and patch versions of Python packages together.
-      # Major version bumps are raised as separate PRs for each package.
+      # Bundle minor and patch bumps; major versions get individual PRs.
       python:
         update-types:
           - "minor"
