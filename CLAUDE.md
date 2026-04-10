@@ -8,15 +8,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current state
 
-The project is midway through a refactor from `gsbparse` → `gsbparse2` (branch: `restructure`). The target is a more generic, better-structured replacement for the original package.
+The hexagonal refactor is complete and on `main`. The legacy `gsbparse/` and working-name `gsbparse2/` directories are superseded by the new `src/gsbparse/` layout. Version is `1.0.0.dev0`.
 
-- **`gsbparse/`** — the legacy, stable package. Pandas-heavy. Do not add features here.
-- **`gsbparse2/`** — the in-progress rewrite. Typed dataclass sections with `from_xml` classmethods. `GsbFile.from_file()` dispatches elements to section classes via `_ELEMENT_TAG_TO_SECTION`.
-- **`tests/`** — targets `gsbparse2`. Uses `tmp_path` with inline XML; no on-disk fixtures yet.
-- **`Example_3.0-en.gsb`** — reference example file for E2E tests.
+**Repository layout:**
+
+- **`src/gsbparse/`** — the production package, `src/` layout. Hexagonal architecture: `domain/`, `adapters/xml/`, `adapters/pandas/`, `ports/` (empty MVP placeholder).
+- **`tests/`** — pytest suite (98 tests). Uses `tmp_path` with inline XML for unit/integration tests; `tests/assets/Example_3.0-en.gsb` for E2E tests.
+- **`docs/`** — Sphinx documentation (sphinx-rtd-theme, myst-parser, sphinx-autodoc-typehints). Build: `uv run sphinx-build -b html docs docs/_build/html`.
+- **`gsbparse/`** — legacy package (frozen at PyPI 0.3.0). Do not add features here.
+- **`gsbparse2/`** — working-name directory from during the parallel rewrite. Superseded by `src/gsbparse/`. Do not add features here.
 - **`2025.12.28-format_fichier_grisbi-2.3.2.txt`** — most recent format spec (may contain errors). Supersedes `2021.01.17-format_fichier_grisbi-2.0.0.txt`.
-
-The final package name will be `gsbparse` — `gsbparse2` was a working name during the parallel rewrite.
 
 ## Standing preferences (from user)
 
@@ -91,23 +92,36 @@ Lessons from this session's design dialogue — apply when asking Claude for arc
 ## Commands
 
 ```shell
-# Install for development (legacy; will migrate to uv)
-pip install -e '.[dev,test]'
+# Install for development
+uv sync --dev
+pre-commit install
 
 # Run all tests
-pytest
+uv run pytest
 
 # Run a single test file
-pytest tests/test_file.py
+uv run pytest tests/test_file.py
 
 # Run a single test
-pytest tests/test_file.py::test_parse_file_returns_empty_dict_if_no_sections
+uv run pytest tests/test_file.py::test_parse_file_returns_empty_dict_if_no_sections
 
 # Lint
-ruff check .
+uv run ruff check .
 
 # Format
-ruff format .
+uv run ruff format .
+
+# Type check (strict)
+uv run mypy
+
+# Enforce hexagonal import boundaries
+uv run lint-imports
+
+# Run everything (same as CI)
+make ci
+
+# Build Sphinx docs locally
+uv run sphinx-build -b html docs docs/_build/html
 
 # Run pre-commit on all files
 pre-commit run --all-files
@@ -255,19 +269,24 @@ class BytesSource(Protocol):
 
 The XML reader accepts a `BytesSource` and doesn't care where the bytes come from. This is the kind of port that earns its keep: real abstraction, multiple implementations foreseeable, clean seam between "how do I get bytes" and "how do I parse bytes". Add it when encrypted-file reading lands, not before.
 
-## Architecture notes (current, pre-refactor-completion)
+## Architecture notes
 
-### `gsbparse2` building blocks
+### `src/gsbparse/` building blocks
 
-- `gsbparse2/xml.py` — `read_file(path)` wraps `defusedxml.ElementTree.parse` and validates the root is a `<Grisbi>` element. Raises `InvalidGsbFileError` / `InvalidGsbFileRootError`.
-- `gsbparse2/account_sections/_abstract_section.py` — `GsbFileSection`: frozen `@dataclass` ABC. Provides static parsers (`parse_int`, `parse_bool`, `parse_date`, `parse_amount`, `parse_str`, `parse_list_int`) decorated with `@parse_null` (returns `None` for `"(null)"`) and `@parse_optional` (swallows errors when `is_optional=True`). Each concrete section implements `from_xml(cls, element) -> Self`.
-- `gsbparse2/account_sections/<tag>.py` — one file per XML tag type. Frozen dataclass, typed fields, `from_xml` classmethod.
-- `gsbparse2/file.py` — `GsbFile` dataclass. `parse_file()` reads XML and dispatches each element tag via `_ELEMENT_TAG_TO_SECTION`. `from_file()` populates fields via `get_elements()`. `transactions` property denormalizes foreign keys into plain dicts. Exposes `to_df()` and `to_csv()`.
-- `gsbparse2/exceptions.py` — typed errors: `XmlParsingError`, `SectionNotFoundError`, `InvalidElementCountError`, `InvalidGsbFileError`, `InvalidGsbFileRootError`.
+- `adapters/xml/reader.py` — `read_gsb_file(path)` wraps `defusedxml.ElementTree.parse`, validates the root is `<Grisbi>`, and dispatches each element tag via `_ELEMENT_TAG_TO_PARSER`. Raises `InvalidGsbFileError` / `InvalidGsbFileRootError`.
+- `adapters/xml/parsers.py` — `parse_int`, `parse_bool`, `parse_date`, `parse_amount`, `parse_str`, `parse_list_int`, plus `@parse_null` (returns `None` for `"(null)"`) and `@parse_optional` decorators. All XML-format knowledge lives here.
+- `adapters/xml/_dispatch.py` — `_ELEMENT_TAG_TO_PARSER` table mapping tag names to free functions.
+- `adapters/xml/sections/<tag>.py` — one file per XML tag; free function `parse_<name>_section(element) → <Name>Section`.
+- `domain/sections/<tag>.py` — one file per tag; frozen dataclass, typed fields, zero XML imports.
+- `domain/file.py` — `GsbFile` frozen dataclass aggregate; `detailed_transactions` property builds `DetailedTransaction` objects via `build_detailed_transactions`.
+- `domain/detailed_transaction.py` — `DetailedTransaction` (FK-resolved view) + `DetailedTransactionColumn` + `build_detailed_transactions`.
+- `domain/errors.py` — typed error hierarchy rooted at `GsbParseError`.
+- `adapters/pandas/` — `to_df` free function with two `@overload` signatures; dispatches on list element type.
 
-### Adding a new section (current pattern, may change post-refactor)
+### Adding a new section
 
-1. Create `gsbparse2/account_sections/<name>.py` — frozen dataclass implementing `from_xml`.
-2. Register in `_ELEMENT_TAG_TO_SECTION` in `gsbparse2/file.py`.
-3. Add a field on `GsbFile`.
-4. Wire in `GsbFile.from_file()` via `get_elements()`.
+1. Create `src/gsbparse/domain/sections/<name>.py` — frozen dataclass with typed fields (Grisbi attribute codes), no XML imports.
+2. Create `src/gsbparse/adapters/xml/sections/<name>.py` — free function `parse_<name>_section(element) → <Name>Section` using helpers from `adapters/xml/parsers.py`.
+3. Register in `_ELEMENT_TAG_TO_PARSER` in `adapters/xml/_dispatch.py`.
+4. Add a field on `GsbFile` in `domain/file.py` and wire it in `adapters/xml/reader.py`.
+5. Re-export the new section class from `domain/sections/__init__.py` and `src/gsbparse/__init__.py`.
