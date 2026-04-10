@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
@@ -49,7 +49,10 @@ dev = [
 ]
 
 [tool.hatch.version]
-path = "src/gsbparse/__init__.py"
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+tag_regex = "^(?P<version>\\d+\\.\\d+\\.\\d+)$"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/gsbparse"]

@@ -51,7 +51,7 @@ These apply to every change in this repo. Re-read before planning or committing.
 ### Tooling
 
 - Target the modern Python stack: `uv`, `pyproject.toml` (not `setup.py`/`setup.cfg`), `pre-commit`, CI/CD via GitHub Actions.
-- **Build backend:** `hatchling`. Version is dynamic, read from `__version__` in `src/gsbparse/__init__.py`.
+- **Build backend:** `hatchling` + `hatch-vcs`. Version is inferred from git tags (format: `X.Y.Z`, no `v` prefix). No hardcoded `__version__` in source.
 - **Python 3.13+.** CI matrix: `ubuntu-latest` × Python 3.13 and 3.14 — 3.13 is the minimum supported version, 3.14 tested for forward compatibility.
 - Ruff for lint + format. mypy for type checking (strict mode). `import-linter` for hexagonal boundary enforcement.
 - Pre-commit hooks must enforce conventional commits (`conventional-pre-commit` is already wired).
@@ -59,7 +59,7 @@ These apply to every change in this repo. Re-read before planning or committing.
 - **Public documentation on Read the Docs.** Sphinx + Read the Docs theme (`sphinx-rtd-theme`) + `sphinx-autodoc-typehints` + `myst-parser`. Markdown source (MyST), not rST. `.readthedocs.yaml` pins Python 3.13 and installs via uv.
 - **PyPI publishing via OIDC trusted publishing** — no long-lived API tokens in GitHub secrets. Configure once on PyPI, publish fires on `X.Y.Z` tag push.
 - **No `CHANGELOG.md`.** GitHub Releases are the single source of truth for release notes, auto-generated from conventional commit history and hand-edited before publishing.
-- **Release process: manual for now.** Bump `__version__` by hand, commit, tag, push. No `scripts/release.py`. If automation becomes worth it later, add a `make release VERSION=…` target in the Makefile — do not build a standalone script.
+- **Release process: tag and push.** Create an annotated tag (`git tag 1.2.3`), push it — hatch-vcs infers the version automatically. No `__version__` to bump by hand. No `scripts/release.py`. If automation becomes worth it later, add a `make release VERSION=…` target in the Makefile — do not build a standalone script.
 
 ### Runtime behaviour
 

@@ -64,8 +64,6 @@ from gsbparse.domain.sections import (
     TransactionSection,
 )
 
-__version__ = "1.0.0.dev0"
-
 __all__ = [
     # Top-level entry point
     "read_gsb",
