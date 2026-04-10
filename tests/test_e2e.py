@@ -16,7 +16,7 @@ import pytest
 
 import gsbparse
 
-EXAMPLE_FILE = Path(__file__).parent.parent / "Example_3.0-en.gsb"
+EXAMPLE_FILE = Path(__file__).parent / "assets" / "example_3.0_en.gsb"
 
 
 @pytest.fixture(scope="module")
