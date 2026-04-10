@@ -5,16 +5,6 @@ into typed domain objects, with an optional pandas adapter for DataFrame output.
 
 **Documentation:** [gsbparse.readthedocs.io](https://gsbparse.readthedocs.io)
 
----
-
-## Breaking change from 0.3.0
-
-Version 1.0 is a ground-up rewrite. The old `AccountFile` / `Transactions` API is gone.
-The last compatible release is **0.3.0** on PyPI. If you depend on the old API, pin
-`gsbparse==0.3.0` before upgrading.
-
----
-
 ## Installation
 
 ```shell
@@ -28,8 +18,6 @@ uv add gsbparse
 ```
 
 Requires Python 3.13+.
-
----
 
 ## Quickstart
 
@@ -92,8 +80,6 @@ df = to_df(gsb.detailed_transactions, columns=columns)
 See the [full quickstart](https://gsbparse.readthedocs.io/en/latest/quickstart.html) and
 [API reference](https://gsbparse.readthedocs.io/en/latest/api.html) on Read the Docs.
 
----
-
 ## Development
 
 ```shell
@@ -105,14 +91,14 @@ pre-commit install
 
 Common commands (via `make`):
 
-| Command            | What it does                         |
-|--------------------|--------------------------------------|
-| `make test`        | Run the test suite                   |
-| `make lint`        | Run ruff check                       |
-| `make format`      | Run ruff format                      |
-| `make type-check`  | Run mypy in strict mode              |
-| `make import-check`| Enforce hexagonal import boundaries  |
-| `make ci`          | Run all of the above                 |
+| Command             | What it does                        |
+| ------------------- | ----------------------------------- |
+| `make test`         | Run the test suite                  |
+| `make lint`         | Run ruff check                      |
+| `make format`       | Run ruff format                     |
+| `make type-check`   | Run mypy in strict mode             |
+| `make import-check` | Enforce hexagonal import boundaries |
+| `make ci`           | Run all of the above                |
 
 ### Contributing
 
