@@ -1,6 +1,12 @@
 """Domain aggregate: GsbFile."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from gsbparse.domain.detailed_transaction import DetailedTransaction
 
 from gsbparse.domain.sections.account import AccountSection
 from gsbparse.domain.sections.amount_comparison import AmountComparisonSection
@@ -83,3 +89,15 @@ class GsbFile:
     reports: list[ReportSection] | None
     text_comparisons: list[TextComparisonSection] | None
     amount_comparisons: list[AmountComparisonSection] | None
+
+    @property
+    def detailed_transactions(self) -> list[DetailedTransaction] | None:
+        """Transactions with all foreign keys resolved to domain objects.
+
+        Returns ``None`` when the file contains no transactions.
+        Accounts or currencies missing from the file cause the affected
+        transaction to be skipped with a ``WARNING`` log entry.
+        """
+        from gsbparse.domain.detailed_transaction import build_detailed_transactions
+
+        return build_detailed_transactions(self)
