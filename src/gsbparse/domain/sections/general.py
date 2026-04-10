@@ -156,7 +156,7 @@ class GeneralSection(GsbFileSection):
     Add_archive_in_total_balance: bool
     Force_credit_before_debit: bool | None
     Bet_array_column_width: str
-    Bet_capital: int
+    Bet_capital: Decimal
     Bet_currency: int
     Bet_taux_annuel: Decimal
     Bet_index_duree: int

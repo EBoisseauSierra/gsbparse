@@ -15,7 +15,7 @@ class PaymentSection(GsbFileSection):
         Sign: Sign convention (1 = debit, -1 = credit, 0 = neutral).
         Show_entry: Show a free-text entry field in the transaction form.
         Automatic_number: Auto-increment the payment reference number.
-        Current_number: Current auto-increment value.
+        Current_number: Current auto-increment value (``None`` when ``Automatic_number`` is off).
         Account: Account identifier this method is attached to (0 = global).
     """
 
@@ -24,5 +24,5 @@ class PaymentSection(GsbFileSection):
     Sign: int
     Show_entry: bool
     Automatic_number: bool
-    Current_number: int
+    Current_number: int | None
     Account: int

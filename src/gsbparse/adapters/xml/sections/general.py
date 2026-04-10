@@ -116,7 +116,7 @@ def parse_general_section(element: ET.Element) -> GeneralSection:
         Add_archive_in_total_balance=parse_bool(a["Add_archive_in_total_balance"]),
         Force_credit_before_debit=_opt_bool("Force-credit-before-debit"),
         Bet_array_column_width=parse_str(a["Bet_array_column_width"]),
-        Bet_capital=parse_int(a["Bet_capital"]),
+        Bet_capital=parse_amount(a["Bet_capital"]),
         Bet_currency=parse_int(a["Bet_currency"]),
         Bet_taux_annuel=parse_amount(a["Bet_taux_annuel"]),
         Bet_index_duree=parse_int(a["Bet_index_duree"]),

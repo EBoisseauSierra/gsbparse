@@ -38,7 +38,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 #: Maps each Grisbi XML tag to the function that parses it into a domain section.
 ELEMENT_TAG_TO_PARSER: dict[str, Callable[[ET.Element], GsbFileSection]] = {
     "General": parse_general_section,
-    "Rgba": parse_rgba_section,
+    "RGBA": parse_rgba_section,
     "Print": parse_print_section,
     "Currency": parse_currency_section,
     "Account": parse_account_section,
