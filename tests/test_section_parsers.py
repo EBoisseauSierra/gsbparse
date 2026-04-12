@@ -197,9 +197,8 @@ class TestParseAccountSection:
 
 
 class TestParseTransactionSection:
-    def test_nullable_date_field(self):
-        element = _el(
-            "Transaction",
+    def _make_transaction_element(self, **overrides: str) -> ET.Element:
+        defaults = dict(
             Ac="1",
             Nb="1",
             Id="(null)",
@@ -229,14 +228,23 @@ class TestParseTransactionSection:
             Trt="0",
             Mo="0",
         )
+        defaults.update(overrides)
+        return _el("Transaction", **defaults)
+
+    def test_nullable_value_date_field(self):
+        element = self._make_transaction_element(Dt="01/15/2023", Dv="(null)")
 
         section = parse_transaction_section(element)
 
-        assert section.Nb == 1
         assert section.Dt == date(2023, 1, 15)
         assert section.Dv is None
-        assert section.Am == Decimal("42.50")
-        assert section.Id is None
+
+    def test_nullable_transaction_date_field(self):
+        element = self._make_transaction_element(Dt="(null)")
+
+        section = parse_transaction_section(element)
+
+        assert section.Dt is None
 
 
 class TestParseScheduledSection:

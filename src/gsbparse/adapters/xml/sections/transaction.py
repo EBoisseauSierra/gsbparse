@@ -29,7 +29,7 @@ def parse_transaction_section(element: ET.Element) -> TransactionSection:
         Ac=parse_int(a["Ac"]),
         Nb=parse_int(a["Nb"]),
         Id=parse_nullable_str(a["Id"]),
-        Dt=parse_date(a["Dt"]),
+        Dt=_parse_nullable_date(a["Dt"]),
         Dv=_parse_nullable_date(a["Dv"]),
         Am=parse_amount(a["Am"]),
         Cu=parse_int(a["Cu"]),

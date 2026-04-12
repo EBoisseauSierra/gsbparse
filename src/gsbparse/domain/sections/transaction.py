@@ -19,7 +19,7 @@ class TransactionSection(GsbFileSection):
         Ac: Account identifier.
         Nb: Transaction number (unique within the account).
         Id: OFX import identifier (nullable).
-        Dt: Transaction date.
+        Dt: Transaction date (nullable).
         Dv: Value date (nullable).
         Am: Amount (negative = debit).
         Cu: Currency identifier.
@@ -49,7 +49,7 @@ class TransactionSection(GsbFileSection):
     Ac: int
     Nb: int
     Id: str | None
-    Dt: date
+    Dt: date | None
     Dv: date | None
     Am: Decimal
     Cu: int

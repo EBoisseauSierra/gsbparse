@@ -46,7 +46,7 @@ class DetailedTransaction:
     Attributes:
         Nb: Transaction number (primary key within the account).
         Id: OFX transaction identifier (nullable).
-        Dt: Transaction date.
+        Dt: Transaction date (nullable).
         Dv: Value date (nullable).
         Am: Amount (positive = credit, negative = debit).
         Exb: Exchange-rate flag.
@@ -76,7 +76,7 @@ class DetailedTransaction:
 
     Nb: int
     Id: str | None
-    Dt: date
+    Dt: date | None
     Dv: date | None
     Am: Decimal
     Exb: bool
