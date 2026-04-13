@@ -637,7 +637,7 @@ class TestParseArchiveSectionNullableDates:
             "Bet_historical",
             {
                 "Nb": "1",
-                "AC": "1",
+                "Ac": "1",
                 "Ori": "0",
                 "Edit": "0",
                 "Damount": "0,00",

@@ -14,7 +14,7 @@ class BetHistoricalSection(GsbFileSection):
 
     Attributes:
         Nb: Unique identifier.
-        AC: Account identifier.
+        Ac: Account identifier.
         Ori: Data origin (0 = categories, 1 = budget lines).
         Div: Division number (category or budget line identifier).
         Edit: Whether the amount has been manually overridden.
@@ -25,7 +25,7 @@ class BetHistoricalSection(GsbFileSection):
     """
 
     Nb: int
-    AC: int
+    Ac: int
     Ori: int
     Div: int
     Edit: bool

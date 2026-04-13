@@ -18,7 +18,7 @@ def parse_bet_historical_section(element: ET.Element) -> BetHistoricalSection:
     a = element.attrib
     return BetHistoricalSection(
         Nb=parse_int(a["Nb"]),
-        AC=parse_int(a["AC"]),
+        Ac=parse_int(a["Ac"]),
         Ori=parse_int(a["Ori"]),
         Div=parse_int(a["Div"]),
         Edit=parse_bool(a["Edit"]),

@@ -36,7 +36,7 @@ class ReportSection(GsbFileSection):
         Show_transaction_sort_type: Show sort type column.
         Show_columns_titles: Show column titles.
         Show_title_column_kind: Show title column kind.
-        Show_exclude_breakdown_child: Exclude breakdown child rows.
+        Show_exclude_split_child: Exclude breakdown child rows.
         Show_split_amounts: Show split amounts.
         Currency_general: Currency identifier for the report.
         Report_in_payees: Include payees in the report.
@@ -45,12 +45,12 @@ class ReportSection(GsbFileSection):
         Financial_year_kind: Financial year filter kind.
         Financial_year_select: Selected financial years (nullable).
         Date_kind: Date range kind.
-        Date_begining: Report start date string.
+        Date_beginning: Report start date string.
         Date_end: Report end date string.
         Split_by_date: Split report by date.
         Split_date_period: Date split period.
         Split_by_fin_year: Split report by financial year.
-        Split_day_begining: Day the report period begins.
+        Split_day_beginning: Day the report period begins.
         Account_use_selection: Filter by account selection.
         Account_selected: Selected accounts (nullable).
         Account_group_transactions: Group transactions by account.
@@ -118,7 +118,7 @@ class ReportSection(GsbFileSection):
     Show_transaction_sort_type: bool
     Show_columns_titles: bool
     Show_title_column_kind: bool
-    Show_exclude_breakdown_child: bool
+    Show_exclude_split_child: bool
     Show_split_amounts: bool
     Currency_general: int
     Report_in_payees: bool
@@ -127,12 +127,12 @@ class ReportSection(GsbFileSection):
     Financial_year_kind: int
     Financial_year_select: str | None
     Date_kind: int
-    Date_begining: str
+    Date_beginning: str
     Date_end: str
     Split_by_date: bool
     Split_date_period: int
     Split_by_fin_year: bool
-    Split_day_begining: int
+    Split_day_beginning: int
     Account_use_selection: bool
     Account_selected: str | None
     Account_group_transactions: bool
