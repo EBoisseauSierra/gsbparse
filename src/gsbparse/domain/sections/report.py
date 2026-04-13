@@ -62,7 +62,6 @@ class ReportSection(GsbFileSection):
         Categ_use: Use category filtering.
         Categ_use_selection: Filter by category selection.
         Categ_selected: Selected categories (nullable).
-        Categ_exclude_transactions: Exclude transactions matching category filter.
         Categ_show_amount: Show category amount.
         Categ_show_sub_categ: Show sub-categories.
         Categ_show_without_sub_categ: Show categories without sub-categories.
@@ -72,7 +71,6 @@ class ReportSection(GsbFileSection):
         Budget_use: Use budget filtering.
         Budget_use_selection: Filter by budget selection.
         Budget_selected: Selected budget lines (nullable).
-        Budget_exclude_transactions: Exclude transactions matching budget filter.
         Budget_show_amount: Show budget amount.
         Budget_show_sub_budget: Show sub-budget lines.
         Budget_show_without_sub_budget: Show budgets without sub-budgets.
@@ -144,7 +142,6 @@ class ReportSection(GsbFileSection):
     Categ_use: bool
     Categ_use_selection: bool
     Categ_selected: str | None
-    Categ_exclude_transactions: bool
     Categ_show_amount: bool
     Categ_show_sub_categ: bool
     Categ_show_without_sub_categ: bool
@@ -154,7 +151,6 @@ class ReportSection(GsbFileSection):
     Budget_use: bool
     Budget_use_selection: bool
     Budget_selected: str | None
-    Budget_exclude_transactions: bool
     Budget_show_amount: bool
     Budget_show_sub_budget: bool
     Budget_show_without_sub_budget: bool
