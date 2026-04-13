@@ -2,8 +2,10 @@
 
 import xml.etree.ElementTree as ET
 
-from gsbparse.adapters.xml.parsers import parse_bool, parse_date, parse_int
+from gsbparse.adapters.xml.parsers import parse_bool, parse_date, parse_int, parse_null
 from gsbparse.domain.sections.bet_transfert import BetTransfertSection
+
+_parse_nullable_date = parse_null(parse_date)
 
 
 def parse_bet_transfert_section(element: ET.Element) -> BetTransfertSection:
@@ -18,13 +20,13 @@ def parse_bet_transfert_section(element: ET.Element) -> BetTransfertSection:
     a = element.attrib
     return BetTransfertSection(
         Nb=parse_int(a["Nb"]),
-        Dt=parse_date(a["Dt"]),
+        Dt=_parse_nullable_date(a["Dt"]),
         Ac=parse_int(a["Ac"]),
         Ty=parse_int(a["Ty"]),
         Ra=parse_int(a["Ra"]),
         Rt=parse_bool(a["Rt"]),
         Dd=parse_bool(a["Dd"]),
-        Dtb=parse_date(a["Dtb"]),
+        Dtb=_parse_nullable_date(a["Dtb"]),
         Mlbd=parse_bool(a["Mlbd"]),
         Pa=parse_int(a["Pa"]),
         Pn=parse_int(a["Pn"]),

@@ -18,7 +18,7 @@ class BetLoanSection(GsbFileSection):
         InCol: Invert the capital/payment columns in amortisation tables.
         Ca: Principal (capital).
         Duree: Duration (number of payments).
-        FDate: First payment date.
+        FDate: First payment date (nullable).
         Fees: Fees per payment.
         Taux: Annual interest rate.
         TyTaux: Interest rate type.
@@ -40,7 +40,7 @@ class BetLoanSection(GsbFileSection):
     InCol: bool
     Ca: Decimal
     Duree: int
-    FDate: date
+    FDate: date | None
     Fees: Decimal
     Taux: Decimal
     TyTaux: int

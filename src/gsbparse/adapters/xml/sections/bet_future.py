@@ -27,7 +27,7 @@ def parse_bet_future_section(element: ET.Element) -> BetFutureSection:
     a = element.attrib
     return BetFutureSection(
         Nb=parse_int(a["Nb"]),
-        Dt=parse_date(a["Dt"]),
+        Dt=_parse_nullable_date(a["Dt"]),
         Ac=parse_int(a["Ac"]),
         Am=parse_amount(a["Am"]),
         Pa=parse_int(a["Pa"]),

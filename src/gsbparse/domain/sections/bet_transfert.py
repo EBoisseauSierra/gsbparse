@@ -15,13 +15,13 @@ class BetTransfertSection(GsbFileSection):
 
     Attributes:
         Nb: Unique identifier.
-        Dt: Settlement date on the main bank account.
+        Dt: Settlement date on the main bank account (nullable).
         Ac: Account identifier (the deferred-debit or partial-balance account).
         Ty: Type (0 = cash account, 1 = partial balance of cash accounts).
         Ra: Account or partial-balance number concerned.
         Rt: Replace a transaction whose date falls in the import search window.
         Dd: Create the debit transaction in the target account.
-        Dtb: Month switchover date (day after the statement cutoff).
+        Dtb: Month switchover date (day after the statement cutoff) (nullable).
         Mlbd: Force settlement date to the last banking day of the month.
         Pa: Party identifier.
         Pn: Payment method identifier.
@@ -37,13 +37,13 @@ class BetTransfertSection(GsbFileSection):
     """
 
     Nb: int
-    Dt: date
+    Dt: date | None
     Ac: int
     Ty: int
     Ra: int
     Rt: bool
     Dd: bool
-    Dtb: date
+    Dtb: date | None
     Mlbd: bool
     Pa: int
     Pn: int

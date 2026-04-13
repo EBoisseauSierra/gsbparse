@@ -13,13 +13,13 @@ class FinancialYearSection(GsbFileSection):
     Attributes:
         Nb: Unique identifier.
         Na: Display name (e.g. ``"2007"``).
-        Bdte: Begin date.
-        Edte: End date.
+        Bdte: Begin date (nullable).
+        Edte: End date (nullable).
         Sho: Show this financial year in the UI.
     """
 
     Nb: int
     Na: str
-    Bdte: date
-    Edte: date
+    Bdte: date | None
+    Edte: date | None
     Sho: bool

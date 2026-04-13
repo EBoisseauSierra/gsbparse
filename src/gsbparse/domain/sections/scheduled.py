@@ -13,7 +13,7 @@ class ScheduledSection(GsbFileSection):
 
     Attributes:
         Nb: Scheduled transaction number.
-        Dt: Next occurrence date.
+        Dt: Next occurrence date (nullable).
         Ac: Account identifier.
         Am: Amount.
         Cu: Currency identifier.
@@ -39,7 +39,7 @@ class ScheduledSection(GsbFileSection):
     """
 
     Nb: int
-    Dt: date
+    Dt: date | None
     Ac: int
     Am: Decimal
     Cu: int

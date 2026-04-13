@@ -15,8 +15,8 @@ class ReconcileSection(GsbFileSection):
         Nb: Unique identifier.
         Na: Display name (e.g. ``"2007-1"``).
         Acc: Account identifier this reconciliation belongs to.
-        Idate: Start date of the reconciliation period.
-        Fdate: End date of the reconciliation period.
+        Idate: Start date of the reconciliation period (nullable).
+        Fdate: End date of the reconciliation period (nullable).
         Ibal: Opening balance.
         Fbal: Closing balance.
     """
@@ -24,7 +24,7 @@ class ReconcileSection(GsbFileSection):
     Nb: int
     Na: str
     Acc: int
-    Idate: date
-    Fdate: date
+    Idate: date | None
+    Fdate: date | None
     Ibal: Decimal
     Fbal: Decimal

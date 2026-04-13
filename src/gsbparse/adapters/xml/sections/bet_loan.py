@@ -2,8 +2,16 @@
 
 import xml.etree.ElementTree as ET
 
-from gsbparse.adapters.xml.parsers import parse_amount, parse_bool, parse_date, parse_int
+from gsbparse.adapters.xml.parsers import (
+    parse_amount,
+    parse_bool,
+    parse_date,
+    parse_int,
+    parse_null,
+)
 from gsbparse.domain.sections.bet_loan import BetLoanSection
+
+_parse_nullable_date = parse_null(parse_date)
 
 
 def parse_bet_loan_section(element: ET.Element) -> BetLoanSection:
@@ -23,7 +31,7 @@ def parse_bet_loan_section(element: ET.Element) -> BetLoanSection:
         InCol=parse_bool(a["InCol"]),
         Ca=parse_amount(a["Ca"]),
         Duree=parse_int(a["Duree"]),
-        FDate=parse_date(a["FDate"]),
+        FDate=_parse_nullable_date(a["FDate"]),
         Fees=parse_amount(a["Fees"]),
         Taux=parse_amount(a["Taux"]),
         TyTaux=parse_int(a["TyTaux"]),

@@ -27,7 +27,7 @@ def parse_scheduled_section(element: ET.Element) -> ScheduledSection:
     a = element.attrib
     return ScheduledSection(
         Nb=parse_int(a["Nb"]),
-        Dt=parse_date(a["Dt"]),
+        Dt=_parse_nullable_date(a["Dt"]),
         Ac=parse_int(a["Ac"]),
         Am=parse_amount(a["Am"]),
         Cu=parse_int(a["Cu"]),

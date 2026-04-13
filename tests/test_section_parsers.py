@@ -574,6 +574,19 @@ class TestParseArchiveSectionNullableDates:
             },
         ),
         (
+            parse_reconcile_section,
+            "Reconcile",
+            {
+                "Nb": "1",
+                "Na": "(null)",
+                "Acc": "1",
+                "Idate": "(null)",
+                "Fdate": "(null)",
+                "Ibal": "500,00",
+                "Fbal": "650,00",
+            },
+        ),
+        (
             parse_currency_link_section,
             "Currency_link",
             {

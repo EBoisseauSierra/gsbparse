@@ -15,7 +15,7 @@ class BetFutureSection(GsbFileSection):
 
     Attributes:
         Nb: Unique identifier.
-        Dt: Date.
+        Dt: Date (nullable).
         Ac: Account identifier.
         Am: Amount.
         Pa: Party identifier.
@@ -37,7 +37,7 @@ class BetFutureSection(GsbFileSection):
     """
 
     Nb: int
-    Dt: date
+    Dt: date | None
     Ac: int
     Am: Decimal
     Pa: int

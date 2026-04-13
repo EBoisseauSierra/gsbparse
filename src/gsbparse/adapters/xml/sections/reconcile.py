@@ -2,8 +2,10 @@
 
 import xml.etree.ElementTree as ET
 
-from gsbparse.adapters.xml.parsers import parse_amount, parse_date, parse_int, parse_str
+from gsbparse.adapters.xml.parsers import parse_amount, parse_date, parse_int, parse_null, parse_str
 from gsbparse.domain.sections.reconcile import ReconcileSection
+
+_parse_nullable_date = parse_null(parse_date)
 
 
 def parse_reconcile_section(element: ET.Element) -> ReconcileSection:
@@ -20,8 +22,8 @@ def parse_reconcile_section(element: ET.Element) -> ReconcileSection:
         Nb=parse_int(a["Nb"]),
         Na=parse_str(a["Na"]),
         Acc=parse_int(a["Acc"]),
-        Idate=parse_date(a["Idate"]),
-        Fdate=parse_date(a["Fdate"]),
+        Idate=_parse_nullable_date(a["Idate"]),
+        Fdate=_parse_nullable_date(a["Fdate"]),
         Ibal=parse_amount(a["Ibal"]),
         Fbal=parse_amount(a["Fbal"]),
     )
