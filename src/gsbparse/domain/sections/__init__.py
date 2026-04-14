@@ -1,7 +1,7 @@
 """Re-exports every concrete section class for convenient import."""
 
 from gsbparse.domain.sections._base import GsbFileSection
-from gsbparse.domain.sections.account import AccountSection
+from gsbparse.domain.sections.account import AccountKind, AccountSection
 from gsbparse.domain.sections.amount_comparison import AmountComparisonSection
 from gsbparse.domain.sections.archive import ArchiveSection
 from gsbparse.domain.sections.bank import BankSection
@@ -33,6 +33,7 @@ from gsbparse.domain.sections.text_comparison import TextComparisonSection
 from gsbparse.domain.sections.transaction import TransactionSection
 
 __all__ = [
+    "AccountKind",
     "AccountSection",
     "AmountComparisonSection",
     "ArchiveSection",

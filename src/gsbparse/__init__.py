@@ -31,6 +31,7 @@ from gsbparse.domain.errors import (
 )
 from gsbparse.domain.file import GsbFile
 from gsbparse.domain.sections import (
+    AccountKind,
     AccountSection,
     AmountComparisonSection,
     ArchiveSection,
@@ -75,6 +76,7 @@ __all__ = [
     "DEFAULT_DETAILED_TRANSACTION_COLUMNS",
     # Section types
     "GsbFileSection",
+    "AccountKind",
     "AccountSection",
     "AmountComparisonSection",
     "ArchiveSection",

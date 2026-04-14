@@ -15,6 +15,7 @@ from pathlib import Path
 import pytest
 
 import gsbparse
+from gsbparse.domain.sections.account import AccountKind
 
 EXAMPLE_FILE = Path(__file__).parent / "assets" / "example_3.0_en.gsb"
 
@@ -70,7 +71,7 @@ class TestAccounts:
         assert gsb.accounts is not None
         account_4 = next(a for a in gsb.accounts if a.Number == 4)
         assert account_4.Name == "Real Estate Loan [liabilities]"
-        assert account_4.Kind == 2  # liability
+        assert account_4.Kind == AccountKind.LIABILITIES
 
 
 class TestTransactions:

@@ -9,7 +9,7 @@ from gsbparse.adapters.xml.parsers import (
     parse_null,
     parse_str,
 )
-from gsbparse.domain.sections.account import AccountSection
+from gsbparse.domain.sections.account import AccountKind, AccountSection
 
 _parse_nullable_str = parse_null(parse_str)
 
@@ -29,7 +29,7 @@ def parse_account_section(element: ET.Element) -> AccountSection:
         Id=_parse_nullable_str(a["Id"]),
         Number=parse_int(a["Number"]),
         Owner=parse_str(a["Owner"]),
-        Kind=parse_int(a["Kind"]),
+        Kind=AccountKind(parse_int(a["Kind"])),
         Currency=parse_int(a["Currency"]),
         Path_icon=parse_str(a["Path_icon"]),
         Bank=parse_int(a["Bank"]),

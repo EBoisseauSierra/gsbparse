@@ -2,8 +2,18 @@
 
 from dataclasses import dataclass
 from decimal import Decimal
+from enum import IntEnum
 
 from gsbparse.domain.sections._base import GsbFileSection
+
+
+class AccountKind(IntEnum):
+    """Account kind as stored in the ``Kind`` attribute of an ``<Account>`` element."""
+
+    BANK = 0
+    CASH = 1
+    LIABILITIES = 2
+    ASSETS = 3
 
 
 @dataclass(frozen=True)
@@ -18,7 +28,7 @@ class AccountSection(GsbFileSection):
         Id: OFX account identifier (nullable).
         Number: Account number (internal).
         Owner: Account holder name.
-        Kind: Account kind (0 = bank, 1 = cash, 2 = liability, …).
+        Kind: Account kind (checking / cash / liability / asset).
         Currency: Currency identifier.
         Path_icon: Path to the account icon file.
         Bank: Bank identifier (0 = none).
@@ -50,7 +60,7 @@ class AccountSection(GsbFileSection):
     Id: str | None
     Number: int
     Owner: str
-    Kind: int
+    Kind: AccountKind
     Currency: int
     Path_icon: str
     Bank: int

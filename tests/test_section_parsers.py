@@ -40,6 +40,7 @@ from gsbparse.adapters.xml.sections.sub_budgetary import parse_sub_budgetary_sec
 from gsbparse.adapters.xml.sections.sub_category import parse_sub_category_section
 from gsbparse.adapters.xml.sections.text_comparison import parse_text_comparison_section
 from gsbparse.adapters.xml.sections.transaction import parse_transaction_section
+from gsbparse.domain.sections.account import AccountKind
 
 
 def _el(tag: str, **attrib: str) -> ET.Element:
@@ -190,6 +191,7 @@ class TestParseAccountSection:
         assert section.Name == dummy_name
         assert section.Id is None
         assert section.Number == int(dummy_number)
+        assert section.Kind == AccountKind.BANK
         assert section.Currency == int(dummy_currency)
         assert section.Initial_balance == Decimal("1000.00")
         assert section.Closed_account is False

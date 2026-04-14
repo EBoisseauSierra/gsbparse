@@ -13,7 +13,7 @@ from gsbparse.domain.detailed_transaction import (
 )
 from gsbparse.domain.errors import UnknownDetailedTransactionPathError
 from gsbparse.domain.file import GsbFile
-from gsbparse.domain.sections.account import AccountSection
+from gsbparse.domain.sections.account import AccountKind, AccountSection
 from gsbparse.domain.sections.category import CategorySection
 from gsbparse.domain.sections.currency import CurrencySection
 from gsbparse.domain.sections.party import PartySection
@@ -27,7 +27,7 @@ def _dummy_account(number: int = 1, name: str = "Checking") -> AccountSection:
         Id=None,
         Number=number,
         Owner="",
-        Kind=0,
+        Kind=AccountKind.BANK,
         Currency=1,
         Path_icon="",
         Bank=0,
