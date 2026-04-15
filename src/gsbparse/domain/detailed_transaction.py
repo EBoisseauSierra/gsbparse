@@ -10,6 +10,7 @@ a parsed :class:`~gsbparse.domain.file.GsbFile`.
 
 from __future__ import annotations
 
+import dataclasses
 import functools
 import logging
 from dataclasses import dataclass
@@ -71,7 +72,8 @@ class DetailedTransaction:
         Fi: Financial year (None when unset).
         Bu: Budget line (None when unset).
         Sbu: Sub-budget line (None when unset).
-        Trt: Transfer target account (None when not a transfer).
+        Trt: Paired contra-transaction for transfers (None when not a transfer or contra not found).
+            The nested object's own ``Trt`` is always ``None`` to prevent infinite nesting.
         Mo: Mother transaction number for breakdown children (0 = top-level).
     """
 
@@ -102,7 +104,7 @@ class DetailedTransaction:
     Fi: FinancialYearSection | None
     Bu: BudgetarySection | None
     Sbu: SubBudgetarySection | None
-    Trt: AccountSection | None
+    Trt: DetailedTransaction | None
 
 
 @dataclass(frozen=True)
@@ -144,7 +146,7 @@ DEFAULT_DETAILED_TRANSACTION_COLUMNS: list[DetailedTransactionColumn] = [
     DetailedTransactionColumn("Fi.Na", "financial_year"),
     DetailedTransactionColumn("Bu.Na", "budget"),
     DetailedTransactionColumn("Sbu.Na", "sub_budget"),
-    DetailedTransactionColumn("Trt.Name", "transfer_account"),
+    DetailedTransactionColumn("Trt.Ac.Name", "transfer_account"),
 ]
 
 
@@ -226,7 +228,11 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
         {s.Nb: s for s in gsb_file.sub_budgetaries} if gsb_file.sub_budgetaries else {}
     )
 
-    result: list[DetailedTransaction] = []
+    # Pass 1 — build every DetailedTransaction with Trt=None and record the raw Trt value.
+    # Keyed by transaction Nb, which is globally unique across the file.
+    pass1: dict[int, DetailedTransaction] = {}
+    raw_trt: dict[int, int] = {}
+
     for tx in gsb_file.transactions:
         account = accounts.get(tx.Ac)
         if account is None:
@@ -238,37 +244,44 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
             _log.warning("Transaction %d: currency %d not found — skipping", tx.Nb, tx.Cu)
             continue
 
-        result.append(
-            DetailedTransaction(
-                Nb=tx.Nb,
-                Id=tx.Id,
-                Dt=tx.Dt,
-                Dv=tx.Dv,
-                Am=tx.Am,
-                Exb=tx.Exb,
-                Exr=tx.Exr,
-                Exf=tx.Exf,
-                Br=tx.Br,
-                No=tx.No,
-                Pc=tx.Pc,
-                Vo=tx.Vo,
-                Ba=tx.Ba,
-                Au=tx.Au,
-                Ma=tx.Ma,
-                Ar=tx.Ar,
-                Mo=tx.Mo,
-                Ac=account,
-                Cu=currency,
-                Pa=parties.get(tx.Pa) if tx.Pa != 0 else None,
-                Ca=categories.get(tx.Ca) if tx.Ca != 0 else None,
-                Sca=sub_categories.get(tx.Sca) if tx.Sca != 0 else None,
-                Pn=payment_methods.get(tx.Pn) if tx.Pn != 0 else None,
-                Re=reconciles.get(tx.Re) if tx.Re != 0 else None,
-                Fi=financial_years.get(tx.Fi) if tx.Fi not in (0, -1, -2) else None,
-                Bu=budgetaries.get(tx.Bu) if tx.Bu != 0 else None,
-                Sbu=sub_budgetaries.get(tx.Sbu) if tx.Sbu != 0 else None,
-                Trt=accounts.get(tx.Trt) if tx.Trt != 0 else None,
-            )
+        dt = DetailedTransaction(
+            Nb=tx.Nb,
+            Id=tx.Id,
+            Dt=tx.Dt,
+            Dv=tx.Dv,
+            Am=tx.Am,
+            Exb=tx.Exb,
+            Exr=tx.Exr,
+            Exf=tx.Exf,
+            Br=tx.Br,
+            No=tx.No,
+            Pc=tx.Pc,
+            Vo=tx.Vo,
+            Ba=tx.Ba,
+            Au=tx.Au,
+            Ma=tx.Ma,
+            Ar=tx.Ar,
+            Mo=tx.Mo,
+            Ac=account,
+            Cu=currency,
+            Pa=parties.get(tx.Pa) if tx.Pa != 0 else None,
+            Ca=categories.get(tx.Ca) if tx.Ca != 0 else None,
+            Sca=sub_categories.get(tx.Sca) if tx.Sca != 0 else None,
+            Pn=payment_methods.get(tx.Pn) if tx.Pn != 0 else None,
+            Re=reconciles.get(tx.Re) if tx.Re != 0 else None,
+            Fi=financial_years.get(tx.Fi) if tx.Fi not in (0, -1, -2) else None,
+            Bu=budgetaries.get(tx.Bu) if tx.Bu != 0 else None,
+            Sbu=sub_budgetaries.get(tx.Sbu) if tx.Sbu != 0 else None,
+            Trt=None,
         )
+        pass1[tx.Nb] = dt
+        raw_trt[tx.Nb] = tx.Trt
+
+    # Pass 2 — resolve Trt: each transfer points to the pass-1 object of its contra
+    # (which has Trt=None), preventing infinite nesting.
+    result = [
+        dataclasses.replace(dt, Trt=pass1.get(raw_trt[nb])) if raw_trt[nb] != 0 else dt
+        for nb, dt in pass1.items()
+    ]
 
     return result if result else None

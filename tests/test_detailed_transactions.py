@@ -229,12 +229,14 @@ class TestBuildDetailedTransactions:
         assert any("account" in r.message.lower() for r in caplog.records)
 
     def test_transfer_target_resolved(self):
+        # Two transactions that form a transfer pair: each Trt points to the other's Nb.
         dummy_account_1 = _dummy_account(number=1, name="Checking")
         dummy_account_2 = _dummy_account(number=2, name="Savings")
         dummy_currency = _dummy_currency()
-        dummy_tx = _dummy_transaction(ac=1, trt=2)
+        dummy_tx_a = _dummy_transaction(nb=1, ac=1, trt=2)
+        dummy_tx_b = _dummy_transaction(nb=2, ac=2, trt=1)
         gsb = _minimal_gsb_file(
-            transactions=[dummy_tx],
+            transactions=[dummy_tx_a, dummy_tx_b],
             accounts=[dummy_account_1, dummy_account_2],
             currencies=[dummy_currency],
         )
@@ -242,7 +244,14 @@ class TestBuildDetailedTransactions:
         result = build_detailed_transactions(gsb)
 
         assert result is not None
-        assert result[0].Trt is dummy_account_2
+        result_a = next(tx for tx in result if tx.Nb == 1)
+        result_b = next(tx for tx in result if tx.Nb == 2)
+        assert result_a.Trt is not None
+        assert result_a.Trt.Nb == 2
+        assert result_a.Trt.Trt is None  # no infinite nesting
+        assert result_b.Trt is not None
+        assert result_b.Trt.Nb == 1
+        assert result_b.Trt.Trt is None  # no infinite nesting
 
     def test_shared_account_identity_preserved(self):
         dummy_account = _dummy_account(number=1)

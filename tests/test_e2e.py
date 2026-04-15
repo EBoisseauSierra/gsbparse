@@ -107,12 +107,13 @@ class TestDetailedTransactions:
         assert tx.Pa is not None
         assert tx.Pa.Na == "Loan Credit"
 
-    def test_transfer_target_resolves_for_known_account(self, detailed):
-        # Transaction Nb=16 is the credit side of a real-estate loan transfer (Trt=16)
-        # Account 16 doesn't exist so Trt should be None (tolerant)
+    def test_transfer_target_resolves_to_contra_transaction(self, detailed):
+        # Nb=16 (Ac=1) and Nb=15 (Ac=4) form a transfer pair; each Trt points to the other.
         assert detailed is not None
         tx_16 = next(tx for tx in detailed if tx.Nb == 16)
-        assert tx_16.Trt is None
+        assert tx_16.Trt is not None
+        assert tx_16.Trt.Nb == 15
+        assert tx_16.Trt.Trt is None  # no infinite nesting
 
     def test_all_transactions_have_parties_in_example_file(self, detailed):
         # The example file has a party for every transaction.
