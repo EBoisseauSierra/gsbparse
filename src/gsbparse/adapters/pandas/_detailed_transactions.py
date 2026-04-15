@@ -57,7 +57,7 @@ def detailed_transactions_to_df(
             val = _resolve_nullable_path(tx, col.path)
             if isinstance(val, _enum.IntEnum):
                 enum_column_names.add(col.output_name)
-                val = str(val)
+                val = str(val.name.replace("_", " ").title())
             row[col.output_name] = val
         rows.append(row)
 
