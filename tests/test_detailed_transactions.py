@@ -85,6 +85,18 @@ def _dummy_sub_budgetary(nb: int = 1, na: str = "Groceries", nbb: int = 1) -> Su
     return SubBudgetarySection(Nb=nb, Na=na, Nbb=nbb)
 
 
+def _dummy_reconcile(nb: int = 1, na: str = "2023-1", acc: int = 1) -> ReconcileSection:
+    return ReconcileSection(
+        Nb=nb,
+        Na=na,
+        Acc=acc,
+        Idate=None,
+        Fdate=None,
+        Ibal=Decimal("0"),
+        Fbal=Decimal("0"),
+    )
+
+
 def _dummy_transaction(
     nb: int = 1,
     ac: int = 1,
@@ -95,6 +107,7 @@ def _dummy_transaction(
     bu: int = 0,
     sbu: int = 0,
     trt: int = 0,
+    re: int = 0,
 ) -> TransactionSection:
     return TransactionSection(
         Nb=nb,
@@ -117,7 +130,7 @@ def _dummy_transaction(
         Ma=TransactionMarkedState.NEW,
         Ar=0,
         Au=False,
-        Re=0,
+        Re=re,
         Fi=0,
         Bu=bu,
         Sbu=sbu,
@@ -419,3 +432,46 @@ class TestDetailedSubBudgetarySection:
         assert result[0].Sbu is not None
         assert result[0].Sbu.Na == "Office"
         assert result[0].Sbu.Nbb is dummy_bu_b
+
+
+class TestDetailedReconcileSection:
+    def test_reconcile_acc_resolves_to_account_section(self):
+        # Arrange
+        dummy_account = _dummy_account(number=1, name="Checking")
+        dummy_currency = _dummy_currency()
+        dummy_reconcile_name = "2023-1"
+        dummy_reconcile = _dummy_reconcile(nb=7, na=dummy_reconcile_name, acc=dummy_account.Number)
+        dummy_tx = _dummy_transaction(re=dummy_reconcile.Nb)
+        gsb = _minimal_gsb_file(
+            transactions=[dummy_tx],
+            accounts=[dummy_account],
+            currencies=[dummy_currency],
+            reconciles=[dummy_reconcile],
+        )
+
+        # Act
+        result = build_detailed_transactions(gsb)
+
+        # Assert
+        assert result is not None
+        assert result[0].Re is not None
+        assert result[0].Re.Na == dummy_reconcile_name
+        assert result[0].Re.Acc is dummy_account
+
+    def test_zero_reconcile_resolves_to_none(self):
+        # Arrange
+        dummy_account = _dummy_account()
+        dummy_currency = _dummy_currency()
+        dummy_tx = _dummy_transaction(re=0)
+        gsb = _minimal_gsb_file(
+            transactions=[dummy_tx],
+            accounts=[dummy_account],
+            currencies=[dummy_currency],
+        )
+
+        # Act
+        result = build_detailed_transactions(gsb)
+
+        # Assert
+        assert result is not None
+        assert result[0].Re is None

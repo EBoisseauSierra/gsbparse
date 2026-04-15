@@ -29,7 +29,7 @@ from gsbparse.domain.sections.currency import CurrencySection
 from gsbparse.domain.sections.financial_year import FinancialYearSection
 from gsbparse.domain.sections.party import PartySection
 from gsbparse.domain.sections.payment import PaymentSection
-from gsbparse.domain.sections.reconcile import ReconcileSection
+from gsbparse.domain.sections.reconcile import DetailedReconcileSection
 from gsbparse.domain.sections.sub_budgetary import DetailedSubBudgetarySection
 from gsbparse.domain.sections.sub_category import DetailedSubCategorySection
 from gsbparse.domain.sections.transaction import TransactionMarkedState
@@ -100,7 +100,7 @@ class DetailedTransaction:
     Ca: CategorySection | None
     Sca: DetailedSubCategorySection | None
     Pn: PaymentSection | None
-    Re: ReconcileSection | None
+    Re: DetailedReconcileSection | None
     Fi: FinancialYearSection | None
     Bu: BudgetarySection | None
     Sbu: DetailedSubBudgetarySection | None
@@ -227,9 +227,22 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
     payment_methods: dict[int, PaymentSection] = (
         {p.Number: p for p in gsb_file.payment_methods} if gsb_file.payment_methods else {}
     )
-    reconciles: dict[int, ReconcileSection] = (
-        {r.Nb: r for r in gsb_file.reconciles} if gsb_file.reconciles else {}
-    )
+    detailed_reconciles: dict[int, DetailedReconcileSection] = {}
+    if gsb_file.reconciles:
+        for r in gsb_file.reconciles:
+            acc = accounts.get(r.Acc)
+            if acc is None:
+                _log.warning("Reconcile %d: account %d not found — skipping", r.Nb, r.Acc)
+                continue
+            detailed_reconciles[r.Nb] = DetailedReconcileSection(
+                Nb=r.Nb,
+                Na=r.Na,
+                Acc=acc,
+                Idate=r.Idate,
+                Fdate=r.Fdate,
+                Ibal=r.Ibal,
+                Fbal=r.Fbal,
+            )
     financial_years: dict[int, FinancialYearSection] = (
         {f.Nb: f for f in gsb_file.financial_years} if gsb_file.financial_years else {}
     )
@@ -292,7 +305,7 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
             Ca=categories.get(tx.Ca) if tx.Ca != 0 else None,
             Sca=detailed_sub_categories.get((tx.Ca, tx.Sca)) if tx.Sca != 0 else None,
             Pn=payment_methods.get(tx.Pn) if tx.Pn != 0 else None,
-            Re=reconciles.get(tx.Re) if tx.Re != 0 else None,
+            Re=detailed_reconciles.get(tx.Re) if tx.Re != 0 else None,
             Fi=financial_years.get(tx.Fi) if tx.Fi not in (0, -1, -2) else None,
             Bu=budgetaries.get(tx.Bu) if tx.Bu != 0 else None,
             Sbu=detailed_sub_budgetaries.get((tx.Bu, tx.Sbu)) if tx.Sbu != 0 else None,
