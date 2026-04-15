@@ -31,6 +31,7 @@ from gsbparse.domain.sections.payment import PaymentSection
 from gsbparse.domain.sections.reconcile import ReconcileSection
 from gsbparse.domain.sections.sub_budgetary import SubBudgetarySection
 from gsbparse.domain.sections.sub_category import SubCategorySection
+from gsbparse.domain.sections.transaction import TransactionMarkedState
 
 _log = logging.getLogger(__name__)
 
@@ -64,7 +65,7 @@ class DetailedTransaction:
         Ca: Category (None when unset).
         Sca: Sub-category (None when unset).
         Pn: Payment method (None when unset).
-        Ma: Marked/reconcile status (0 = none, 1 = pointed, 2 = reconciled).
+        Ma: Marked / reconciliation state.
         Ar: Archive this transaction belongs to (identifier; not resolved).
         Re: Reconcile record (None when unset).
         Fi: Financial year (None when unset).
@@ -88,7 +89,7 @@ class DetailedTransaction:
     Vo: str | None
     Ba: str | None
     Au: bool
-    Ma: int
+    Ma: TransactionMarkedState
     Ar: int
     Mo: int
     Ac: AccountSection

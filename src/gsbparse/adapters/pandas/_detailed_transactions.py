@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import enum as _enum
+
 import pandas as pd
 
 from gsbparse.domain.detailed_transaction import (
@@ -47,14 +49,22 @@ def detailed_transactions_to_df(
     cols = columns if columns is not None else DEFAULT_DETAILED_TRANSACTION_COLUMNS
     validate_columns(cols)
 
+    enum_column_names: set[str] = set()
     rows = []
     for tx in transactions:
         row: dict[str, object] = {}
         for col in cols:
-            row[col.output_name] = _resolve_nullable_path(tx, col.path)
+            val = _resolve_nullable_path(tx, col.path)
+            if isinstance(val, _enum.IntEnum):
+                enum_column_names.add(col.output_name)
+                val = str(val)
+            row[col.output_name] = val
         rows.append(row)
 
-    return pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
+    for col_name in enum_column_names:
+        df[col_name] = pd.Categorical(df[col_name])
+    return df
 
 
 def _resolve_nullable_path(tx: DetailedTransaction, path: str) -> object:
