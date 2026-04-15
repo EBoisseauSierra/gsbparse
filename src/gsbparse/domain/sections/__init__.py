@@ -1,7 +1,7 @@
 """Re-exports every concrete section class for convenient import."""
 
 from gsbparse.domain.sections._base import GsbFileSection
-from gsbparse.domain.sections.account import AccountKind, AccountSection
+from gsbparse.domain.sections.account import AccountKind, AccountSection, DetailedAccountSection
 from gsbparse.domain.sections.amount_comparison import AmountComparisonSection
 from gsbparse.domain.sections.archive import ArchiveSection
 from gsbparse.domain.sections.bank import BankSection
@@ -22,13 +22,13 @@ from gsbparse.domain.sections.partial_balance import PartialBalanceSection
 from gsbparse.domain.sections.party import PartySection
 from gsbparse.domain.sections.payment import PaymentSection
 from gsbparse.domain.sections.print import PrintSection
-from gsbparse.domain.sections.reconcile import ReconcileSection
+from gsbparse.domain.sections.reconcile import DetailedReconcileSection, ReconcileSection
 from gsbparse.domain.sections.report import ReportSection
 from gsbparse.domain.sections.rgba import RgbaSection
 from gsbparse.domain.sections.scheduled import ScheduledSection
 from gsbparse.domain.sections.special_line import SpecialLineAction, SpecialLineSection
-from gsbparse.domain.sections.sub_budgetary import SubBudgetarySection
-from gsbparse.domain.sections.sub_category import SubCategorySection
+from gsbparse.domain.sections.sub_budgetary import DetailedSubBudgetarySection, SubBudgetarySection
+from gsbparse.domain.sections.sub_category import DetailedSubCategorySection, SubCategorySection
 from gsbparse.domain.sections.text_comparison import TextComparisonSection
 from gsbparse.domain.sections.transaction import TransactionMarkedState, TransactionSection
 
@@ -51,6 +51,10 @@ __all__ = [
     "CategorySection",
     "CurrencyLinkSection",
     "CurrencySection",
+    "DetailedAccountSection",
+    "DetailedReconcileSection",
+    "DetailedSubBudgetarySection",
+    "DetailedSubCategorySection",
     "FinancialYearSection",
     "GeneralSection",
     "GsbFileSection",
