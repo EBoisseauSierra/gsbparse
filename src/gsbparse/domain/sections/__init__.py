@@ -8,11 +8,11 @@ from gsbparse.domain.sections.bank import BankSection
 from gsbparse.domain.sections.bet import BetSection
 from gsbparse.domain.sections.bet_future import BetFutureSection
 from gsbparse.domain.sections.bet_graph import BetGraphSection
-from gsbparse.domain.sections.bet_historical import BetHistoricalSection
+from gsbparse.domain.sections.bet_historical import BetDataOrigin, BetHistoricalSection
 from gsbparse.domain.sections.bet_loan import BetLoanSection
-from gsbparse.domain.sections.bet_transfert import BetTransfertSection
+from gsbparse.domain.sections.bet_transfert import BetTransfertAccountType, BetTransfertSection
 from gsbparse.domain.sections.budgetary import BudgetarySection
-from gsbparse.domain.sections.category import CategorySection
+from gsbparse.domain.sections.category import CategoryKind, CategorySection
 from gsbparse.domain.sections.currency import CurrencySection
 from gsbparse.domain.sections.currency_link import CurrencyLinkSection
 from gsbparse.domain.sections.financial_year import FinancialYearSection
@@ -26,11 +26,11 @@ from gsbparse.domain.sections.reconcile import ReconcileSection
 from gsbparse.domain.sections.report import ReportSection
 from gsbparse.domain.sections.rgba import RgbaSection
 from gsbparse.domain.sections.scheduled import ScheduledSection
-from gsbparse.domain.sections.special_line import SpecialLineSection
+from gsbparse.domain.sections.special_line import SpecialLineAction, SpecialLineSection
 from gsbparse.domain.sections.sub_budgetary import SubBudgetarySection
 from gsbparse.domain.sections.sub_category import SubCategorySection
 from gsbparse.domain.sections.text_comparison import TextComparisonSection
-from gsbparse.domain.sections.transaction import TransactionSection
+from gsbparse.domain.sections.transaction import TransactionMarkedState, TransactionSection
 
 __all__ = [
     "AccountKind",
@@ -38,13 +38,16 @@ __all__ = [
     "AmountComparisonSection",
     "ArchiveSection",
     "BankSection",
+    "BetDataOrigin",
     "BetFutureSection",
     "BetGraphSection",
     "BetHistoricalSection",
     "BetLoanSection",
     "BetSection",
+    "BetTransfertAccountType",
     "BetTransfertSection",
     "BudgetarySection",
+    "CategoryKind",
     "CategorySection",
     "CurrencyLinkSection",
     "CurrencySection",
@@ -60,9 +63,11 @@ __all__ = [
     "ReportSection",
     "RgbaSection",
     "ScheduledSection",
+    "SpecialLineAction",
     "SpecialLineSection",
     "SubBudgetarySection",
     "SubCategorySection",
     "TextComparisonSection",
+    "TransactionMarkedState",
     "TransactionSection",
 ]

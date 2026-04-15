@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 
 from gsbparse.adapters.xml.parsers import parse_int
 from gsbparse.domain.sections.budgetary import BudgetarySection
+from gsbparse.domain.sections.category import CategoryKind
 
 
 def parse_budgetary_section(element: ET.Element) -> BudgetarySection:
@@ -19,5 +20,5 @@ def parse_budgetary_section(element: ET.Element) -> BudgetarySection:
     return BudgetarySection(
         Nb=parse_int(a["Nb"]),
         Na=a["Na"],
-        Kd=parse_int(a["Kd"]),
+        Kd=CategoryKind(parse_int(a["Kd"])),
     )

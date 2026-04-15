@@ -10,7 +10,7 @@ from gsbparse.adapters.xml.parsers import (
     parse_null,
     parse_nullable_str,
 )
-from gsbparse.domain.sections.transaction import TransactionSection
+from gsbparse.domain.sections.transaction import TransactionMarkedState, TransactionSection
 
 _parse_nullable_date = parse_null(parse_date)
 
@@ -43,7 +43,7 @@ def parse_transaction_section(element: ET.Element) -> TransactionSection:
         No=parse_nullable_str(a["No"]),
         Pn=parse_int(a["Pn"]),
         Pc=parse_nullable_str(a["Pc"]),
-        Ma=parse_int(a["Ma"]),
+        Ma=TransactionMarkedState(parse_int(a["Ma"])),
         Ar=parse_int(a["Ar"]),
         Au=parse_bool(a["Au"]),
         Re=parse_int(a["Re"]),

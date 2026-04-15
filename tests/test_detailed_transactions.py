@@ -14,11 +14,11 @@ from gsbparse.domain.detailed_transaction import (
 from gsbparse.domain.errors import UnknownDetailedTransactionPathError
 from gsbparse.domain.file import GsbFile
 from gsbparse.domain.sections.account import AccountKind, AccountSection
-from gsbparse.domain.sections.category import CategorySection
+from gsbparse.domain.sections.category import CategoryKind, CategorySection
 from gsbparse.domain.sections.currency import CurrencySection
 from gsbparse.domain.sections.party import PartySection
 from gsbparse.domain.sections.sub_category import SubCategorySection
-from gsbparse.domain.sections.transaction import TransactionSection
+from gsbparse.domain.sections.transaction import TransactionMarkedState, TransactionSection
 
 
 def _dummy_account(number: int = 1, name: str = "Checking") -> AccountSection:
@@ -65,7 +65,7 @@ def _dummy_party(nb: int = 1, na: str = "Supermarket") -> PartySection:
 
 
 def _dummy_category(nb: int = 1, na: str = "Food") -> CategorySection:
-    return CategorySection(Nb=nb, Na=na, Kd=1)
+    return CategorySection(Nb=nb, Na=na, Kd=CategoryKind.INCOME)
 
 
 def _dummy_sub_category(nb: int = 1, na: str = "Groceries", nbc: int = 1) -> SubCategorySection:
@@ -99,7 +99,7 @@ def _dummy_transaction(
         No=None,
         Pn=0,
         Pc=None,
-        Ma=0,
+        Ma=TransactionMarkedState.NEW,
         Ar=0,
         Au=False,
         Re=0,

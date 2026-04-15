@@ -41,6 +41,7 @@ from gsbparse.adapters.xml.sections.sub_category import parse_sub_category_secti
 from gsbparse.adapters.xml.sections.text_comparison import parse_text_comparison_section
 from gsbparse.adapters.xml.sections.transaction import parse_transaction_section
 from gsbparse.domain.sections.account import AccountKind
+from gsbparse.domain.sections.category import CategoryKind
 
 
 def _el(tag: str, **attrib: str) -> ET.Element:
@@ -102,7 +103,7 @@ class TestParseCategorySection:
 
         assert section.Nb == int(dummy_nb)
         assert section.Na == dummy_na
-        assert section.Kd == int(dummy_kd)
+        assert section.Kd == CategoryKind(int(dummy_kd))
 
 
 class TestParseSubCategorySection:
@@ -130,7 +131,7 @@ class TestParseBudgetarySection:
 
         assert section.Nb == int(dummy_nb)
         assert section.Na == dummy_na
-        assert section.Kd == int(dummy_kd)
+        assert section.Kd == CategoryKind(int(dummy_kd))
 
 
 class TestParseSubBudgetarySection:

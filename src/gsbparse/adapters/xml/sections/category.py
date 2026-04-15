@@ -3,7 +3,7 @@
 import xml.etree.ElementTree as ET
 
 from gsbparse.adapters.xml.parsers import parse_int
-from gsbparse.domain.sections.category import CategorySection
+from gsbparse.domain.sections.category import CategoryKind, CategorySection
 
 
 def parse_category_section(element: ET.Element) -> CategorySection:
@@ -19,5 +19,5 @@ def parse_category_section(element: ET.Element) -> CategorySection:
     return CategorySection(
         Nb=parse_int(a["Nb"]),
         Na=a["Na"],
-        Kd=parse_int(a["Kd"]),
+        Kd=CategoryKind(parse_int(a["Kd"])),
     )

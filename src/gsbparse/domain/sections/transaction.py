@@ -1,10 +1,36 @@
 """Domain section: Transaction."""
 
+import logging
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from enum import IntEnum
 
 from gsbparse.domain.sections._base import GsbFileSection
+
+_log = logging.getLogger(__name__)
+
+
+class TransactionMarkedState(IntEnum):
+    """Reconciliation / marked state stored in the ``Ma`` attribute of a ``<Transaction>`` element.
+
+    Unknown values encountered in the file fall back to :attr:`NONE`.
+    """
+
+    NONE = -1
+    NEW = 0
+    POINTED = 1
+    TO_RECONCILE = 2
+    RECONCILED = 3
+
+    @classmethod
+    def _missing_(cls, value: object) -> "TransactionMarkedState":
+        _log.warning("Unknown TransactionMarkedState value %r — falling back to NONE", value)
+        return cls.NONE
+
+    def __str__(self) -> str:
+        """Return a lowercase human-readable label."""
+        return self.name.lower().replace("_", " ")
 
 
 @dataclass(frozen=True)
@@ -33,7 +59,7 @@ class TransactionSection(GsbFileSection):
         No: Notes (nullable).
         Pn: Payment method identifier.
         Pc: Payment method content / reference (nullable).
-        Ma: Marked state (0 = none, 1 = P, 2 = T, 3 = R).
+        Ma: Marked / reconciliation state.
         Ar: Archive identifier (0 = not archived).
         Au: Automatic transaction (0 = manual, 1 = from scheduled).
         Re: Reconcile identifier (0 = not reconciled).
@@ -63,7 +89,7 @@ class TransactionSection(GsbFileSection):
     No: str | None
     Pn: int
     Pc: str | None
-    Ma: int
+    Ma: TransactionMarkedState
     Ar: int
     Au: bool
     Re: int

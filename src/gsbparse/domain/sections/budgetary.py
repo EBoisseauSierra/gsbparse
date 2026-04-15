@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 
 from gsbparse.domain.sections._base import GsbFileSection
+from gsbparse.domain.sections.category import CategoryKind
 
 
 @dataclass(frozen=True)
@@ -12,9 +13,9 @@ class BudgetarySection(GsbFileSection):
     Attributes:
         Nb: Unique identifier.
         Na: Display name.
-        Kd: Kind (0 = expense, 1 = income).
+        Kd: Kind (expense or income).
     """
 
     Nb: int
     Na: str
-    Kd: int
+    Kd: CategoryKind

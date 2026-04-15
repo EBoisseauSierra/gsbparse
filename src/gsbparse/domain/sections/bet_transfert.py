@@ -2,8 +2,20 @@
 
 from dataclasses import dataclass
 from datetime import date
+from enum import IntEnum
 
 from gsbparse.domain.sections._base import GsbFileSection
+
+
+class BetTransfertAccountType(IntEnum):
+    """Account type stored in the ``Ty`` attribute of a ``<Bet_transfert>`` element."""
+
+    CASH_ACCOUNT = 0
+    PARTIAL_BALANCE = 1
+
+    def __str__(self) -> str:
+        """Return a lowercase human-readable label."""
+        return self.name.lower().replace("_", " ")
 
 
 @dataclass(frozen=True)
@@ -17,7 +29,7 @@ class BetTransfertSection(GsbFileSection):
         Nb: Unique identifier.
         Dt: Settlement date on the main bank account (nullable).
         Ac: Account identifier (the deferred-debit or partial-balance account).
-        Ty: Type (0 = cash account, 1 = partial balance of cash accounts).
+        Ty: Account type being settled (cash account or partial balance).
         Ra: Account or partial-balance number concerned.
         Rt: Replace a transaction whose date falls in the import search window.
         Dd: Create the debit transaction in the target account.
@@ -39,7 +51,7 @@ class BetTransfertSection(GsbFileSection):
     Nb: int
     Dt: date | None
     Ac: int
-    Ty: int
+    Ty: BetTransfertAccountType
     Ra: int
     Rt: bool
     Dd: bool
