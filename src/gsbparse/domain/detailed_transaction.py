@@ -31,7 +31,7 @@ from gsbparse.domain.sections.party import PartySection
 from gsbparse.domain.sections.payment import PaymentSection
 from gsbparse.domain.sections.reconcile import ReconcileSection
 from gsbparse.domain.sections.sub_budgetary import SubBudgetarySection
-from gsbparse.domain.sections.sub_category import SubCategorySection
+from gsbparse.domain.sections.sub_category import DetailedSubCategorySection
 from gsbparse.domain.sections.transaction import TransactionMarkedState
 
 _log = logging.getLogger(__name__)
@@ -98,7 +98,7 @@ class DetailedTransaction:
     Cu: CurrencySection
     Pa: PartySection | None
     Ca: CategorySection | None
-    Sca: SubCategorySection | None
+    Sca: DetailedSubCategorySection | None
     Pn: PaymentSection | None
     Re: ReconcileSection | None
     Fi: FinancialYearSection | None
@@ -209,9 +209,21 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
     categories: dict[int, CategorySection] = (
         {c.Nb: c for c in gsb_file.categories} if gsb_file.categories else {}
     )
-    sub_categories: dict[int, SubCategorySection] = (
-        {s.Nb: s for s in gsb_file.sub_categories} if gsb_file.sub_categories else {}
-    )
+    # Keyed by (parent_category_nb, sub_category_nb) to disambiguate shared Nb values.
+    detailed_sub_categories: dict[tuple[int, int], DetailedSubCategorySection] = {}
+    if gsb_file.sub_categories:
+        for sc in gsb_file.sub_categories:
+            parent = categories.get(sc.Nbc)
+            if parent is None:
+                _log.warning(
+                    "SubCategory %d (parent=%d): parent category not found — skipping",
+                    sc.Nb,
+                    sc.Nbc,
+                )
+                continue
+            detailed_sub_categories[(sc.Nbc, sc.Nb)] = DetailedSubCategorySection(
+                Nbc=parent, Nb=sc.Nb, Na=sc.Na
+            )
     payment_methods: dict[int, PaymentSection] = (
         {p.Number: p for p in gsb_file.payment_methods} if gsb_file.payment_methods else {}
     )
@@ -266,7 +278,7 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
             Cu=currency,
             Pa=parties.get(tx.Pa) if tx.Pa != 0 else None,
             Ca=categories.get(tx.Ca) if tx.Ca != 0 else None,
-            Sca=sub_categories.get(tx.Sca) if tx.Sca != 0 else None,
+            Sca=detailed_sub_categories.get((tx.Ca, tx.Sca)) if tx.Sca != 0 else None,
             Pn=payment_methods.get(tx.Pn) if tx.Pn != 0 else None,
             Re=reconciles.get(tx.Re) if tx.Re != 0 else None,
             Fi=financial_years.get(tx.Fi) if tx.Fi not in (0, -1, -2) else None,

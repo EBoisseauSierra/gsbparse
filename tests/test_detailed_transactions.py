@@ -14,9 +14,14 @@ from gsbparse.domain.detailed_transaction import (
 from gsbparse.domain.errors import UnknownDetailedTransactionPathError
 from gsbparse.domain.file import GsbFile
 from gsbparse.domain.sections.account import AccountKind, AccountSection
+from gsbparse.domain.sections.bank import BankSection
+from gsbparse.domain.sections.budgetary import BudgetarySection
 from gsbparse.domain.sections.category import CategoryKind, CategorySection
 from gsbparse.domain.sections.currency import CurrencySection
 from gsbparse.domain.sections.party import PartySection
+from gsbparse.domain.sections.payment import PaymentSection
+from gsbparse.domain.sections.reconcile import ReconcileSection
+from gsbparse.domain.sections.sub_budgetary import SubBudgetarySection
 from gsbparse.domain.sections.sub_category import SubCategorySection
 from gsbparse.domain.sections.transaction import TransactionMarkedState, TransactionSection
 
@@ -120,8 +125,11 @@ def _minimal_gsb_file(
     parties: list[PartySection] | None = None,
     categories: list[CategorySection] | None = None,
     sub_categories: list[SubCategorySection] | None = None,
-    budgetaries: None = None,
-    sub_budgetaries: None = None,
+    budgetaries: list[BudgetarySection] | None = None,
+    sub_budgetaries: list[SubBudgetarySection] | None = None,
+    banks: list[BankSection] | None = None,
+    payment_methods: list[PaymentSection] | None = None,
+    reconciles: list[ReconcileSection] | None = None,
 ) -> GsbFile:
     return GsbFile(
         general=None,
@@ -129,9 +137,9 @@ def _minimal_gsb_file(
         print_settings=None,
         currencies=currencies,
         accounts=accounts,
-        banks=None,
+        banks=banks,
         parties=parties,
-        payment_methods=None,
+        payment_methods=payment_methods,
         transactions=transactions,
         scheduled=None,
         categories=categories,
@@ -141,7 +149,7 @@ def _minimal_gsb_file(
         currency_links=None,
         financial_years=None,
         archives=None,
-        reconciles=None,
+        reconciles=reconciles,
         import_rules=None,
         special_lines=None,
         partial_balances=None,
@@ -300,3 +308,54 @@ class TestDetailedTransactionViaProperty:
 
         assert result is not None
         assert isinstance(result[0], DetailedTransaction)
+
+
+class TestDetailedSubCategorySection:
+    def test_sub_category_nbc_resolves_to_category(self):
+        # Arrange
+        dummy_category = _dummy_category(nb=3, na="Transport")
+        dummy_sub_category = _dummy_sub_category(nb=2, na="Bus", nbc=3)
+        dummy_account = _dummy_account()
+        dummy_currency = _dummy_currency()
+        dummy_tx = _dummy_transaction(ca=3, sca=2)
+        gsb = _minimal_gsb_file(
+            transactions=[dummy_tx],
+            accounts=[dummy_account],
+            currencies=[dummy_currency],
+            categories=[dummy_category],
+            sub_categories=[dummy_sub_category],
+        )
+
+        # Act
+        result = build_detailed_transactions(gsb)
+
+        # Assert
+        assert result is not None
+        assert result[0].Sca is not None
+        assert result[0].Sca.Na == "Bus"
+        assert result[0].Sca.Nbc is dummy_category
+
+    def test_sub_categories_sharing_nb_are_disambiguated_by_parent(self):
+        # Two sub-categories have the same Nb=1 but different parent categories.
+        dummy_shared_nb = 1
+        dummy_cat_a = _dummy_category(nb=1, na="Food")
+        dummy_cat_b = _dummy_category(nb=2, na="Transport")
+        dummy_sca_a = SubCategorySection(Nb=dummy_shared_nb, Na="Groceries", Nbc=dummy_cat_a.Nb)
+        dummy_sca_b = SubCategorySection(Nb=dummy_shared_nb, Na="Bus", Nbc=dummy_cat_b.Nb)
+        dummy_account = _dummy_account()
+        dummy_currency = _dummy_currency()
+        dummy_tx = _dummy_transaction(ca=dummy_cat_b.Nb, sca=dummy_shared_nb)  # wants Transport/Bus
+        gsb = _minimal_gsb_file(
+            transactions=[dummy_tx],
+            accounts=[dummy_account],
+            currencies=[dummy_currency],
+            categories=[dummy_cat_a, dummy_cat_b],
+            sub_categories=[dummy_sca_a, dummy_sca_b],
+        )
+
+        result = build_detailed_transactions(gsb)
+
+        assert result is not None
+        assert result[0].Sca is not None
+        assert result[0].Sca.Na == "Bus"
+        assert result[0].Sca.Nbc is dummy_cat_b
