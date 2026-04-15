@@ -22,7 +22,8 @@ if TYPE_CHECKING:
     from gsbparse.domain.file import GsbFile
 
 from gsbparse.domain.errors import UnknownDetailedTransactionPathError
-from gsbparse.domain.sections.account import AccountSection
+from gsbparse.domain.sections.account import AccountSection, DetailedAccountSection
+from gsbparse.domain.sections.bank import BankSection
 from gsbparse.domain.sections.budgetary import BudgetarySection
 from gsbparse.domain.sections.category import CategorySection
 from gsbparse.domain.sections.currency import CurrencySection
@@ -94,7 +95,7 @@ class DetailedTransaction:
     Ma: TransactionMarkedState
     Ar: int
     Mo: int
-    Ac: AccountSection
+    Ac: DetailedAccountSection
     Cu: CurrencySection
     Pa: PartySection | None
     Ca: CategorySection | None
@@ -200,6 +201,7 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
     accounts: dict[int, AccountSection] = (
         {a.Number: a for a in gsb_file.accounts} if gsb_file.accounts else {}
     )
+    banks: dict[int, BankSection] = {b.Nb: b for b in gsb_file.banks} if gsb_file.banks else {}
     currencies: dict[int, CurrencySection] = (
         {c.Nb: c for c in gsb_file.currencies} if gsb_file.currencies else {}
     )
@@ -227,6 +229,53 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
     payment_methods: dict[int, PaymentSection] = (
         {p.Number: p for p in gsb_file.payment_methods} if gsb_file.payment_methods else {}
     )
+    detailed_accounts: dict[int, DetailedAccountSection] = {}
+    if gsb_file.accounts:
+        for a in gsb_file.accounts:
+            currency = currencies.get(a.Currency)
+            if currency is None:
+                _log.warning("Account %d: currency %d not found — skipping", a.Number, a.Currency)
+                continue
+            detailed_accounts[a.Number] = DetailedAccountSection(
+                Name=a.Name,
+                Id=a.Id,
+                Number=a.Number,
+                Owner=a.Owner,
+                Kind=a.Kind,
+                Currency=currency,
+                Path_icon=a.Path_icon,
+                Bank=banks.get(a.Bank) if a.Bank != 0 else None,
+                Bank_branch_code=a.Bank_branch_code,
+                Bank_account_number=a.Bank_account_number,
+                Key=a.Key,
+                Bank_account_IBAN=a.Bank_account_IBAN,
+                Initial_balance=a.Initial_balance,
+                Minimum_wanted_balance=a.Minimum_wanted_balance,
+                Minimum_authorised_balance=a.Minimum_authorised_balance,
+                Closed_account=a.Closed_account,
+                Show_marked=a.Show_marked,
+                Show_archives_lines=a.Show_archives_lines,
+                Lines_per_transaction=a.Lines_per_transaction,
+                Comment=a.Comment,
+                Owner_address=a.Owner_address,
+                Default_debit_method=(
+                    payment_methods.get(a.Default_debit_method)
+                    if a.Default_debit_method != 0
+                    else None
+                ),
+                Default_credit_method=(
+                    payment_methods.get(a.Default_credit_method)
+                    if a.Default_credit_method != 0
+                    else None
+                ),
+                Sort_by_method=a.Sort_by_method,
+                Neutrals_inside_method=a.Neutrals_inside_method,
+                Sort_order=a.Sort_order,
+                Ascending_sort=a.Ascending_sort,
+                Column_sort=a.Column_sort,
+                Sorting_kind_column=a.Sorting_kind_column,
+                Bet_use_budget=a.Bet_use_budget,
+            )
     detailed_reconciles: dict[int, DetailedReconcileSection] = {}
     if gsb_file.reconciles:
         for r in gsb_file.reconciles:
@@ -271,7 +320,7 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
     raw_trt: dict[int, int] = {}
 
     for tx in gsb_file.transactions:
-        account = accounts.get(tx.Ac)
+        account = detailed_accounts.get(tx.Ac)
         if account is None:
             _log.warning("Transaction %d: account %d not found — skipping", tx.Nb, tx.Ac)
             continue

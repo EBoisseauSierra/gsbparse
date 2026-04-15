@@ -13,7 +13,7 @@ from gsbparse.domain.detailed_transaction import (
 )
 from gsbparse.domain.errors import UnknownDetailedTransactionPathError
 from gsbparse.domain.file import GsbFile
-from gsbparse.domain.sections.account import AccountKind, AccountSection
+from gsbparse.domain.sections.account import AccountKind, AccountSection, DetailedAccountSection
 from gsbparse.domain.sections.bank import BankSection
 from gsbparse.domain.sections.budgetary import BudgetarySection
 from gsbparse.domain.sections.category import CategoryKind, CategorySection
@@ -94,6 +94,36 @@ def _dummy_reconcile(nb: int = 1, na: str = "2023-1", acc: int = 1) -> Reconcile
         Fdate=None,
         Ibal=Decimal("0"),
         Fbal=Decimal("0"),
+    )
+
+
+def _dummy_bank(nb: int = 1, na: str = "My Bank") -> BankSection:
+    return BankSection(
+        Nb=nb,
+        Na=na,
+        Co="",
+        BIC="",
+        Adr="",
+        Tel="",
+        Mail=None,
+        Web=None,
+        Nac="",
+        Faxc="",
+        Telc="",
+        Mailc="",
+        Rem=None,
+    )
+
+
+def _dummy_payment(number: int = 1, name: str = "Card") -> PaymentSection:
+    return PaymentSection(
+        Number=number,
+        Name=name,
+        Sign=0,
+        Show_entry=False,
+        Automatic_number=False,
+        Current_number=None,
+        Account=0,
     )
 
 
@@ -194,7 +224,9 @@ class TestBuildDetailedTransactions:
         assert build_detailed_transactions(gsb) is None
 
     def test_resolves_account_and_currency(self):
-        dummy_account = _dummy_account(number=1, name="Checking")
+        # Arrange
+        dummy_account_name = "Checking"
+        dummy_account = _dummy_account(number=1, name=dummy_account_name)
         dummy_currency = _dummy_currency(nb=1, na="Euro")
         dummy_tx = _dummy_transaction(nb=1, ac=1, cu=1)
         gsb = _minimal_gsb_file(
@@ -203,11 +235,14 @@ class TestBuildDetailedTransactions:
             currencies=[dummy_currency],
         )
 
+        # Act
         result = build_detailed_transactions(gsb)
 
+        # Assert
         assert result is not None
         assert len(result) == 1
-        assert result[0].Ac is dummy_account
+        assert result[0].Ac.Name == dummy_account_name
+        assert result[0].Ac.Currency is dummy_currency
         assert result[0].Cu is dummy_currency
 
     def test_resolves_optional_party(self):
@@ -475,3 +510,176 @@ class TestDetailedReconcileSection:
         # Assert
         assert result is not None
         assert result[0].Re is None
+
+
+class TestDetailedAccountSection:
+    def test_currency_resolves(self):
+        # Arrange
+        dummy_currency = _dummy_currency(nb=1, na="Euro")
+        dummy_account = _dummy_account(number=1)  # Currency=1, Bank=0
+        dummy_tx = _dummy_transaction(nb=1, ac=1, cu=1)
+        gsb = _minimal_gsb_file(
+            transactions=[dummy_tx],
+            accounts=[dummy_account],
+            currencies=[dummy_currency],
+        )
+        # Act
+        result = build_detailed_transactions(gsb)
+        # Assert
+        assert result is not None
+        detailed_ac = result[0].Ac
+        assert isinstance(detailed_ac, DetailedAccountSection)
+        assert detailed_ac.Currency is dummy_currency
+
+    def test_bank_resolves_when_nonzero(self):
+        # Arrange
+        dummy_currency = _dummy_currency()
+        dummy_bank = _dummy_bank(nb=5, na="Savings Bank")
+        raw_account = AccountSection(
+            Name="Checking",
+            Id=None,
+            Number=1,
+            Owner="",
+            Kind=AccountKind.BANK,
+            Currency=1,
+            Path_icon="",
+            Bank=5,
+            Bank_branch_code="",
+            Bank_account_number="",
+            Key="",
+            Bank_account_IBAN="",
+            Initial_balance=Decimal("0"),
+            Minimum_wanted_balance=Decimal("0"),
+            Minimum_authorised_balance=Decimal("0"),
+            Closed_account=False,
+            Show_marked=False,
+            Show_archives_lines=False,
+            Lines_per_transaction=1,
+            Comment="",
+            Owner_address="",
+            Default_debit_method=0,
+            Default_credit_method=0,
+            Sort_by_method=False,
+            Neutrals_inside_method=False,
+            Sort_order="",
+            Ascending_sort=True,
+            Column_sort=0,
+            Sorting_kind_column="",
+            Bet_use_budget=0,
+        )
+        dummy_tx = _dummy_transaction(nb=1, ac=1, cu=1)
+        gsb = _minimal_gsb_file(
+            transactions=[dummy_tx],
+            accounts=[raw_account],
+            currencies=[dummy_currency],
+            banks=[dummy_bank],
+        )
+        # Act
+        result = build_detailed_transactions(gsb)
+        # Assert
+        assert result is not None
+        assert result[0].Ac.Bank is dummy_bank
+
+    def test_bank_is_none_when_zero(self):
+        # Arrange
+        dummy_currency = _dummy_currency()
+        dummy_account = _dummy_account(number=1)  # Bank=0
+        dummy_tx = _dummy_transaction(nb=1, ac=1, cu=1)
+        gsb = _minimal_gsb_file(
+            transactions=[dummy_tx],
+            accounts=[dummy_account],
+            currencies=[dummy_currency],
+        )
+        # Act
+        result = build_detailed_transactions(gsb)
+        # Assert
+        assert result is not None
+        assert result[0].Ac.Bank is None
+
+    def test_default_debit_method_resolves_when_nonzero(self):
+        # Arrange
+        dummy_currency = _dummy_currency()
+        dummy_payment = _dummy_payment(number=3, name="Cheque")
+        dummy_payment_number = dummy_payment.Number
+        raw_account = AccountSection(
+            Name="Checking",
+            Id=None,
+            Number=1,
+            Owner="",
+            Kind=AccountKind.BANK,
+            Currency=1,
+            Path_icon="",
+            Bank=0,
+            Bank_branch_code="",
+            Bank_account_number="",
+            Key="",
+            Bank_account_IBAN="",
+            Initial_balance=Decimal("0"),
+            Minimum_wanted_balance=Decimal("0"),
+            Minimum_authorised_balance=Decimal("0"),
+            Closed_account=False,
+            Show_marked=False,
+            Show_archives_lines=False,
+            Lines_per_transaction=1,
+            Comment="",
+            Owner_address="",
+            Default_debit_method=dummy_payment_number,
+            Default_credit_method=0,
+            Sort_by_method=False,
+            Neutrals_inside_method=False,
+            Sort_order="",
+            Ascending_sort=True,
+            Column_sort=0,
+            Sorting_kind_column="",
+            Bet_use_budget=0,
+        )
+        dummy_tx = _dummy_transaction(nb=1, ac=1, cu=1)
+        gsb = _minimal_gsb_file(
+            transactions=[dummy_tx],
+            accounts=[raw_account],
+            currencies=[dummy_currency],
+            payment_methods=[dummy_payment],
+        )
+        # Act
+        result = build_detailed_transactions(gsb)
+        # Assert
+        assert result is not None
+        assert result[0].Ac.Default_debit_method is dummy_payment
+
+    def test_default_methods_none_when_zero_or_missing(self):
+        # Arrange
+        dummy_currency = _dummy_currency()
+        dummy_account = _dummy_account()  # Default_debit_method=1, Default_credit_method=1
+        dummy_tx = _dummy_transaction()
+        gsb = _minimal_gsb_file(
+            transactions=[dummy_tx],
+            accounts=[dummy_account],
+            currencies=[dummy_currency],
+            # No payment_methods → empty dict → None
+        )
+        # Act
+        result = build_detailed_transactions(gsb)
+        # Assert
+        assert result is not None
+        assert result[0].Ac.Default_debit_method is None
+        assert result[0].Ac.Default_credit_method is None
+
+    def test_non_resolved_fields_are_copied_verbatim(self):
+        # Arrange
+        dummy_account_name = "My Account"
+        dummy_currency = _dummy_currency()
+        dummy_account = _dummy_account(number=1, name=dummy_account_name)
+        dummy_tx = _dummy_transaction()
+        gsb = _minimal_gsb_file(
+            transactions=[dummy_tx],
+            accounts=[dummy_account],
+            currencies=[dummy_currency],
+        )
+        # Act
+        result = build_detailed_transactions(gsb)
+        # Assert
+        assert result is not None
+        ac = result[0].Ac
+        assert ac.Name == dummy_account_name
+        assert ac.Number == 1
+        assert ac.Kind == AccountKind.BANK
