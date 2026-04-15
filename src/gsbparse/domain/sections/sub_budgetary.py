@@ -1,8 +1,14 @@
 """Domain section: Sub-budgetary (sous-imputation budgétaire)."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from gsbparse.domain.sections._base import GsbFileSection
+
+if TYPE_CHECKING:
+    from gsbparse.domain.sections.budgetary import BudgetarySection
 
 
 @dataclass(frozen=True)
@@ -16,5 +22,20 @@ class SubBudgetarySection(GsbFileSection):
     """
 
     Nbb: int
+    Nb: int
+    Na: str
+
+
+@dataclass(frozen=True)
+class DetailedSubBudgetarySection(GsbFileSection):
+    """A budget sub-line with its parent budgetary resolved.
+
+    Attributes:
+        Nbb: Parent budgetary (resolved from the raw ``Nbb`` identifier).
+        Nb: Unique identifier within the parent budget line.
+        Na: Display name.
+    """
+
+    Nbb: BudgetarySection
     Nb: int
     Na: str

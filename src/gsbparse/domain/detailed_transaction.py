@@ -30,7 +30,7 @@ from gsbparse.domain.sections.financial_year import FinancialYearSection
 from gsbparse.domain.sections.party import PartySection
 from gsbparse.domain.sections.payment import PaymentSection
 from gsbparse.domain.sections.reconcile import ReconcileSection
-from gsbparse.domain.sections.sub_budgetary import SubBudgetarySection
+from gsbparse.domain.sections.sub_budgetary import DetailedSubBudgetarySection
 from gsbparse.domain.sections.sub_category import DetailedSubCategorySection
 from gsbparse.domain.sections.transaction import TransactionMarkedState
 
@@ -103,7 +103,7 @@ class DetailedTransaction:
     Re: ReconcileSection | None
     Fi: FinancialYearSection | None
     Bu: BudgetarySection | None
-    Sbu: SubBudgetarySection | None
+    Sbu: DetailedSubBudgetarySection | None
     Trt: DetailedTransaction | None
 
 
@@ -213,8 +213,8 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
     detailed_sub_categories: dict[tuple[int, int], DetailedSubCategorySection] = {}
     if gsb_file.sub_categories:
         for sc in gsb_file.sub_categories:
-            parent = categories.get(sc.Nbc)
-            if parent is None:
+            parent_category = categories.get(sc.Nbc)
+            if parent_category is None:
                 _log.warning(
                     "SubCategory %d (parent=%d): parent category not found — skipping",
                     sc.Nb,
@@ -222,7 +222,7 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
                 )
                 continue
             detailed_sub_categories[(sc.Nbc, sc.Nb)] = DetailedSubCategorySection(
-                Nbc=parent, Nb=sc.Nb, Na=sc.Na
+                Nbc=parent_category, Nb=sc.Nb, Na=sc.Na
             )
     payment_methods: dict[int, PaymentSection] = (
         {p.Number: p for p in gsb_file.payment_methods} if gsb_file.payment_methods else {}
@@ -236,9 +236,21 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
     budgetaries: dict[int, BudgetarySection] = (
         {b.Nb: b for b in gsb_file.budgetaries} if gsb_file.budgetaries else {}
     )
-    sub_budgetaries: dict[int, SubBudgetarySection] = (
-        {s.Nb: s for s in gsb_file.sub_budgetaries} if gsb_file.sub_budgetaries else {}
-    )
+    # Keyed by (parent_budgetary_nb, sub_budgetary_nb) to disambiguate shared Nb values.
+    detailed_sub_budgetaries: dict[tuple[int, int], DetailedSubBudgetarySection] = {}
+    if gsb_file.sub_budgetaries:
+        for sb in gsb_file.sub_budgetaries:
+            parent_budgetary = budgetaries.get(sb.Nbb)
+            if parent_budgetary is None:
+                _log.warning(
+                    "SubBudgetary %d (parent=%d): parent budgetary not found — skipping",
+                    sb.Nb,
+                    sb.Nbb,
+                )
+                continue
+            detailed_sub_budgetaries[(sb.Nbb, sb.Nb)] = DetailedSubBudgetarySection(
+                Nbb=parent_budgetary, Nb=sb.Nb, Na=sb.Na
+            )
 
     # Pass 1 — build every DetailedTransaction with Trt=None and record the raw Trt value.
     # Keyed by transaction Nb, which is globally unique across the file.
@@ -283,7 +295,7 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
             Re=reconciles.get(tx.Re) if tx.Re != 0 else None,
             Fi=financial_years.get(tx.Fi) if tx.Fi not in (0, -1, -2) else None,
             Bu=budgetaries.get(tx.Bu) if tx.Bu != 0 else None,
-            Sbu=sub_budgetaries.get(tx.Sbu) if tx.Sbu != 0 else None,
+            Sbu=detailed_sub_budgetaries.get((tx.Bu, tx.Sbu)) if tx.Sbu != 0 else None,
             Trt=None,
         )
         pass1[tx.Nb] = dt

@@ -77,6 +77,14 @@ def _dummy_sub_category(nb: int = 1, na: str = "Groceries", nbc: int = 1) -> Sub
     return SubCategorySection(Nb=nb, Na=na, Nbc=nbc)
 
 
+def _dummy_budgetary(nb: int = 1, na: str = "Household") -> BudgetarySection:
+    return BudgetarySection(Nb=nb, Na=na, Kd=CategoryKind.EXPENSE)
+
+
+def _dummy_sub_budgetary(nb: int = 1, na: str = "Groceries", nbb: int = 1) -> SubBudgetarySection:
+    return SubBudgetarySection(Nb=nb, Na=na, Nbb=nbb)
+
+
 def _dummy_transaction(
     nb: int = 1,
     ac: int = 1,
@@ -84,6 +92,8 @@ def _dummy_transaction(
     pa: int = 0,
     ca: int = 0,
     sca: int = 0,
+    bu: int = 0,
+    sbu: int = 0,
     trt: int = 0,
 ) -> TransactionSection:
     return TransactionSection(
@@ -109,8 +119,8 @@ def _dummy_transaction(
         Au=False,
         Re=0,
         Fi=0,
-        Bu=0,
-        Sbu=0,
+        Bu=bu,
+        Sbu=sbu,
         Vo=None,
         Ba=None,
         Trt=trt,
@@ -359,3 +369,53 @@ class TestDetailedSubCategorySection:
         assert result[0].Sca is not None
         assert result[0].Sca.Na == "Bus"
         assert result[0].Sca.Nbc is dummy_cat_b
+
+
+class TestDetailedSubBudgetarySection:
+    def test_sub_budgetary_nbb_resolves_to_budgetary(self):
+        # Arrange
+        dummy_budget = _dummy_budgetary(nb=4, na="Living")
+        dummy_sub_budget = _dummy_sub_budgetary(nb=1, na="Rent", nbb=4)
+        dummy_account = _dummy_account()
+        dummy_currency = _dummy_currency()
+        dummy_tx = _dummy_transaction(bu=dummy_budget.Nb, sbu=dummy_sub_budget.Nb)
+        gsb = _minimal_gsb_file(
+            transactions=[dummy_tx],
+            accounts=[dummy_account],
+            currencies=[dummy_currency],
+            budgetaries=[dummy_budget],
+            sub_budgetaries=[dummy_sub_budget],
+        )
+
+        # Act
+        result = build_detailed_transactions(gsb)
+
+        # Assert
+        assert result is not None
+        assert result[0].Sbu is not None
+        assert result[0].Sbu.Na == "Rent"
+        assert result[0].Sbu.Nbb is dummy_budget
+
+    def test_sub_budgetaries_sharing_nb_are_disambiguated_by_parent(self):
+        dummy_shared_nb = 1
+        dummy_bu_a = _dummy_budgetary(nb=1, na="Household")
+        dummy_bu_b = _dummy_budgetary(nb=2, na="Work")
+        dummy_sbu_a = SubBudgetarySection(Nb=dummy_shared_nb, Na="Rent", Nbb=dummy_bu_a.Nb)
+        dummy_sbu_b = SubBudgetarySection(Nb=dummy_shared_nb, Na="Office", Nbb=dummy_bu_b.Nb)
+        dummy_account = _dummy_account()
+        dummy_currency = _dummy_currency()
+        dummy_tx = _dummy_transaction(bu=dummy_bu_b.Nb, sbu=dummy_shared_nb)  # wants Work/Office
+        gsb = _minimal_gsb_file(
+            transactions=[dummy_tx],
+            accounts=[dummy_account],
+            currencies=[dummy_currency],
+            budgetaries=[dummy_bu_a, dummy_bu_b],
+            sub_budgetaries=[dummy_sbu_a, dummy_sbu_b],
+        )
+
+        result = build_detailed_transactions(gsb)
+
+        assert result is not None
+        assert result[0].Sbu is not None
+        assert result[0].Sbu.Na == "Office"
+        assert result[0].Sbu.Nbb is dummy_bu_b
