@@ -126,6 +126,44 @@ class TestDetailedTransactions:
         currencies = {id(tx.Cu) for tx in detailed}
         assert len(currencies) == 1  # all share the same CurrencySection instance
 
+    def test_account_currency_resolves(self, detailed):
+        # All accounts use GBP (Currency=1). Verify via the first transaction (Nb=15, Ac=4).
+        assert detailed is not None
+        tx_15 = next(tx for tx in detailed if tx.Nb == 15)
+        assert tx_15.Ac.Currency.Ico == "GBP"
+        assert tx_15.Ac.Currency.Na == "Pound Sterling"
+
+    def test_account_bank_resolves(self, detailed):
+        # Transaction Nb=15 belongs to account 4 (Bank=1 = "HSBC UK Bank").
+        assert detailed is not None
+        tx_15 = next(tx for tx in detailed if tx.Nb == 15)
+        assert tx_15.Ac.Bank is not None
+        assert tx_15.Ac.Bank.Na == "HSBC UK Bank"
+
+    def test_sub_category_parent_resolves(self, detailed):
+        # Transaction Nb=20: Ca=15 ("Financial expenses"), Sca=3 ("Loan/Mortgage").
+        assert detailed is not None
+        tx_20 = next(tx for tx in detailed if tx.Nb == 20)
+        assert tx_20.Sca is not None
+        assert tx_20.Sca.Na == "Loan/Mortgage"
+        assert tx_20.Sca.Nbc.Na == "Financial expenses"
+
+    def test_reconcile_account_resolves(self, detailed):
+        # Transaction Nb=127: Re=1 (reconcile "delayed-debit-card-[liabilities]-1", Acc=5).
+        assert detailed is not None
+        tx_127 = next(tx for tx in detailed if tx.Nb == 127)
+        assert tx_127.Re is not None
+        assert tx_127.Re.Na == "delayed-debit-card-[liabilities]-1"
+        assert tx_127.Re.Acc.Name == "Delayed Debit card [liabilities]"
+
+    def test_shared_detailed_account_identity(self, detailed):
+        # Transactions on the same account share the same DetailedAccountSection instance.
+        assert detailed is not None
+        account_1_txs = [tx for tx in detailed if tx.Ac.Number == 1]
+        assert len(account_1_txs) > 1  # sanity check
+        ids = {id(tx.Ac) for tx in account_1_txs}
+        assert len(ids) == 1
+
 
 class TestPandasAdapter:
     def test_currencies_to_df(self, gsb):
