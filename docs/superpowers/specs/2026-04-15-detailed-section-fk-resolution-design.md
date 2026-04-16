@@ -108,3 +108,15 @@ In `test_e2e.py`: select one transaction from `Example_3.0-en.gsb` with known va
 **Option B (flat promotion):** Add `AcCurrency`, `AcBank`, etc. as top-level fields on `DetailedTransaction`. Rejected: violates the "Not flat" design principle in CLAUDE.md and breaks the dotted-path column projection pattern.
 
 **Option C (`__getattr__` delegation):** Wrapper types that delegate non-FK fields to the raw section. Rejected: incompatible with mypy strict and frozen dataclasses.
+
+**Option D (generic `expand()` / runtime depth):** A generic free function or method — `expand(gsb.transactions, depth=N)` or `gsb.transactions.expand(depth=N)` — that resolves FK fields to arbitrary depth at call time.
+
+Rejected for four independent reasons:
+
+1. **Static types become `Any`.** The return type of `expand(gsb.transactions, depth=2)` cannot be expressed without recursive generics or `Any`. The value of `DetailedTransaction` is precisely that mypy knows `tx.Ac.Currency` is a `CurrencySection`. A runtime depth parameter erases that.
+
+2. **The FK graph is not uniform.** `depth=N` implies a uniform tree. Grisbi's FK graph is not: `TransactionSection → AccountSection → CurrencySection` is 2 hops; `TransactionSection → CategorySection` is 1 hop (no further FKs); `TransactionSection → ReconcileSection → AccountSection` is 2 hops. A single integer cannot capture which paths to follow and where to stop. The current design encodes those decisions explicitly in the `Detailed*Section` types — which is the right time to make them.
+
+3. **Resolution requires full-file context.** Resolving `AccountSection.Currency: int → CurrencySection` requires `gsb_file.currencies`. A standalone `expand(gsb.transactions)` cannot resolve FKs without the full file. The signature collapses to `expand(gsb)` — making the `.transactions` argument redundant — or `expand(gsb.transactions, context=gsb)`, which is `build_detailed_transactions(gsb)` with a worse name.
+
+4. **Frozen dataclasses with typed fields are the idiom.** There is no mechanism to generically produce a new typed, frozen dataclass at runtime. The type *is* the schema. The closest ORM analogies (Django `select_related()`, SQLAlchemy `joinedload()`) name specific relationships to join — they are not generic depth parameters. Explicitness over runtime magic is the right tradeoff here.
