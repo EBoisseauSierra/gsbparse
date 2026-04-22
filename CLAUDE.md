@@ -13,7 +13,7 @@ The hexagonal refactor is complete and on `main`. The legacy `gsbparse/` and wor
 **Repository layout:**
 
 - **`src/gsbparse/`** — the production package, `src/` layout. Hexagonal architecture: `domain/`, `adapters/xml/`, `adapters/pandas/`, `ports/` (empty MVP placeholder).
-- **`tests/`** — pytest suite (98 tests). Uses `tmp_path` with inline XML for unit/integration tests; `tests/assets/Example_3.0-en.gsb` for E2E tests.
+- **`tests/`** — pytest suite (120 tests). Uses `tmp_path` with inline XML for unit/integration tests; `tests/assets/Example_3.0-en.gsb` for E2E tests.
 - **`docs/`** — Sphinx documentation (sphinx-rtd-theme, myst-parser, sphinx-autodoc-typehints). Build: `uv run sphinx-build -b html docs docs/_build/html`.
 - **`gsbparse/`** — legacy package (frozen at PyPI 0.3.0). Do not add features here.
 - **`gsbparse2/`** — working-name directory from during the parallel rewrite. Superseded by `src/gsbparse/`. Do not add features here.
@@ -183,7 +183,7 @@ gsb_file.accounts                           # list[AccountSection] | None
 gsb_file.currencies                         # list[CurrencySection] | None
 gsb_file.detailed_transactions              # list[DetailedTransaction] | None
 for tx in gsb_file.detailed_transactions:
-    print(tx.Ac.Na, tx.Am)                  # typed nested access via resolved FKs
+    print(tx.Ac.Name, tx.Am)                 # typed nested access via resolved FKs
 ```
 
 **Pandas adapter** — free function `to_df` in a submodule:
