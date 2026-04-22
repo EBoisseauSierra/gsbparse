@@ -78,12 +78,12 @@ Decimal('-42.50')
 
 ## Converting to pandas DataFrames
 
-Import the pandas adapter as a module alias so the adapter identity stays visible
-in the import line:
+Import the `to_df()` method from the `gsbparse.pandas` module to convert any
+{class}`~gsbparse.GsbFileSection` into a pandas DataFrame:
 
 ```{doctest}
->>> import gsbparse.pandas as gsbpd
->>> gsbpd.to_df(gsb.currencies)
+>>> from gsbparse.pandas import to_df
+>>> to_df(gsb.currencies)
    Nb         Na Co  Ico  Fl
 0   1       Euro  €  EUR   2
 1   2  US Dollar  $  USD   2
@@ -93,7 +93,7 @@ For detailed transactions the adapter flattens nested domain objects into column
 using dotted-path specs:
 
 ```{doctest}
->>> df = gsbpd.to_df(gsb.detailed_transactions)
+>>> df = to_df(gsb.detailed_transactions)
 >>> df.shape
 (2, 22)
 >>> list(df.columns[:4])
@@ -114,7 +114,7 @@ and rename columns:
 ...     DetailedTransactionColumn(path="Pa.Na",   output_name="party"),
 ...     DetailedTransactionColumn(path="Ca.Na",   output_name="category"),
 ... ]
->>> gsbpd.to_df(gsb.detailed_transactions, columns=columns)
+>>> to_df(gsb.detailed_transactions, columns=columns)
          date   amount   account        party category
 0  2024-01-05   -42.50  Checking  Supermarket     Food
 1  2024-01-31  2500.00  Checking     Employer   Income
@@ -141,10 +141,10 @@ except gsbparse.GsbParseError as exc:
 
 ## Future output adapters
 
-The `import gsbparse.pandas as gsbpd` pattern is intentional — swapping to a
+The `from gsbparse.pandas import to_df` pattern is intentional — swapping to a
 future adapter is a one-line change:
 
 ```python
-import gsbparse.pandas as gsbpd    # pandas (current)
-# import gsbparse.polars as gsbpd  # polars (future)
+from gsbparse.pandas import to_df    # pandas (current)
+# from gsbparse.polars import to_df  # polars (future)
 ```

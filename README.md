@@ -60,8 +60,8 @@ Decimal('-42.50')
 ### Convert to pandas DataFrame
 
 ```python
->>> import gsbparse.pandas as gsbpd
->>> gsbpd.to_df(gsb.currencies)
+>>> from gsbparse.pandas import to_df
+>>> to_df(gsb.currencies)
    Nb         Na Co  Ico  Fl
 0   1       Euro  €  EUR   2
 1   2  US Dollar  $  USD   2
@@ -79,7 +79,7 @@ Custom column projection:
 ...     DetailedTransactionColumn(path="Pa.Na",   output_name="party"),
 ...     DetailedTransactionColumn(path="Ca.Na",   output_name="category"),
 ... ]
->>> gsbpd.to_df(gsb.detailed_transactions, columns=columns)
+>>> to_df(gsb.detailed_transactions, columns=columns)
          date   amount   account        party category
 0  2024-01-05   -42.50  Checking  Supermarket     Food
 1  2024-01-31  2500.00  Checking     Employer   Income

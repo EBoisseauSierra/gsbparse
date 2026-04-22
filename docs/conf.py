@@ -48,7 +48,7 @@ doctest_global_setup = f"""
 import datetime
 from decimal import Decimal
 import gsbparse
-import gsbparse.pandas as gsbpd
+from gsbparse.pandas import to_df
 from gsbparse import DetailedTransactionColumn
 
 gsb = gsbparse.read_gsb(r"{_SIMPLE_EXAMPLE}")
