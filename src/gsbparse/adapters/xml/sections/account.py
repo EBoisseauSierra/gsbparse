@@ -6,12 +6,10 @@ from gsbparse.adapters.xml.parsers import (
     parse_amount,
     parse_bool,
     parse_int,
-    parse_null,
+    parse_nullable_str,
     parse_str,
 )
 from gsbparse.domain.sections.account import AccountKind, AccountSection
-
-_parse_nullable_str = parse_null(parse_str)
 
 
 def parse_account_section(element: ET.Element) -> AccountSection:
@@ -26,7 +24,7 @@ def parse_account_section(element: ET.Element) -> AccountSection:
     a = element.attrib
     return AccountSection(
         Name=parse_str(a["Name"]),
-        Id=_parse_nullable_str(a["Id"]),
+        Id=parse_nullable_str(a["Id"]),
         Number=parse_int(a["Number"]),
         Owner=parse_str(a["Owner"]),
         Kind=AccountKind(parse_int(a["Kind"])),

@@ -12,7 +12,6 @@ from gsbparse.adapters.xml.parsers import (
 )
 from gsbparse.domain.sections.general import GeneralSection
 
-_parse_nullable_str = parse_null(parse_str)
 _parse_optional_int = parse_null(parse_int)
 _parse_optional_bool = parse_null(parse_bool)
 
