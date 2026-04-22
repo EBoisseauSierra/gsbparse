@@ -8,9 +8,9 @@ from enum import IntEnum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from gsbparse.domain.sections.bank import BankSection
-    from gsbparse.domain.sections.currency import CurrencySection
-    from gsbparse.domain.sections.payment import PaymentSection
+    from gsbparse.domain.sections.bank import Bank
+    from gsbparse.domain.sections.currency import Currency
+    from gsbparse.domain.sections.payment import Payment
 
 from gsbparse.domain.sections._base import GsbFileSection
 
@@ -25,7 +25,7 @@ class AccountKind(IntEnum):
 
 
 @dataclass(frozen=True)
-class AccountSection(GsbFileSection):
+class Account(GsbFileSection):
     """A bank or cash account defined in the Grisbi file.
 
     Budget-estimate fields (``Bet_*``) are present only when
@@ -97,10 +97,10 @@ class AccountSection(GsbFileSection):
 
 
 @dataclass(frozen=True)
-class DetailedAccountSection(GsbFileSection):
+class DetailedAccount(GsbFileSection):
     """An account with its currency, bank, and payment methods resolved.
 
-    All fields mirror :class:`AccountSection` except the three FK integer fields
+    All fields mirror :class:`Account` except the three FK integer fields
     which are replaced by their resolved domain objects.
 
     Attributes:
@@ -141,9 +141,9 @@ class DetailedAccountSection(GsbFileSection):
     Number: int
     Owner: str
     Kind: AccountKind
-    Currency: CurrencySection
+    Currency: Currency
     Path_icon: str
-    Bank: BankSection | None
+    Bank: Bank | None
     Bank_branch_code: str
     Bank_account_number: str
     Key: str
@@ -157,8 +157,8 @@ class DetailedAccountSection(GsbFileSection):
     Lines_per_transaction: int
     Comment: str
     Owner_address: str
-    Default_debit_method: PaymentSection | None
-    Default_credit_method: PaymentSection | None
+    Default_debit_method: Payment | None
+    Default_credit_method: Payment | None
     Sort_by_method: bool
     Neutrals_inside_method: bool
     Sort_order: str

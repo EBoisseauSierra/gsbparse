@@ -1,4 +1,4 @@
-"""XML adapter: parse a ``<Scheduled>`` element into a ``ScheduledSection``."""
+"""XML adapter: parse a ``<Scheduled>`` element into a ``Scheduled``."""
 
 import xml.etree.ElementTree as ET
 
@@ -10,22 +10,22 @@ from gsbparse.adapters.xml.parsers import (
     parse_null,
     parse_nullable_str,
 )
-from gsbparse.domain.sections.scheduled import ScheduledSection
+from gsbparse.domain.sections.scheduled import Scheduled
 
 _parse_nullable_date = parse_null(parse_date)
 
 
-def parse_scheduled_section(element: ET.Element) -> ScheduledSection:
-    """Parse a ``<Scheduled>`` XML element into a :class:`ScheduledSection`.
+def parse_scheduled_section(element: ET.Element) -> Scheduled:
+    """Parse a ``<Scheduled>`` XML element into a :class:`Scheduled`.
 
     Args:
         element: The ``<Scheduled>`` XML element.
 
     Returns:
-        A fully populated :class:`ScheduledSection`.
+        A fully populated :class:`Scheduled`.
     """
     a = element.attrib
-    return ScheduledSection(
+    return Scheduled(
         Nb=parse_int(a["Nb"]),
         Dt=_parse_nullable_date(a["Dt"]),
         Ac=parse_int(a["Ac"]),

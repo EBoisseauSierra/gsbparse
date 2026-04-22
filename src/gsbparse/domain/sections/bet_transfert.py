@@ -19,7 +19,7 @@ class BetTransfertAccountType(IntEnum):
 
 
 @dataclass(frozen=True)
-class BetTransfertSection(GsbFileSection):
+class BetTransfert(GsbFileSection):
     """A deferred-debit or partial-balance settlement entry.
 
     Used when a credit-card account (deferred debit) or a partial balance

@@ -1,22 +1,22 @@
-"""XML adapter: parse a ``<Report>`` element into a ``ReportSection``."""
+"""XML adapter: parse a ``<Report>`` element into a ``Report``."""
 
 import xml.etree.ElementTree as ET
 
 from gsbparse.adapters.xml.parsers import parse_bool, parse_int, parse_nullable_str, parse_str
-from gsbparse.domain.sections.report import ReportSection
+from gsbparse.domain.sections.report import Report
 
 
-def parse_report_section(element: ET.Element) -> ReportSection:
-    """Parse a ``<Report>`` XML element into a :class:`ReportSection`.
+def parse_report_section(element: ET.Element) -> Report:
+    """Parse a ``<Report>`` XML element into a :class:`Report`.
 
     Args:
         element: The ``<Report>`` XML element.
 
     Returns:
-        A fully populated :class:`ReportSection`.
+        A fully populated :class:`Report`.
     """
     a = element.attrib
-    return ReportSection(
+    return Report(
         Nb=parse_int(a["Nb"]),
         Name=parse_str(a["Name"]),
         Compl_name_function=parse_int(a["Compl_name_function"]),

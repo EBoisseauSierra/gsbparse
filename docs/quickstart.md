@@ -30,7 +30,7 @@ Every field is either `None` (section absent from the file), a single typed obje
 
 ```{doctest}
 >>> gsb.currencies
-[CurrencySection(Nb=1, Na='Euro', Co='€', Ico='EUR', Fl=2), CurrencySection(Nb=2, Na='US Dollar', Co='$', Ico='USD', Fl=2)]
+[Currency(Nb=1, Na='Euro', Co='€', Ico='EUR', Fl=2), Currency(Nb=2, Na='US Dollar', Co='$', Ico='USD', Fl=2)]
 
 >>> gsb.currencies[0].Na
 'Euro'

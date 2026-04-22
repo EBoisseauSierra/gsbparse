@@ -7,7 +7,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class AmountComparisonSection(GsbFileSection):
+class AmountComparison(GsbFileSection):
     """An amount-comparison filter rule attached to a report.
 
     Attributes:

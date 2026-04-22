@@ -8,36 +8,36 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from gsbparse.domain.detailed_transaction import DetailedTransaction
 
-from gsbparse.domain.sections.account import AccountSection
-from gsbparse.domain.sections.amount_comparison import AmountComparisonSection
-from gsbparse.domain.sections.archive import ArchiveSection
-from gsbparse.domain.sections.bank import BankSection
-from gsbparse.domain.sections.bet import BetSection
-from gsbparse.domain.sections.bet_future import BetFutureSection
-from gsbparse.domain.sections.bet_graph import BetGraphSection
-from gsbparse.domain.sections.bet_historical import BetHistoricalSection
-from gsbparse.domain.sections.bet_loan import BetLoanSection
-from gsbparse.domain.sections.bet_transfert import BetTransfertSection
-from gsbparse.domain.sections.budgetary import BudgetarySection
-from gsbparse.domain.sections.category import CategorySection
-from gsbparse.domain.sections.currency import CurrencySection
-from gsbparse.domain.sections.currency_link import CurrencyLinkSection
-from gsbparse.domain.sections.financial_year import FinancialYearSection
-from gsbparse.domain.sections.general import GeneralSection
-from gsbparse.domain.sections.import_rule import ImportRuleSection
-from gsbparse.domain.sections.partial_balance import PartialBalanceSection
-from gsbparse.domain.sections.party import PartySection
-from gsbparse.domain.sections.payment import PaymentSection
-from gsbparse.domain.sections.print import PrintSection
-from gsbparse.domain.sections.reconcile import ReconcileSection
-from gsbparse.domain.sections.report import ReportSection
-from gsbparse.domain.sections.rgba import RgbaSection
-from gsbparse.domain.sections.scheduled import ScheduledSection
-from gsbparse.domain.sections.special_line import SpecialLineSection
-from gsbparse.domain.sections.sub_budgetary import SubBudgetarySection
-from gsbparse.domain.sections.sub_category import SubCategorySection
-from gsbparse.domain.sections.text_comparison import TextComparisonSection
-from gsbparse.domain.sections.transaction import TransactionSection
+from gsbparse.domain.sections.account import Account
+from gsbparse.domain.sections.amount_comparison import AmountComparison
+from gsbparse.domain.sections.archive import Archive
+from gsbparse.domain.sections.bank import Bank
+from gsbparse.domain.sections.bet import Bet
+from gsbparse.domain.sections.bet_future import BetFuture
+from gsbparse.domain.sections.bet_graph import BetGraph
+from gsbparse.domain.sections.bet_historical import BetHistorical
+from gsbparse.domain.sections.bet_loan import BetLoan
+from gsbparse.domain.sections.bet_transfert import BetTransfert
+from gsbparse.domain.sections.budgetary import Budgetary
+from gsbparse.domain.sections.category import Category
+from gsbparse.domain.sections.currency import Currency
+from gsbparse.domain.sections.currency_link import CurrencyLink
+from gsbparse.domain.sections.financial_year import FinancialYear
+from gsbparse.domain.sections.general import General
+from gsbparse.domain.sections.import_rule import ImportRule
+from gsbparse.domain.sections.partial_balance import PartialBalance
+from gsbparse.domain.sections.party import Party
+from gsbparse.domain.sections.payment import Payment
+from gsbparse.domain.sections.print import Print
+from gsbparse.domain.sections.reconcile import Reconcile
+from gsbparse.domain.sections.report import Report
+from gsbparse.domain.sections.rgba import Rgba
+from gsbparse.domain.sections.scheduled import Scheduled
+from gsbparse.domain.sections.special_line import SpecialLine
+from gsbparse.domain.sections.sub_budgetary import SubBudgetary
+from gsbparse.domain.sections.sub_category import SubCategory
+from gsbparse.domain.sections.text_comparison import TextComparison
+from gsbparse.domain.sections.transaction import Transaction
 
 
 @dataclass(frozen=True)
@@ -59,36 +59,36 @@ class GsbFile:
         resolved (added when ``DetailedTransaction`` is introduced).
     """
 
-    general: GeneralSection | None
-    rgba: RgbaSection | None
-    print_settings: PrintSection | None
-    currencies: list[CurrencySection] | None
-    accounts: list[AccountSection] | None
-    banks: list[BankSection] | None
-    parties: list[PartySection] | None
-    payment_methods: list[PaymentSection] | None
-    transactions: list[TransactionSection] | None
-    scheduled: list[ScheduledSection] | None
-    categories: list[CategorySection] | None
-    sub_categories: list[SubCategorySection] | None
-    budgetaries: list[BudgetarySection] | None
-    sub_budgetaries: list[SubBudgetarySection] | None
-    currency_links: list[CurrencyLinkSection] | None
-    financial_years: list[FinancialYearSection] | None
-    archives: list[ArchiveSection] | None
-    reconciles: list[ReconcileSection] | None
-    import_rules: list[ImportRuleSection] | None
-    special_lines: list[SpecialLineSection] | None
-    partial_balances: list[PartialBalanceSection] | None
-    bet: BetSection | None
-    bet_graphs: list[BetGraphSection] | None
-    bet_historicals: list[BetHistoricalSection] | None
-    bet_futures: list[BetFutureSection] | None
-    bet_transferts: list[BetTransfertSection] | None
-    bet_loans: list[BetLoanSection] | None
-    reports: list[ReportSection] | None
-    text_comparisons: list[TextComparisonSection] | None
-    amount_comparisons: list[AmountComparisonSection] | None
+    general: General | None
+    rgba: Rgba | None
+    print_settings: Print | None
+    currencies: list[Currency] | None
+    accounts: list[Account] | None
+    banks: list[Bank] | None
+    parties: list[Party] | None
+    payment_methods: list[Payment] | None
+    transactions: list[Transaction] | None
+    scheduled: list[Scheduled] | None
+    categories: list[Category] | None
+    sub_categories: list[SubCategory] | None
+    budgetaries: list[Budgetary] | None
+    sub_budgetaries: list[SubBudgetary] | None
+    currency_links: list[CurrencyLink] | None
+    financial_years: list[FinancialYear] | None
+    archives: list[Archive] | None
+    reconciles: list[Reconcile] | None
+    import_rules: list[ImportRule] | None
+    special_lines: list[SpecialLine] | None
+    partial_balances: list[PartialBalance] | None
+    bet: Bet | None
+    bet_graphs: list[BetGraph] | None
+    bet_historicals: list[BetHistorical] | None
+    bet_futures: list[BetFuture] | None
+    bet_transferts: list[BetTransfert] | None
+    bet_loans: list[BetLoan] | None
+    reports: list[Report] | None
+    text_comparisons: list[TextComparison] | None
+    amount_comparisons: list[AmountComparison] | None
 
     @property
     def detailed_transactions(self) -> list[DetailedTransaction] | None:

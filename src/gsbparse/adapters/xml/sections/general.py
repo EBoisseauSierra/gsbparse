@@ -1,4 +1,4 @@
-"""XML adapter: parse a ``<General>`` element into a ``GeneralSection``."""
+"""XML adapter: parse a ``<General>`` element into a ``General``."""
 
 import xml.etree.ElementTree as ET
 
@@ -10,17 +10,17 @@ from gsbparse.adapters.xml.parsers import (
     parse_nullable_str,
     parse_str,
 )
-from gsbparse.domain.sections.general import GeneralSection
+from gsbparse.domain.sections.general import General
 
 _parse_optional_int = parse_null(parse_int)
 _parse_optional_bool = parse_null(parse_bool)
 
 
-def parse_general_section(element: ET.Element) -> GeneralSection:
-    """Parse a ``<General>`` XML element into a :class:`GeneralSection`.
+def parse_general_section(element: ET.Element) -> General:
+    """Parse a ``<General>`` XML element into a :class:`General`.
 
     Several attributes are absent in older Grisbi file versions; these are
-    modelled as ``T | None`` on :class:`GeneralSection` and resolved to
+    modelled as ``T | None`` on :class:`General` and resolved to
     ``None`` via ``a.get()`` when the key is missing from the element.
 
     Hyphenated XML attribute names are mapped to their underscored Python
@@ -30,7 +30,7 @@ def parse_general_section(element: ET.Element) -> GeneralSection:
         element: The ``<General>`` XML element.
 
     Returns:
-        A fully populated :class:`GeneralSection`.
+        A fully populated :class:`General`.
     """
     a = element.attrib
 
@@ -46,7 +46,7 @@ def parse_general_section(element: ET.Element) -> GeneralSection:
         raw = a.get(key)
         return parse_nullable_str(raw) if raw is not None else None
 
-    return GeneralSection(
+    return General(
         File_version=parse_str(a["File_version"]),
         Grisbi_version=parse_str(a["Grisbi_version"]),
         Crypt_file=parse_bool(a["Crypt_file"]),

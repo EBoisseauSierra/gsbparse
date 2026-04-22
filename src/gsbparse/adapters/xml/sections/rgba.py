@@ -1,22 +1,22 @@
-"""XML adapter: parse an ``<RGBA>`` element into an ``RgbaSection``."""
+"""XML adapter: parse an ``<RGBA>`` element into an ``Rgba``."""
 
 import xml.etree.ElementTree as ET
 
 from gsbparse.adapters.xml.parsers import parse_str
-from gsbparse.domain.sections.rgba import RgbaSection
+from gsbparse.domain.sections.rgba import Rgba
 
 
-def parse_rgba_section(element: ET.Element) -> RgbaSection:
-    """Parse an ``<RGBA>`` XML element into an :class:`RgbaSection`.
+def parse_rgba_section(element: ET.Element) -> Rgba:
+    """Parse an ``<RGBA>`` XML element into an :class:`Rgba`.
 
     Args:
         element: The ``<RGBA>`` XML element.
 
     Returns:
-        A fully populated :class:`RgbaSection`.
+        A fully populated :class:`Rgba`.
     """
     a = element.attrib
-    return RgbaSection(
+    return Rgba(
         Background_color_0=parse_str(a["Background_color_0"]),
         Background_color_1=parse_str(a["Background_color_1"]),
         Couleur_jour=parse_str(a["Couleur_jour"]),

@@ -6,7 +6,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class CurrencySection(GsbFileSection):
+class Currency(GsbFileSection):
     """A currency defined in the Grisbi file.
 
     Attributes:

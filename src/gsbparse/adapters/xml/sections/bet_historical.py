@@ -1,22 +1,22 @@
-"""XML adapter: parse a ``<Bet_historical>`` element into a ``BetHistoricalSection``."""
+"""XML adapter: parse a ``<Bet_historical>`` element into a ``BetHistorical``."""
 
 import xml.etree.ElementTree as ET
 
 from gsbparse.adapters.xml.parsers import parse_amount, parse_bool, parse_int
-from gsbparse.domain.sections.bet_historical import BetDataOrigin, BetHistoricalSection
+from gsbparse.domain.sections.bet_historical import BetDataOrigin, BetHistorical
 
 
-def parse_bet_historical_section(element: ET.Element) -> BetHistoricalSection:
-    """Parse a ``<Bet_historical>`` XML element into a :class:`BetHistoricalSection`.
+def parse_bet_historical_section(element: ET.Element) -> BetHistorical:
+    """Parse a ``<Bet_historical>`` XML element into a :class:`BetHistorical`.
 
     Args:
         element: The ``<Bet_historical>`` XML element.
 
     Returns:
-        A fully populated :class:`BetHistoricalSection`.
+        A fully populated :class:`BetHistorical`.
     """
     a = element.attrib
-    return BetHistoricalSection(
+    return BetHistorical(
         Nb=parse_int(a["Nb"]),
         Ac=parse_int(a["Ac"]),
         Ori=BetDataOrigin(parse_int(a["Ori"])),

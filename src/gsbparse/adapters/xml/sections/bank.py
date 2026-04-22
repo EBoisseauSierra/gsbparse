@@ -1,22 +1,22 @@
-"""XML adapter: parse a ``<Bank>`` element into a ``BankSection``."""
+"""XML adapter: parse a ``<Bank>`` element into a ``Bank``."""
 
 import xml.etree.ElementTree as ET
 
 from gsbparse.adapters.xml.parsers import parse_int, parse_nullable_str, parse_str
-from gsbparse.domain.sections.bank import BankSection
+from gsbparse.domain.sections.bank import Bank
 
 
-def parse_bank_section(element: ET.Element) -> BankSection:
-    """Parse a ``<Bank>`` XML element into a :class:`BankSection`.
+def parse_bank_section(element: ET.Element) -> Bank:
+    """Parse a ``<Bank>`` XML element into a :class:`Bank`.
 
     Args:
         element: The ``<Bank>`` XML element.
 
     Returns:
-        A fully populated :class:`BankSection`.
+        A fully populated :class:`Bank`.
     """
     a = element.attrib
-    return BankSection(
+    return Bank(
         Nb=parse_int(a["Nb"]),
         Na=parse_str(a["Na"]),
         Co=parse_str(a["Co"]),

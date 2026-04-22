@@ -18,7 +18,7 @@ class CategoryKind(IntEnum):
 
 
 @dataclass(frozen=True)
-class CategorySection(GsbFileSection):
+class Category(GsbFileSection):
     """A transaction category defined in the Grisbi file.
 
     Attributes:

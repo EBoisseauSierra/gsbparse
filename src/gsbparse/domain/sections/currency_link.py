@@ -7,7 +7,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class CurrencyLinkSection(GsbFileSection):
+class CurrencyLink(GsbFileSection):
     """An exchange-rate link between two currencies.
 
     Attributes:

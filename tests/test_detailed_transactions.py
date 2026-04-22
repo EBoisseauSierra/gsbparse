@@ -13,21 +13,21 @@ from gsbparse.domain.detailed_transaction import (
 )
 from gsbparse.domain.errors import UnknownDetailedTransactionPathError
 from gsbparse.domain.file import GsbFile
-from gsbparse.domain.sections.account import AccountKind, AccountSection, DetailedAccountSection
-from gsbparse.domain.sections.bank import BankSection
-from gsbparse.domain.sections.budgetary import BudgetarySection
-from gsbparse.domain.sections.category import CategoryKind, CategorySection
-from gsbparse.domain.sections.currency import CurrencySection
-from gsbparse.domain.sections.party import PartySection
-from gsbparse.domain.sections.payment import PaymentSection
-from gsbparse.domain.sections.reconcile import ReconcileSection
-from gsbparse.domain.sections.sub_budgetary import SubBudgetarySection
-from gsbparse.domain.sections.sub_category import SubCategorySection
-from gsbparse.domain.sections.transaction import TransactionMarkedState, TransactionSection
+from gsbparse.domain.sections.account import Account, AccountKind, DetailedAccount
+from gsbparse.domain.sections.bank import Bank
+from gsbparse.domain.sections.budgetary import Budgetary
+from gsbparse.domain.sections.category import Category, CategoryKind
+from gsbparse.domain.sections.currency import Currency
+from gsbparse.domain.sections.party import Party
+from gsbparse.domain.sections.payment import Payment
+from gsbparse.domain.sections.reconcile import Reconcile
+from gsbparse.domain.sections.sub_budgetary import SubBudgetary
+from gsbparse.domain.sections.sub_category import SubCategory
+from gsbparse.domain.sections.transaction import Transaction, TransactionMarkedState
 
 
-def _dummy_account(number: int = 1, name: str = "Checking") -> AccountSection:
-    return AccountSection(
+def _dummy_account(number: int = 1, name: str = "Checking") -> Account:
+    return Account(
         Name=name,
         Id=None,
         Number=number,
@@ -61,32 +61,32 @@ def _dummy_account(number: int = 1, name: str = "Checking") -> AccountSection:
     )
 
 
-def _dummy_currency(nb: int = 1, na: str = "Euro") -> CurrencySection:
-    return CurrencySection(Nb=nb, Na=na, Co="E", Ico="EUR", Fl=2)
+def _dummy_currency(nb: int = 1, na: str = "Euro") -> Currency:
+    return Currency(Nb=nb, Na=na, Co="E", Ico="EUR", Fl=2)
 
 
-def _dummy_party(nb: int = 1, na: str = "Supermarket") -> PartySection:
-    return PartySection(Nb=nb, Na=na, Txt=None, Search=None, IgnCase=False, UseRegex=False)
+def _dummy_party(nb: int = 1, na: str = "Supermarket") -> Party:
+    return Party(Nb=nb, Na=na, Txt=None, Search=None, IgnCase=False, UseRegex=False)
 
 
-def _dummy_category(nb: int = 1, na: str = "Food") -> CategorySection:
-    return CategorySection(Nb=nb, Na=na, Kd=CategoryKind.INCOME)
+def _dummy_category(nb: int = 1, na: str = "Food") -> Category:
+    return Category(Nb=nb, Na=na, Kd=CategoryKind.INCOME)
 
 
-def _dummy_sub_category(nb: int = 1, na: str = "Groceries", nbc: int = 1) -> SubCategorySection:
-    return SubCategorySection(Nb=nb, Na=na, Nbc=nbc)
+def _dummy_sub_category(nb: int = 1, na: str = "Groceries", nbc: int = 1) -> SubCategory:
+    return SubCategory(Nb=nb, Na=na, Nbc=nbc)
 
 
-def _dummy_budgetary(nb: int = 1, na: str = "Household") -> BudgetarySection:
-    return BudgetarySection(Nb=nb, Na=na, Kd=CategoryKind.EXPENSE)
+def _dummy_budgetary(nb: int = 1, na: str = "Household") -> Budgetary:
+    return Budgetary(Nb=nb, Na=na, Kd=CategoryKind.EXPENSE)
 
 
-def _dummy_sub_budgetary(nb: int = 1, na: str = "Groceries", nbb: int = 1) -> SubBudgetarySection:
-    return SubBudgetarySection(Nb=nb, Na=na, Nbb=nbb)
+def _dummy_sub_budgetary(nb: int = 1, na: str = "Groceries", nbb: int = 1) -> SubBudgetary:
+    return SubBudgetary(Nb=nb, Na=na, Nbb=nbb)
 
 
-def _dummy_reconcile(nb: int = 1, na: str = "2023-1", acc: int = 1) -> ReconcileSection:
-    return ReconcileSection(
+def _dummy_reconcile(nb: int = 1, na: str = "2023-1", acc: int = 1) -> Reconcile:
+    return Reconcile(
         Nb=nb,
         Na=na,
         Acc=acc,
@@ -97,8 +97,8 @@ def _dummy_reconcile(nb: int = 1, na: str = "2023-1", acc: int = 1) -> Reconcile
     )
 
 
-def _dummy_bank(nb: int = 1, na: str = "My Bank") -> BankSection:
-    return BankSection(
+def _dummy_bank(nb: int = 1, na: str = "My Bank") -> Bank:
+    return Bank(
         Nb=nb,
         Na=na,
         Co="",
@@ -115,8 +115,8 @@ def _dummy_bank(nb: int = 1, na: str = "My Bank") -> BankSection:
     )
 
 
-def _dummy_payment(number: int = 1, name: str = "Card") -> PaymentSection:
-    return PaymentSection(
+def _dummy_payment(number: int = 1, name: str = "Card") -> Payment:
+    return Payment(
         Number=number,
         Name=name,
         Sign=0,
@@ -138,8 +138,8 @@ def _dummy_transaction(
     sbu: int = 0,
     trt: int = 0,
     re: int = 0,
-) -> TransactionSection:
-    return TransactionSection(
+) -> Transaction:
+    return Transaction(
         Nb=nb,
         Ac=ac,
         Id=None,
@@ -172,17 +172,17 @@ def _dummy_transaction(
 
 
 def _minimal_gsb_file(
-    transactions: list[TransactionSection] | None = None,
-    accounts: list[AccountSection] | None = None,
-    currencies: list[CurrencySection] | None = None,
-    parties: list[PartySection] | None = None,
-    categories: list[CategorySection] | None = None,
-    sub_categories: list[SubCategorySection] | None = None,
-    budgetaries: list[BudgetarySection] | None = None,
-    sub_budgetaries: list[SubBudgetarySection] | None = None,
-    banks: list[BankSection] | None = None,
-    payment_methods: list[PaymentSection] | None = None,
-    reconciles: list[ReconcileSection] | None = None,
+    transactions: list[Transaction] | None = None,
+    accounts: list[Account] | None = None,
+    currencies: list[Currency] | None = None,
+    parties: list[Party] | None = None,
+    categories: list[Category] | None = None,
+    sub_categories: list[SubCategory] | None = None,
+    budgetaries: list[Budgetary] | None = None,
+    sub_budgetaries: list[SubBudgetary] | None = None,
+    banks: list[Bank] | None = None,
+    payment_methods: list[Payment] | None = None,
+    reconciles: list[Reconcile] | None = None,
 ) -> GsbFile:
     return GsbFile(
         general=None,
@@ -378,7 +378,7 @@ class TestDetailedTransactionViaProperty:
         assert isinstance(result[0], DetailedTransaction)
 
 
-class TestDetailedSubCategorySection:
+class TestDetailedSubCategory:
     def test_sub_category_nbc_resolves_to_category(self):
         # Arrange
         dummy_category = _dummy_category(nb=3, na="Transport")
@@ -408,8 +408,8 @@ class TestDetailedSubCategorySection:
         dummy_shared_nb = 1
         dummy_cat_a = _dummy_category(nb=1, na="Food")
         dummy_cat_b = _dummy_category(nb=2, na="Transport")
-        dummy_sca_a = SubCategorySection(Nb=dummy_shared_nb, Na="Groceries", Nbc=dummy_cat_a.Nb)
-        dummy_sca_b = SubCategorySection(Nb=dummy_shared_nb, Na="Bus", Nbc=dummy_cat_b.Nb)
+        dummy_sca_a = SubCategory(Nb=dummy_shared_nb, Na="Groceries", Nbc=dummy_cat_a.Nb)
+        dummy_sca_b = SubCategory(Nb=dummy_shared_nb, Na="Bus", Nbc=dummy_cat_b.Nb)
         dummy_account = _dummy_account()
         dummy_currency = _dummy_currency()
         dummy_tx = _dummy_transaction(ca=dummy_cat_b.Nb, sca=dummy_shared_nb)  # wants Transport/Bus
@@ -429,7 +429,7 @@ class TestDetailedSubCategorySection:
         assert result[0].Sca.Nbc is dummy_cat_b
 
 
-class TestDetailedSubBudgetarySection:
+class TestDetailedSubBudgetary:
     def test_sub_budgetary_nbb_resolves_to_budgetary(self):
         # Arrange
         dummy_budget = _dummy_budgetary(nb=4, na="Living")
@@ -458,8 +458,8 @@ class TestDetailedSubBudgetarySection:
         dummy_shared_nb = 1
         dummy_bu_a = _dummy_budgetary(nb=1, na="Household")
         dummy_bu_b = _dummy_budgetary(nb=2, na="Work")
-        dummy_sbu_a = SubBudgetarySection(Nb=dummy_shared_nb, Na="Rent", Nbb=dummy_bu_a.Nb)
-        dummy_sbu_b = SubBudgetarySection(Nb=dummy_shared_nb, Na="Office", Nbb=dummy_bu_b.Nb)
+        dummy_sbu_a = SubBudgetary(Nb=dummy_shared_nb, Na="Rent", Nbb=dummy_bu_a.Nb)
+        dummy_sbu_b = SubBudgetary(Nb=dummy_shared_nb, Na="Office", Nbb=dummy_bu_b.Nb)
         dummy_account = _dummy_account()
         dummy_currency = _dummy_currency()
         dummy_tx = _dummy_transaction(bu=dummy_bu_b.Nb, sbu=dummy_shared_nb)  # wants Work/Office
@@ -479,7 +479,7 @@ class TestDetailedSubBudgetarySection:
         assert result[0].Sbu.Nbb is dummy_bu_b
 
 
-class TestDetailedReconcileSection:
+class TestDetailedReconcile:
     def test_reconcile_acc_resolves_to_account_section(self):
         # Arrange
         dummy_account = _dummy_account(number=1, name="Checking")
@@ -522,7 +522,7 @@ class TestDetailedReconcileSection:
         assert result[0].Re is None
 
 
-class TestDetailedAccountSection:
+class TestDetailedAccount:
     def test_currency_resolves(self):
         # Arrange
         dummy_currency = _dummy_currency(nb=1, na="Euro")
@@ -538,14 +538,14 @@ class TestDetailedAccountSection:
         # Assert
         assert result is not None
         detailed_ac = result[0].Ac
-        assert isinstance(detailed_ac, DetailedAccountSection)
+        assert isinstance(detailed_ac, DetailedAccount)
         assert detailed_ac.Currency is dummy_currency
 
     def test_bank_resolves_when_nonzero(self):
         # Arrange
         dummy_currency = _dummy_currency()
         dummy_bank = _dummy_bank(nb=5, na="Savings Bank")
-        raw_account = AccountSection(
+        raw_account = Account(
             Name="Checking",
             Id=None,
             Number=1,
@@ -611,7 +611,7 @@ class TestDetailedAccountSection:
         dummy_currency = _dummy_currency()
         dummy_payment = _dummy_payment(number=3, name="Cheque")
         dummy_payment_number = dummy_payment.Number
-        raw_account = AccountSection(
+        raw_account = Account(
             Name="Checking",
             Id=None,
             Number=1,

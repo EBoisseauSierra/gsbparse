@@ -6,7 +6,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class PaymentSection(GsbFileSection):
+class Payment(GsbFileSection):
     """A payment method defined in the Grisbi file.
 
     Attributes:

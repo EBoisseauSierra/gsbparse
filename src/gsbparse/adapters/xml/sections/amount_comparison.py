@@ -1,22 +1,22 @@
-"""XML adapter: parse an ``<Amount_comparison>`` element into an ``AmountComparisonSection``."""
+"""XML adapter: parse an ``<Amount_comparison>`` element into an ``AmountComparison``."""
 
 import xml.etree.ElementTree as ET
 
 from gsbparse.adapters.xml.parsers import parse_amount, parse_int
-from gsbparse.domain.sections.amount_comparison import AmountComparisonSection
+from gsbparse.domain.sections.amount_comparison import AmountComparison
 
 
-def parse_amount_comparison_section(element: ET.Element) -> AmountComparisonSection:
-    """Parse an ``<Amount_comparison>`` XML element into an :class:`AmountComparisonSection`.
+def parse_amount_comparison_section(element: ET.Element) -> AmountComparison:
+    """Parse an ``<Amount_comparison>`` XML element into an :class:`AmountComparison`.
 
     Args:
         element: The ``<Amount_comparison>`` XML element.
 
     Returns:
-        A fully populated :class:`AmountComparisonSection`.
+        A fully populated :class:`AmountComparison`.
     """
     a = element.attrib
-    return AmountComparisonSection(
+    return AmountComparison(
         Comparison_number=parse_int(a["Comparison_number"]),
         Report_nb=parse_int(a["Report_nb"]),
         Last_comparison=parse_int(a["Last_comparison"]),

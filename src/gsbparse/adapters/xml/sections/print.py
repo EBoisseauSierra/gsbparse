@@ -1,22 +1,22 @@
-"""XML adapter: parse a ``<Print>`` element into a ``PrintSection``."""
+"""XML adapter: parse a ``<Print>`` element into a ``Print``."""
 
 import xml.etree.ElementTree as ET
 
 from gsbparse.adapters.xml.parsers import parse_bool, parse_str
-from gsbparse.domain.sections.print import PrintSection
+from gsbparse.domain.sections.print import Print
 
 
-def parse_print_section(element: ET.Element) -> PrintSection:
-    """Parse a ``<Print>`` XML element into a :class:`PrintSection`.
+def parse_print_section(element: ET.Element) -> Print:
+    """Parse a ``<Print>`` XML element into a :class:`Print`.
 
     Args:
         element: The ``<Print>`` XML element.
 
     Returns:
-        A fully populated :class:`PrintSection`.
+        A fully populated :class:`Print`.
     """
     a = element.attrib
-    return PrintSection(
+    return Print(
         Draw_lines=parse_bool(a["Draw_lines"]),
         Draw_column=parse_bool(a["Draw_column"]),
         Draw_background=parse_bool(a["Draw_background"]),

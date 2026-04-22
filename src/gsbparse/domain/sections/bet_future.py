@@ -8,10 +8,10 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class BetFutureSection(GsbFileSection):
+class BetFuture(GsbFileSection):
     """A future/projected transaction in the budget-estimate module.
 
-    Fields mirror those of :class:`~gsbparse.domain.sections.scheduled.ScheduledSection`.
+    Fields mirror those of :class:`~gsbparse.domain.sections.scheduled.Scheduled`.
 
     Attributes:
         Nb: Unique identifier.

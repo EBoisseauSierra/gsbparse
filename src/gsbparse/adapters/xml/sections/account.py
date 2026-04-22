@@ -1,4 +1,4 @@
-"""XML adapter: parse an ``<Account>`` element into an ``AccountSection``."""
+"""XML adapter: parse an ``<Account>`` element into an ``Account``."""
 
 import xml.etree.ElementTree as ET
 
@@ -9,20 +9,20 @@ from gsbparse.adapters.xml.parsers import (
     parse_nullable_str,
     parse_str,
 )
-from gsbparse.domain.sections.account import AccountKind, AccountSection
+from gsbparse.domain.sections.account import Account, AccountKind
 
 
-def parse_account_section(element: ET.Element) -> AccountSection:
-    """Parse an ``<Account>`` XML element into an :class:`AccountSection`.
+def parse_account_section(element: ET.Element) -> Account:
+    """Parse an ``<Account>`` XML element into an :class:`Account`.
 
     Args:
         element: The ``<Account>`` XML element.
 
     Returns:
-        A fully populated :class:`AccountSection`.
+        A fully populated :class:`Account`.
     """
     a = element.attrib
-    return AccountSection(
+    return Account(
         Name=parse_str(a["Name"]),
         Id=parse_nullable_str(a["Id"]),
         Number=parse_int(a["Number"]),

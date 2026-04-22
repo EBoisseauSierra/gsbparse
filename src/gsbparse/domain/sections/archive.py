@@ -7,7 +7,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class ArchiveSection(GsbFileSection):
+class Archive(GsbFileSection):
     """An archive group defined in the Grisbi file.
 
     Archives compress old transactions into a single summary entry.

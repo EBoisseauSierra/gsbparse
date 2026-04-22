@@ -1,7 +1,7 @@
 """Domain model: DetailedTransaction with resolved foreign keys.
 
 A :class:`DetailedTransaction` is a denormalized view of a
-:class:`~gsbparse.domain.sections.transaction.TransactionSection` where every
+:class:`~gsbparse.domain.sections.transaction.Transaction` where every
 foreign-key integer has been resolved to the referenced domain object.
 
 The :func:`build_detailed_transactions` function performs that resolution given
@@ -22,17 +22,17 @@ if TYPE_CHECKING:
     from gsbparse.domain.file import GsbFile
 
 from gsbparse.domain.errors import UnknownDetailedTransactionPathError
-from gsbparse.domain.sections.account import AccountSection, DetailedAccountSection
-from gsbparse.domain.sections.bank import BankSection
-from gsbparse.domain.sections.budgetary import BudgetarySection
-from gsbparse.domain.sections.category import CategorySection
-from gsbparse.domain.sections.currency import CurrencySection
-from gsbparse.domain.sections.financial_year import FinancialYearSection
-from gsbparse.domain.sections.party import PartySection
-from gsbparse.domain.sections.payment import PaymentSection
-from gsbparse.domain.sections.reconcile import DetailedReconcileSection
-from gsbparse.domain.sections.sub_budgetary import DetailedSubBudgetarySection
-from gsbparse.domain.sections.sub_category import DetailedSubCategorySection
+from gsbparse.domain.sections.account import Account, DetailedAccount
+from gsbparse.domain.sections.bank import Bank
+from gsbparse.domain.sections.budgetary import Budgetary
+from gsbparse.domain.sections.category import Category
+from gsbparse.domain.sections.currency import Currency
+from gsbparse.domain.sections.financial_year import FinancialYear
+from gsbparse.domain.sections.party import Party
+from gsbparse.domain.sections.payment import Payment
+from gsbparse.domain.sections.reconcile import DetailedReconcile
+from gsbparse.domain.sections.sub_budgetary import DetailedSubBudgetary
+from gsbparse.domain.sections.sub_category import DetailedSubCategory
 from gsbparse.domain.sections.transaction import TransactionMarkedState
 
 _log = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ _log = logging.getLogger(__name__)
 class DetailedTransaction:
     """A transaction with every foreign-key field resolved to its domain object.
 
-    Fields mirror :class:`~gsbparse.domain.sections.transaction.TransactionSection`
+    Fields mirror :class:`~gsbparse.domain.sections.transaction.Transaction`
     but integer FK identifiers are replaced by the referenced section instances
     (or ``None`` when the FK is zero / not present in the file).
 
@@ -95,16 +95,16 @@ class DetailedTransaction:
     Ma: TransactionMarkedState
     Ar: int
     Mo: int
-    Ac: DetailedAccountSection
-    Cu: CurrencySection
-    Pa: PartySection | None
-    Ca: CategorySection | None
-    Sca: DetailedSubCategorySection | None
-    Pn: PaymentSection | None
-    Re: DetailedReconcileSection | None
-    Fi: FinancialYearSection | None
-    Bu: BudgetarySection | None
-    Sbu: DetailedSubBudgetarySection | None
+    Ac: DetailedAccount
+    Cu: Currency
+    Pa: Party | None
+    Ca: Category | None
+    Sca: DetailedSubCategory | None
+    Pn: Payment | None
+    Re: DetailedReconcile | None
+    Fi: FinancialYear | None
+    Bu: Budgetary | None
+    Sbu: DetailedSubBudgetary | None
     Trt: DetailedTransaction | None
 
 
@@ -230,21 +230,19 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
         return None
 
     # Build lookup dicts keyed by Nb (primary key for each section type).
-    accounts: dict[int, AccountSection] = (
+    accounts: dict[int, Account] = (
         {a.Number: a for a in gsb_file.accounts} if gsb_file.accounts else {}
     )
-    banks: dict[int, BankSection] = {b.Nb: b for b in gsb_file.banks} if gsb_file.banks else {}
-    currencies: dict[int, CurrencySection] = (
+    banks: dict[int, Bank] = {b.Nb: b for b in gsb_file.banks} if gsb_file.banks else {}
+    currencies: dict[int, Currency] = (
         {c.Nb: c for c in gsb_file.currencies} if gsb_file.currencies else {}
     )
-    parties: dict[int, PartySection] = (
-        {p.Nb: p for p in gsb_file.parties} if gsb_file.parties else {}
-    )
-    categories: dict[int, CategorySection] = (
+    parties: dict[int, Party] = {p.Nb: p for p in gsb_file.parties} if gsb_file.parties else {}
+    categories: dict[int, Category] = (
         {c.Nb: c for c in gsb_file.categories} if gsb_file.categories else {}
     )
     # Keyed by (parent_category_nb, sub_category_nb) to disambiguate shared Nb values.
-    detailed_sub_categories: dict[tuple[int, int], DetailedSubCategorySection] = {}
+    detailed_sub_categories: dict[tuple[int, int], DetailedSubCategory] = {}
     if gsb_file.sub_categories:
         for sc in gsb_file.sub_categories:
             parent_category = categories.get(sc.Nbc)
@@ -255,20 +253,20 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
                     sc.Nbc,
                 )
                 continue
-            detailed_sub_categories[(sc.Nbc, sc.Nb)] = DetailedSubCategorySection(
+            detailed_sub_categories[(sc.Nbc, sc.Nb)] = DetailedSubCategory(
                 Nbc=parent_category, Nb=sc.Nb, Na=sc.Na
             )
-    payment_methods: dict[int, PaymentSection] = (
+    payment_methods: dict[int, Payment] = (
         {p.Number: p for p in gsb_file.payment_methods} if gsb_file.payment_methods else {}
     )
-    detailed_accounts: dict[int, DetailedAccountSection] = {}
+    detailed_accounts: dict[int, DetailedAccount] = {}
     if gsb_file.accounts:
         for a in gsb_file.accounts:
             currency = currencies.get(a.Currency)
             if currency is None:
                 _log.warning("Account %d: currency %d not found — skipping", a.Number, a.Currency)
                 continue
-            detailed_accounts[a.Number] = DetailedAccountSection(
+            detailed_accounts[a.Number] = DetailedAccount(
                 Name=a.Name,
                 Id=a.Id,
                 Number=a.Number,
@@ -308,14 +306,14 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
                 Sorting_kind_column=a.Sorting_kind_column,
                 Bet_use_budget=a.Bet_use_budget,
             )
-    detailed_reconciles: dict[int, DetailedReconcileSection] = {}
+    detailed_reconciles: dict[int, DetailedReconcile] = {}
     if gsb_file.reconciles:
         for r in gsb_file.reconciles:
             acc = accounts.get(r.Acc)
             if acc is None:
                 _log.warning("Reconcile %d: account %d not found — skipping", r.Nb, r.Acc)
                 continue
-            detailed_reconciles[r.Nb] = DetailedReconcileSection(
+            detailed_reconciles[r.Nb] = DetailedReconcile(
                 Nb=r.Nb,
                 Na=r.Na,
                 Acc=acc,
@@ -324,14 +322,14 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
                 Ibal=r.Ibal,
                 Fbal=r.Fbal,
             )
-    financial_years: dict[int, FinancialYearSection] = (
+    financial_years: dict[int, FinancialYear] = (
         {f.Nb: f for f in gsb_file.financial_years} if gsb_file.financial_years else {}
     )
-    budgetaries: dict[int, BudgetarySection] = (
+    budgetaries: dict[int, Budgetary] = (
         {b.Nb: b for b in gsb_file.budgetaries} if gsb_file.budgetaries else {}
     )
     # Keyed by (parent_budgetary_nb, sub_budgetary_nb) to disambiguate shared Nb values.
-    detailed_sub_budgetaries: dict[tuple[int, int], DetailedSubBudgetarySection] = {}
+    detailed_sub_budgetaries: dict[tuple[int, int], DetailedSubBudgetary] = {}
     if gsb_file.sub_budgetaries:
         for sb in gsb_file.sub_budgetaries:
             parent_budgetary = budgetaries.get(sb.Nbb)
@@ -342,7 +340,7 @@ def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] 
                     sb.Nbb,
                 )
                 continue
-            detailed_sub_budgetaries[(sb.Nbb, sb.Nb)] = DetailedSubBudgetarySection(
+            detailed_sub_budgetaries[(sb.Nbb, sb.Nb)] = DetailedSubBudgetary(
                 Nbb=parent_budgetary, Nb=sb.Nb, Na=sb.Na
             )
 

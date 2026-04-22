@@ -1,18 +1,18 @@
-"""XML adapter: parse a ``<Bet_graph>`` element into a ``BetGraphSection``."""
+"""XML adapter: parse a ``<Bet_graph>`` element into a ``BetGraph``."""
 
 import xml.etree.ElementTree as ET
 
 from gsbparse.adapters.xml.parsers import parse_str
-from gsbparse.domain.sections.bet_graph import BetGraphSection
+from gsbparse.domain.sections.bet_graph import BetGraph
 
 
-def parse_bet_graph_section(element: ET.Element) -> BetGraphSection:
-    """Parse a ``<Bet_graph>`` XML element into a :class:`BetGraphSection`.
+def parse_bet_graph_section(element: ET.Element) -> BetGraph:
+    """Parse a ``<Bet_graph>`` XML element into a :class:`BetGraph`.
 
     Args:
         element: The ``<Bet_graph>`` XML element.
 
     Returns:
-        A fully populated :class:`BetGraphSection`.
+        A fully populated :class:`BetGraph`.
     """
-    return BetGraphSection(prefs=parse_str(element.attrib["prefs"]))
+    return BetGraph(prefs=parse_str(element.attrib["prefs"]))

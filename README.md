@@ -33,7 +33,7 @@ gsb = gsbparse.read_gsb("my_accounts.gsb")
 
 ```python
 >>> gsb.currencies
-[CurrencySection(Nb=1, Na='Euro', Co='€', Ico='EUR', Fl=2), CurrencySection(Nb=2, Na='US Dollar', Co='$', Ico='USD', Fl=2)]
+[Currency(Nb=1, Na='Euro', Co='€', Ico='EUR', Fl=2), Currency(Nb=2, Na='US Dollar', Co='$', Ico='USD', Fl=2)]
 
 >>> for account in gsb.accounts:
 ...     print(account.Number, account.Name)

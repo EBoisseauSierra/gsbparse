@@ -4,7 +4,7 @@
 
 **Goal:** Resolve all FK integer fields inside `DetailedTransaction`'s nested section objects (`Ac`, `Sca`, `Sbu`, `Re`) so that navigating `tx.Ac.Currency.Ico`, `tx.Sca.Nbc.Na`, `tx.Re.Acc.Name`, etc. works without any raw integers remaining in the FK-resolved view.
 
-**Architecture:** Four new frozen dataclasses (`DetailedAccountSection`, `DetailedSubCategorySection`, `DetailedSubBudgetarySection`, `DetailedReconcileSection`) replace the raw section types on the corresponding `DetailedTransaction` fields. `build_detailed_transactions` gains pre-pass lookup dicts to resolve each FK before Pass 1. The sub-category and sub-budgetary lookups use composite keys `(parent_nb, child_nb)` to correctly disambiguate children that share the same `Nb` across different parents. Raw section types on `GsbFile` are unchanged.
+**Architecture:** Four new frozen dataclasses (`DetailedAccount`, `DetailedSubCategory`, `DetailedSubBudgetary`, `DetailedReconcile`) replace the raw section types on the corresponding `DetailedTransaction` fields. `build_detailed_transactions` gains pre-pass lookup dicts to resolve each FK before Pass 1. The sub-category and sub-budgetary lookups use composite keys `(parent_nb, child_nb)` to correctly disambiguate children that share the same `Nb` across different parents. Raw section types on `GsbFile` are unchanged.
 
 **Tech Stack:** Python 3.13+, `dataclasses`, stdlib only in `domain/`. Tests: `pytest`, `caplog`.
 
@@ -14,10 +14,10 @@
 
 | File | Change |
 |---|---|
-| `src/gsbparse/domain/sections/sub_category.py` | Add `DetailedSubCategorySection` |
-| `src/gsbparse/domain/sections/sub_budgetary.py` | Add `DetailedSubBudgetarySection` |
-| `src/gsbparse/domain/sections/reconcile.py` | Add `DetailedReconcileSection` |
-| `src/gsbparse/domain/sections/account.py` | Add `DetailedAccountSection` |
+| `src/gsbparse/domain/sections/sub_category.py` | Add `DetailedSubCategory` |
+| `src/gsbparse/domain/sections/sub_budgetary.py` | Add `DetailedSubBudgetary` |
+| `src/gsbparse/domain/sections/reconcile.py` | Add `DetailedReconcile` |
+| `src/gsbparse/domain/sections/account.py` | Add `DetailedAccount` |
 | `src/gsbparse/domain/detailed_transaction.py` | Update field types on `DetailedTransaction`; update `build_detailed_transactions`; update imports |
 | `src/gsbparse/domain/sections/__init__.py` | Re-export four new types |
 | `src/gsbparse/__init__.py` | Re-export four new types |
@@ -26,7 +26,7 @@
 
 ---
 
-## Task 1: `DetailedSubCategorySection`
+## Task 1: `DetailedSubCategory`
 
 **Files:**
 - Modify: `src/gsbparse/domain/sections/sub_category.py`
@@ -38,25 +38,25 @@
 In `tests/test_detailed_transactions.py`, replace the existing `_minimal_gsb_file` signature and body:
 
 ```python
-from gsbparse.domain.sections.bank import BankSection
-from gsbparse.domain.sections.budgetary import BudgetarySection
-from gsbparse.domain.sections.payment import PaymentSection
-from gsbparse.domain.sections.reconcile import ReconcileSection
-from gsbparse.domain.sections.sub_budgetary import SubBudgetarySection
+from gsbparse.domain.sections.bank import Bank
+from gsbparse.domain.sections.budgetary import Budgetary
+from gsbparse.domain.sections.payment import Payment
+from gsbparse.domain.sections.reconcile import Reconcile
+from gsbparse.domain.sections.sub_budgetary import SubBudgetary
 
 
 def _minimal_gsb_file(
-    transactions: list[TransactionSection] | None = None,
-    accounts: list[AccountSection] | None = None,
-    currencies: list[CurrencySection] | None = None,
-    parties: list[PartySection] | None = None,
-    categories: list[CategorySection] | None = None,
-    sub_categories: list[SubCategorySection] | None = None,
-    budgetaries: list[BudgetarySection] | None = None,
-    sub_budgetaries: list[SubBudgetarySection] | None = None,
-    banks: list[BankSection] | None = None,
-    payment_methods: list[PaymentSection] | None = None,
-    reconciles: list[ReconcileSection] | None = None,
+    transactions: list[Transaction] | None = None,
+    accounts: list[Account] | None = None,
+    currencies: list[Currency] | None = None,
+    parties: list[Party] | None = None,
+    categories: list[Category] | None = None,
+    sub_categories: list[SubCategory] | None = None,
+    budgetaries: list[Budgetary] | None = None,
+    sub_budgetaries: list[SubBudgetary] | None = None,
+    banks: list[Bank] | None = None,
+    payment_methods: list[Payment] | None = None,
+    reconciles: list[Reconcile] | None = None,
 ) -> GsbFile:
     return GsbFile(
         general=None,
@@ -97,7 +97,7 @@ def _minimal_gsb_file(
 Add this test class to `tests/test_detailed_transactions.py`:
 
 ```python
-class TestDetailedSubCategorySection:
+class TestDetailedSubCategory:
     def test_sub_category_nbc_resolves_to_category(self):
         # Arrange
         dummy_category = _dummy_category(nb=3, na="Transport")
@@ -126,8 +126,8 @@ class TestDetailedSubCategorySection:
         # Two sub-categories have the same Nb=1 but different parent categories.
         dummy_cat_a = _dummy_category(nb=1, na="Food")
         dummy_cat_b = _dummy_category(nb=2, na="Transport")
-        dummy_sca_a = SubCategorySection(Nb=1, Na="Groceries", Nbc=1)
-        dummy_sca_b = SubCategorySection(Nb=1, Na="Bus", Nbc=2)
+        dummy_sca_a = SubCategory(Nb=1, Na="Groceries", Nbc=1)
+        dummy_sca_b = SubCategory(Nb=1, Na="Bus", Nbc=2)
         dummy_account = _dummy_account()
         dummy_currency = _dummy_currency()
         dummy_tx = _dummy_transaction(ca=2, sca=1)  # wants Transport/Bus
@@ -150,21 +150,21 @@ class TestDetailedSubCategorySection:
 - [ ] **Step 3: Run the failing test**
 
 ```
-uv run pytest tests/test_detailed_transactions.py::TestDetailedSubCategorySection -v
+uv run pytest tests/test_detailed_transactions.py::TestDetailedSubCategory -v
 ```
 
-Expected: FAIL — `AttributeError` or type mismatch (`Sca.Nbc` is `int`, not `CategorySection`).
+Expected: FAIL — `AttributeError` or type mismatch (`Sca.Nbc` is `int`, not `Category`).
 
-- [ ] **Step 4: Add `DetailedSubCategorySection` to `sub_category.py`**
+- [ ] **Step 4: Add `DetailedSubCategory` to `sub_category.py`**
 
-Add after the existing `SubCategorySection` class in `src/gsbparse/domain/sections/sub_category.py`:
+Add after the existing `SubCategory` class in `src/gsbparse/domain/sections/sub_category.py`:
 
 ```python
-from gsbparse.domain.sections.category import CategorySection
+from gsbparse.domain.sections.category import Category
 
 
 @dataclass(frozen=True)
-class DetailedSubCategorySection(GsbFileSection):
+class DetailedSubCategory(GsbFileSection):
     """A transaction sub-category with its parent category resolved.
 
     Attributes:
@@ -173,7 +173,7 @@ class DetailedSubCategorySection(GsbFileSection):
         Na: Display name.
     """
 
-    Nbc: CategorySection
+    Nbc: Category
     Nb: int
     Na: str
 ```
@@ -182,22 +182,22 @@ class DetailedSubCategorySection(GsbFileSection):
 
 Replace:
 ```python
-from gsbparse.domain.sections.sub_category import SubCategorySection
+from gsbparse.domain.sections.sub_category import SubCategory
 ```
 With:
 ```python
-from gsbparse.domain.sections.sub_category import DetailedSubCategorySection
+from gsbparse.domain.sections.sub_category import DetailedSubCategory
 ```
 
 - [ ] **Step 6: Update `DetailedTransaction.Sca` field type in `detailed_transaction.py`**
 
 Replace:
 ```python
-    Sca: SubCategorySection | None
+    Sca: SubCategory | None
 ```
 With:
 ```python
-    Sca: DetailedSubCategorySection | None
+    Sca: DetailedSubCategory | None
 ```
 
 - [ ] **Step 7: Update `build_detailed_transactions` in `detailed_transaction.py`**
@@ -205,7 +205,7 @@ With:
 Replace the existing `sub_categories` dict and its usage. Find and replace:
 
 ```python
-    sub_categories: dict[int, SubCategorySection] = (
+    sub_categories: dict[int, SubCategory] = (
         {s.Nb: s for s in gsb_file.sub_categories} if gsb_file.sub_categories else {}
     )
 ```
@@ -214,7 +214,7 @@ With:
 
 ```python
     # Keyed by (parent_category_nb, sub_category_nb) to disambiguate shared Nb values.
-    detailed_sub_categories: dict[tuple[int, int], DetailedSubCategorySection] = {}
+    detailed_sub_categories: dict[tuple[int, int], DetailedSubCategory] = {}
     if gsb_file.sub_categories:
         for sc in gsb_file.sub_categories:
             parent = categories.get(sc.Nbc)
@@ -225,7 +225,7 @@ With:
                     sc.Nbc,
                 )
                 continue
-            detailed_sub_categories[(sc.Nbc, sc.Nb)] = DetailedSubCategorySection(
+            detailed_sub_categories[(sc.Nbc, sc.Nb)] = DetailedSubCategory(
                 Nbc=parent, Nb=sc.Nb, Na=sc.Na
             )
 ```
@@ -245,7 +245,7 @@ With:
 uv run pytest tests/test_detailed_transactions.py -v
 ```
 
-Expected: all pass including the new `TestDetailedSubCategorySection` tests.
+Expected: all pass including the new `TestDetailedSubCategory` tests.
 
 - [ ] **Step 9: Run full CI**
 
@@ -262,9 +262,9 @@ git add src/gsbparse/domain/sections/sub_category.py \
         src/gsbparse/domain/detailed_transaction.py \
         tests/test_detailed_transactions.py
 git commit -m "$(cat <<'EOF'
-feat(domain/sections): Add DetailedSubCategorySection with resolved parent CategorySection
+feat(domain/sections): Add DetailedSubCategory with resolved parent Category
 
-Resolves SubCategorySection.Nbc from int to CategorySection in the
+Resolves SubCategory.Nbc from int to Category in the
 DetailedTransaction view. Uses composite (parent_nb, child_nb) key to
 correctly disambiguate sub-categories sharing the same Nb across parents.
 
@@ -275,7 +275,7 @@ EOF
 
 ---
 
-## Task 2: `DetailedSubBudgetarySection`
+## Task 2: `DetailedSubBudgetary`
 
 **Files:**
 - Modify: `src/gsbparse/domain/sections/sub_budgetary.py`
@@ -287,16 +287,16 @@ EOF
 Add after the existing `_dummy_sub_category` helper:
 
 ```python
-from gsbparse.domain.sections.budgetary import BudgetarySection
-from gsbparse.domain.sections.sub_budgetary import SubBudgetarySection
+from gsbparse.domain.sections.budgetary import Budgetary
+from gsbparse.domain.sections.sub_budgetary import SubBudgetary
 
 
-def _dummy_budgetary(nb: int = 1, na: str = "Household") -> BudgetarySection:
-    return BudgetarySection(Nb=nb, Na=na, Kd=CategoryKind.EXPENSE)
+def _dummy_budgetary(nb: int = 1, na: str = "Household") -> Budgetary:
+    return Budgetary(Nb=nb, Na=na, Kd=CategoryKind.EXPENSE)
 
 
-def _dummy_sub_budgetary(nb: int = 1, na: str = "Groceries", nbb: int = 1) -> SubBudgetarySection:
-    return SubBudgetarySection(Nb=nb, Na=na, Nbb=nbb)
+def _dummy_sub_budgetary(nb: int = 1, na: str = "Groceries", nbb: int = 1) -> SubBudgetary:
+    return SubBudgetary(Nb=nb, Na=na, Nbb=nbb)
 ```
 
 - [ ] **Step 2: Write the failing test**
@@ -304,7 +304,7 @@ def _dummy_sub_budgetary(nb: int = 1, na: str = "Groceries", nbb: int = 1) -> Su
 Add to `tests/test_detailed_transactions.py`:
 
 ```python
-class TestDetailedSubBudgetarySection:
+class TestDetailedSubBudgetary:
     def test_sub_budgetary_nbb_resolves_to_budgetary(self):
         # Arrange
         dummy_budget = _dummy_budgetary(nb=4, na="Living")
@@ -343,8 +343,8 @@ def _dummy_transaction(
     bu: int = 0,
     sbu: int = 0,
     trt: int = 0,
-) -> TransactionSection:
-    return TransactionSection(
+) -> Transaction:
+    return Transaction(
         Nb=nb,
         Ac=ac,
         Id=None,
@@ -379,21 +379,21 @@ def _dummy_transaction(
 - [ ] **Step 3: Run the failing test**
 
 ```
-uv run pytest tests/test_detailed_transactions.py::TestDetailedSubBudgetarySection -v
+uv run pytest tests/test_detailed_transactions.py::TestDetailedSubBudgetary -v
 ```
 
-Expected: FAIL — `Sbu.Nbb` is `int`, not `BudgetarySection`.
+Expected: FAIL — `Sbu.Nbb` is `int`, not `Budgetary`.
 
-- [ ] **Step 4: Add `DetailedSubBudgetarySection` to `sub_budgetary.py`**
+- [ ] **Step 4: Add `DetailedSubBudgetary` to `sub_budgetary.py`**
 
-Add after the existing `SubBudgetarySection` class in `src/gsbparse/domain/sections/sub_budgetary.py`:
+Add after the existing `SubBudgetary` class in `src/gsbparse/domain/sections/sub_budgetary.py`:
 
 ```python
-from gsbparse.domain.sections.budgetary import BudgetarySection
+from gsbparse.domain.sections.budgetary import Budgetary
 
 
 @dataclass(frozen=True)
-class DetailedSubBudgetarySection(GsbFileSection):
+class DetailedSubBudgetary(GsbFileSection):
     """A budget sub-line with its parent budgetary resolved.
 
     Attributes:
@@ -402,7 +402,7 @@ class DetailedSubBudgetarySection(GsbFileSection):
         Na: Display name.
     """
 
-    Nbb: BudgetarySection
+    Nbb: Budgetary
     Nb: int
     Na: str
 ```
@@ -411,36 +411,36 @@ class DetailedSubBudgetarySection(GsbFileSection):
 
 Replace:
 ```python
-from gsbparse.domain.sections.sub_budgetary import SubBudgetarySection
+from gsbparse.domain.sections.sub_budgetary import SubBudgetary
 ```
 With:
 ```python
-from gsbparse.domain.sections.sub_budgetary import DetailedSubBudgetarySection
+from gsbparse.domain.sections.sub_budgetary import DetailedSubBudgetary
 ```
 
 - [ ] **Step 6: Update `DetailedTransaction.Sbu` field type**
 
 Replace:
 ```python
-    Sbu: SubBudgetarySection | None
+    Sbu: SubBudgetary | None
 ```
 With:
 ```python
-    Sbu: DetailedSubBudgetarySection | None
+    Sbu: DetailedSubBudgetary | None
 ```
 
 - [ ] **Step 7: Update `build_detailed_transactions`**
 
 Replace:
 ```python
-    sub_budgetaries: dict[int, SubBudgetarySection] = (
+    sub_budgetaries: dict[int, SubBudgetary] = (
         {s.Nb: s for s in gsb_file.sub_budgetaries} if gsb_file.sub_budgetaries else {}
     )
 ```
 With:
 ```python
     # Keyed by (parent_budgetary_nb, sub_budgetary_nb) to disambiguate shared Nb values.
-    detailed_sub_budgetaries: dict[tuple[int, int], DetailedSubBudgetarySection] = {}
+    detailed_sub_budgetaries: dict[tuple[int, int], DetailedSubBudgetary] = {}
     if gsb_file.sub_budgetaries:
         for sb in gsb_file.sub_budgetaries:
             parent = budgetaries.get(sb.Nbb)
@@ -451,7 +451,7 @@ With:
                     sb.Nbb,
                 )
                 continue
-            detailed_sub_budgetaries[(sb.Nbb, sb.Nb)] = DetailedSubBudgetarySection(
+            detailed_sub_budgetaries[(sb.Nbb, sb.Nb)] = DetailedSubBudgetary(
                 Nbb=parent, Nb=sb.Nb, Na=sb.Na
             )
 ```
@@ -486,9 +486,9 @@ git add src/gsbparse/domain/sections/sub_budgetary.py \
         src/gsbparse/domain/detailed_transaction.py \
         tests/test_detailed_transactions.py
 git commit -m "$(cat <<'EOF'
-feat(domain/sections): Add DetailedSubBudgetarySection with resolved parent BudgetarySection
+feat(domain/sections): Add DetailedSubBudgetary with resolved parent Budgetary
 
-Resolves SubBudgetarySection.Nbb from int to BudgetarySection in the
+Resolves SubBudgetary.Nbb from int to Budgetary in the
 DetailedTransaction view. Uses composite (parent_nb, child_nb) key to
 correctly disambiguate sub-budgetaries sharing the same Nb across parents.
 
@@ -499,7 +499,7 @@ EOF
 
 ---
 
-## Task 3: `DetailedReconcileSection`
+## Task 3: `DetailedReconcile`
 
 **Files:**
 - Modify: `src/gsbparse/domain/sections/reconcile.py`
@@ -511,17 +511,17 @@ EOF
 Add to `tests/test_detailed_transactions.py`:
 
 ```python
-from gsbparse.domain.sections.reconcile import ReconcileSection
+from gsbparse.domain.sections.reconcile import Reconcile
 
 
-def _dummy_reconcile(nb: int = 1, na: str = "2023-1", acc: int = 1) -> ReconcileSection:
-    return ReconcileSection(
+def _dummy_reconcile(nb: int = 1, na: str = "2023-1", acc: int = 1) -> Reconcile:
+    return Reconcile(
         Nb=nb, Na=na, Acc=acc, Idate=None, Fdate=None,
         Ibal=Decimal("0"), Fbal=Decimal("0"),
     )
 
 
-class TestDetailedReconcileSection:
+class TestDetailedReconcile:
     def test_reconcile_acc_resolves_to_account_section(self):
         # Arrange
         dummy_account = _dummy_account(number=1, name="Checking")
@@ -575,8 +575,8 @@ def _dummy_transaction(
     sbu: int = 0,
     trt: int = 0,
     re: int = 0,
-) -> TransactionSection:
-    return TransactionSection(
+) -> Transaction:
+    return Transaction(
         Nb=nb,
         Ac=ac,
         Id=None,
@@ -611,21 +611,21 @@ def _dummy_transaction(
 - [ ] **Step 2: Run the failing test**
 
 ```
-uv run pytest tests/test_detailed_transactions.py::TestDetailedReconcileSection -v
+uv run pytest tests/test_detailed_transactions.py::TestDetailedReconcile -v
 ```
 
-Expected: FAIL — `Re.Acc` is `int`, not `AccountSection`.
+Expected: FAIL — `Re.Acc` is `int`, not `Account`.
 
-- [ ] **Step 3: Add `DetailedReconcileSection` to `reconcile.py`**
+- [ ] **Step 3: Add `DetailedReconcile` to `reconcile.py`**
 
-Add after the existing `ReconcileSection` class in `src/gsbparse/domain/sections/reconcile.py`:
+Add after the existing `Reconcile` class in `src/gsbparse/domain/sections/reconcile.py`:
 
 ```python
-from gsbparse.domain.sections.account import AccountSection
+from gsbparse.domain.sections.account import Account
 
 
 @dataclass(frozen=True)
-class DetailedReconcileSection(GsbFileSection):
+class DetailedReconcile(GsbFileSection):
     """A reconciliation record with its account resolved.
 
     Attributes:
@@ -640,7 +640,7 @@ class DetailedReconcileSection(GsbFileSection):
 
     Nb: int
     Na: str
-    Acc: AccountSection
+    Acc: Account
     Idate: date | None
     Fdate: date | None
     Ibal: Decimal
@@ -651,22 +651,22 @@ class DetailedReconcileSection(GsbFileSection):
 
 Replace:
 ```python
-from gsbparse.domain.sections.reconcile import ReconcileSection
+from gsbparse.domain.sections.reconcile import Reconcile
 ```
 With:
 ```python
-from gsbparse.domain.sections.reconcile import DetailedReconcileSection
+from gsbparse.domain.sections.reconcile import DetailedReconcile
 ```
 
 - [ ] **Step 5: Update `DetailedTransaction.Re` field type**
 
 Replace:
 ```python
-    Re: ReconcileSection | None
+    Re: Reconcile | None
 ```
 With:
 ```python
-    Re: DetailedReconcileSection | None
+    Re: DetailedReconcile | None
 ```
 
 - [ ] **Step 6: Update `build_detailed_transactions`**
@@ -675,17 +675,17 @@ After the existing `accounts` lookup, add a `raw_accounts` lookup and replace th
 
 Replace:
 ```python
-    accounts: dict[int, AccountSection] = (
+    accounts: dict[int, Account] = (
         {a.Number: a for a in gsb_file.accounts} if gsb_file.accounts else {}
     )
 ```
 With:
 ```python
-    accounts: dict[int, AccountSection] = (
+    accounts: dict[int, Account] = (
         {a.Number: a for a in gsb_file.accounts} if gsb_file.accounts else {}
     )
 
-    detailed_reconciles: dict[int, DetailedReconcileSection] = {}
+    detailed_reconciles: dict[int, DetailedReconcile] = {}
     if gsb_file.reconciles:
         for r in gsb_file.reconciles:
             acc = accounts.get(r.Acc)
@@ -694,7 +694,7 @@ With:
                     "Reconcile %d: account %d not found — skipping", r.Nb, r.Acc
                 )
                 continue
-            detailed_reconciles[r.Nb] = DetailedReconcileSection(
+            detailed_reconciles[r.Nb] = DetailedReconcile(
                 Nb=r.Nb,
                 Na=r.Na,
                 Acc=acc,
@@ -707,7 +707,7 @@ With:
 
 Then remove the existing `reconciles` dict:
 ```python
-    reconciles: dict[int, ReconcileSection] = (
+    reconciles: dict[int, Reconcile] = (
         {r.Nb: r for r in gsb_file.reconciles} if gsb_file.reconciles else {}
     )
 ```
@@ -742,9 +742,9 @@ git add src/gsbparse/domain/sections/reconcile.py \
         src/gsbparse/domain/detailed_transaction.py \
         tests/test_detailed_transactions.py
 git commit -m "$(cat <<'EOF'
-feat(domain/sections): Add DetailedReconcileSection with resolved AccountSection
+feat(domain/sections): Add DetailedReconcile with resolved Account
 
-Resolves ReconcileSection.Acc from int to AccountSection in the
+Resolves Reconcile.Acc from int to Account in the
 DetailedTransaction view.
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
@@ -754,9 +754,9 @@ EOF
 
 ---
 
-## Task 4: `DetailedAccountSection`
+## Task 4: `DetailedAccount`
 
-This task replaces the raw `AccountSection` on `DetailedTransaction.Ac` with a richer `DetailedAccountSection` that resolves Currency, Bank, Default_debit_method, and Default_credit_method. It also fixes the existing test that relied on object identity of the raw section.
+This task replaces the raw `Account` on `DetailedTransaction.Ac` with a richer `DetailedAccount` that resolves Currency, Bank, Default_debit_method, and Default_credit_method. It also fixes the existing test that relied on object identity of the raw section.
 
 **Files:**
 - Modify: `src/gsbparse/domain/sections/account.py`
@@ -768,11 +768,11 @@ This task replaces the raw `AccountSection` on `DetailedTransaction.Ac` with a r
 Add a `_dummy_bank` helper and imports to `tests/test_detailed_transactions.py`:
 
 ```python
-from gsbparse.domain.sections.bank import BankSection
+from gsbparse.domain.sections.bank import Bank
 
 
-def _dummy_bank(nb: int = 1, na: str = "My Bank") -> BankSection:
-    return BankSection(
+def _dummy_bank(nb: int = 1, na: str = "My Bank") -> Bank:
+    return Bank(
         Nb=nb, Na=na, Co="", BIC="", Adr="", Tel="",
         Mail=None, Web=None, Nac="", Faxc="", Telc="", Mailc="", Rem=None,
     )
@@ -783,18 +783,18 @@ def _dummy_bank(nb: int = 1, na: str = "My Bank") -> BankSection:
 Add to `tests/test_detailed_transactions.py`:
 
 ```python
-from gsbparse.domain.sections.account import DetailedAccountSection
-from gsbparse.domain.sections.payment import PaymentSection
+from gsbparse.domain.sections.account import DetailedAccount
+from gsbparse.domain.sections.payment import Payment
 
 
-def _dummy_payment(number: int = 1, name: str = "Card") -> PaymentSection:
-    return PaymentSection(
+def _dummy_payment(number: int = 1, name: str = "Card") -> Payment:
+    return Payment(
         Number=number, Name=name, Sign=0,
         Show_entry=False, Automatic_number=False, Current_number=None, Account=0,
     )
 
 
-class TestDetailedAccountSection:
+class TestDetailedAccount:
     def test_currency_resolves(self):
         # Arrange
         dummy_currency = _dummy_currency(nb=1, na="Euro")
@@ -812,14 +812,14 @@ class TestDetailedAccountSection:
         # Assert
         assert result is not None
         detailed_ac = result[0].Ac
-        assert isinstance(detailed_ac, DetailedAccountSection)
+        assert isinstance(detailed_ac, DetailedAccount)
         assert detailed_ac.Currency is dummy_currency
 
     def test_bank_resolves_when_nonzero(self):
         # Arrange
         dummy_currency = _dummy_currency()
         dummy_bank = _dummy_bank(nb=5, na="Savings Bank")
-        raw_account = AccountSection(
+        raw_account = Account(
             Name="Checking",
             Id=None,
             Number=1,
@@ -884,7 +884,7 @@ class TestDetailedAccountSection:
         # Arrange
         dummy_currency = _dummy_currency()
         dummy_payment = _dummy_payment(number=3, name="Cheque")
-        raw_account = AccountSection(
+        raw_account = Account(
             Name="Checking",
             Id=None,
             Number=1,
@@ -969,25 +969,25 @@ class TestDetailedAccountSection:
 - [ ] **Step 3: Run the failing tests**
 
 ```
-uv run pytest tests/test_detailed_transactions.py::TestDetailedAccountSection -v
+uv run pytest tests/test_detailed_transactions.py::TestDetailedAccount -v
 ```
 
-Expected: FAIL — `DetailedAccountSection` does not exist yet.
+Expected: FAIL — `DetailedAccount` does not exist yet.
 
-- [ ] **Step 4: Add `DetailedAccountSection` to `account.py`**
+- [ ] **Step 4: Add `DetailedAccount` to `account.py`**
 
-In `src/gsbparse/domain/sections/account.py`, add the imports and the new class after `AccountSection`:
+In `src/gsbparse/domain/sections/account.py`, add the imports and the new class after `Account`:
 
 ```python
-from gsbparse.domain.sections.bank import BankSection
-from gsbparse.domain.sections.payment import PaymentSection
+from gsbparse.domain.sections.bank import Bank
+from gsbparse.domain.sections.payment import Payment
 
 
 @dataclass(frozen=True)
-class DetailedAccountSection(GsbFileSection):
+class DetailedAccount(GsbFileSection):
     """An account with its currency, bank, and payment methods resolved.
 
-    All fields mirror :class:`AccountSection` except the three FK integer fields
+    All fields mirror :class:`Account` except the three FK integer fields
     which are replaced by their resolved domain objects.
 
     Attributes:
@@ -1028,9 +1028,9 @@ class DetailedAccountSection(GsbFileSection):
     Number: int
     Owner: str
     Kind: AccountKind
-    Currency: CurrencySection
+    Currency: Currency
     Path_icon: str
-    Bank: BankSection | None
+    Bank: Bank | None
     Bank_branch_code: str
     Bank_account_number: str
     Key: str
@@ -1044,8 +1044,8 @@ class DetailedAccountSection(GsbFileSection):
     Lines_per_transaction: int
     Comment: str
     Owner_address: str
-    Default_debit_method: PaymentSection | None
-    Default_credit_method: PaymentSection | None
+    Default_debit_method: Payment | None
+    Default_credit_method: Payment | None
     Sort_by_method: bool
     Neutrals_inside_method: bool
     Sort_order: str
@@ -1055,44 +1055,44 @@ class DetailedAccountSection(GsbFileSection):
     Bet_use_budget: int
 ```
 
-`CurrencySection` is already imported at the top of `account.py` (check — if not, add it):
+`Currency` is already imported at the top of `account.py` (check — if not, add it):
 ```python
-from gsbparse.domain.sections.currency import CurrencySection
+from gsbparse.domain.sections.currency import Currency
 ```
 
 - [ ] **Step 5: Update imports in `detailed_transaction.py`**
 
 Replace:
 ```python
-from gsbparse.domain.sections.account import AccountSection
+from gsbparse.domain.sections.account import Account
 ```
 With:
 ```python
-from gsbparse.domain.sections.account import AccountSection, DetailedAccountSection
-from gsbparse.domain.sections.bank import BankSection
+from gsbparse.domain.sections.account import Account, DetailedAccount
+from gsbparse.domain.sections.bank import Bank
 ```
 
 - [ ] **Step 6: Update `DetailedTransaction.Ac` field type**
 
 Replace:
 ```python
-    Ac: AccountSection
+    Ac: Account
 ```
 With:
 ```python
-    Ac: DetailedAccountSection
+    Ac: DetailedAccount
 ```
 
 - [ ] **Step 7: Update `build_detailed_transactions` — add `banks` lookup and `detailed_accounts` construction**
 
-After the existing `accounts: dict[int, AccountSection]` lookup, add:
+After the existing `accounts: dict[int, Account]` lookup, add:
 
 ```python
-    banks: dict[int, BankSection] = (
+    banks: dict[int, Bank] = (
         {b.Nb: b for b in gsb_file.banks} if gsb_file.banks else {}
     )
 
-    detailed_accounts: dict[int, DetailedAccountSection] = {}
+    detailed_accounts: dict[int, DetailedAccount] = {}
     if gsb_file.accounts:
         for a in gsb_file.accounts:
             currency = currencies.get(a.Currency)
@@ -1101,7 +1101,7 @@ After the existing `accounts: dict[int, AccountSection]` lookup, add:
                     "Account %d: currency %d not found — skipping", a.Number, a.Currency
                 )
                 continue
-            detailed_accounts[a.Number] = DetailedAccountSection(
+            detailed_accounts[a.Number] = DetailedAccount(
                 Name=a.Name,
                 Id=a.Id,
                 Number=a.Number,
@@ -1156,7 +1156,7 @@ And in the `DetailedTransaction(...)` constructor call, replace:
 ```python
             Ac=account,
 ```
-(this line is unchanged in content; mypy now infers `account: DetailedAccountSection`.)
+(this line is unchanged in content; mypy now infers `account: DetailedAccount`.)
 
 Also remove the old warning block that checked `accounts.get(tx.Ac)` — `detailed_accounts` replaces it.
 
@@ -1217,12 +1217,12 @@ git add src/gsbparse/domain/sections/account.py \
         src/gsbparse/domain/detailed_transaction.py \
         tests/test_detailed_transactions.py
 git commit -m "$(cat <<'EOF'
-feat(domain/sections): Add DetailedAccountSection with resolved Currency, Bank, and payment methods
+feat(domain/sections): Add DetailedAccount with resolved Currency, Bank, and payment methods
 
-Resolves AccountSection.Currency, .Bank, .Default_debit_method, and
+Resolves Account.Currency, .Bank, .Default_debit_method, and
 .Default_credit_method from int to their domain objects in the
 DetailedTransaction view. Updates DetailedTransaction.Ac to
-DetailedAccountSection throughout.
+DetailedAccount throughout.
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 EOF
@@ -1241,36 +1241,36 @@ EOF
 
 In the imports block, add:
 ```python
-from gsbparse.domain.sections.account import DetailedAccountSection
-from gsbparse.domain.sections.reconcile import DetailedReconcileSection
-from gsbparse.domain.sections.sub_budgetary import DetailedSubBudgetarySection
-from gsbparse.domain.sections.sub_category import DetailedSubCategorySection
+from gsbparse.domain.sections.account import DetailedAccount
+from gsbparse.domain.sections.reconcile import DetailedReconcile
+from gsbparse.domain.sections.sub_budgetary import DetailedSubBudgetary
+from gsbparse.domain.sections.sub_category import DetailedSubCategory
 ```
 
 In the `__all__` list, add (in alphabetical position):
 ```python
-    "DetailedAccountSection",
-    "DetailedReconcileSection",
-    "DetailedSubBudgetarySection",
-    "DetailedSubCategorySection",
+    "DetailedAccount",
+    "DetailedReconcile",
+    "DetailedSubBudgetary",
+    "DetailedSubCategory",
 ```
 
 - [ ] **Step 2: Add exports to `src/gsbparse/__init__.py`**
 
 In the `from gsbparse.domain.sections import (` block, add:
 ```python
-    DetailedAccountSection,
-    DetailedReconcileSection,
-    DetailedSubBudgetarySection,
-    DetailedSubCategorySection,
+    DetailedAccount,
+    DetailedReconcile,
+    DetailedSubBudgetary,
+    DetailedSubCategory,
 ```
 
 In the `__all__` list, add (in the section types block):
 ```python
-    "DetailedAccountSection",
-    "DetailedReconcileSection",
-    "DetailedSubBudgetarySection",
-    "DetailedSubCategorySection",
+    "DetailedAccount",
+    "DetailedReconcile",
+    "DetailedSubBudgetary",
+    "DetailedSubCategory",
 ```
 
 - [ ] **Step 3: Run full CI**
@@ -1289,8 +1289,8 @@ git add src/gsbparse/domain/sections/__init__.py \
 git commit -m "$(cat <<'EOF'
 feat: Re-export Detailed*Section types from public API
 
-Adds DetailedAccountSection, DetailedSubCategorySection,
-DetailedSubBudgetarySection, and DetailedReconcileSection to the
+Adds DetailedAccount, DetailedSubCategory,
+DetailedSubBudgetary, and DetailedReconcile to the
 gsbparse.domain.sections and gsbparse public namespaces.
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
@@ -1348,7 +1348,7 @@ In `tests/test_e2e.py`, inside `class TestDetailedTransactions`, add:
         assert tx_127.Re.Acc.Name == "Delayed Debit card [liabilities]"
 
     def test_shared_detailed_account_identity(self, detailed):
-        # Transactions on the same account share the same DetailedAccountSection instance.
+        # Transactions on the same account share the same DetailedAccount instance.
         assert detailed is not None
         account_1_txs = [tx for tx in detailed if tx.Ac.Number == 1]
         assert len(account_1_txs) > 1  # sanity check

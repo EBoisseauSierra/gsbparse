@@ -7,7 +7,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class FinancialYearSection(GsbFileSection):
+class FinancialYear(GsbFileSection):
     """A financial year defined in the Grisbi file.
 
     Attributes:

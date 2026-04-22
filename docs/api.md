@@ -38,123 +38,123 @@ All section classes are frozen dataclasses. Field names mirror the Grisbi format
 attribute codes.
 
 ```{eval-rst}
-.. autoclass:: gsbparse.AccountSection
+.. autoclass:: gsbparse.Account
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.CurrencySection
+.. autoclass:: gsbparse.Currency
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.TransactionSection
+.. autoclass:: gsbparse.Transaction
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.PartySection
+.. autoclass:: gsbparse.Party
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.CategorySection
+.. autoclass:: gsbparse.Category
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.SubCategorySection
+.. autoclass:: gsbparse.SubCategory
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.BudgetarySection
+.. autoclass:: gsbparse.Budgetary
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.SubBudgetarySection
+.. autoclass:: gsbparse.SubBudgetary
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.GeneralSection
+.. autoclass:: gsbparse.General
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.BankSection
+.. autoclass:: gsbparse.Bank
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.PaymentSection
+.. autoclass:: gsbparse.Payment
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.ReconcileSection
+.. autoclass:: gsbparse.Reconcile
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.ScheduledSection
+.. autoclass:: gsbparse.Scheduled
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.FinancialYearSection
+.. autoclass:: gsbparse.FinancialYear
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.ArchiveSection
+.. autoclass:: gsbparse.Archive
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.CurrencyLinkSection
+.. autoclass:: gsbparse.CurrencyLink
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.ImportRuleSection
+.. autoclass:: gsbparse.ImportRule
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.PartialBalanceSection
+.. autoclass:: gsbparse.PartialBalance
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.ReportSection
+.. autoclass:: gsbparse.Report
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.PrintSection
+.. autoclass:: gsbparse.Print
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.RgbaSection
+.. autoclass:: gsbparse.Rgba
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.BetSection
+.. autoclass:: gsbparse.Bet
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.BetGraphSection
+.. autoclass:: gsbparse.BetGraph
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.BetHistoricalSection
+.. autoclass:: gsbparse.BetHistorical
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.BetFutureSection
+.. autoclass:: gsbparse.BetFuture
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.BetLoanSection
+.. autoclass:: gsbparse.BetLoan
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.BetTransfertSection
+.. autoclass:: gsbparse.BetTransfert
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.SpecialLineSection
+.. autoclass:: gsbparse.SpecialLine
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.AmountComparisonSection
+.. autoclass:: gsbparse.AmountComparison
    :members:
    :undoc-members:
 
-.. autoclass:: gsbparse.TextComparisonSection
+.. autoclass:: gsbparse.TextComparison
    :members:
    :undoc-members:
 ```

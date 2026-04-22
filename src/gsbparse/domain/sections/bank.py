@@ -6,7 +6,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class BankSection(GsbFileSection):
+class Bank(GsbFileSection):
     """A bank defined in the Grisbi file.
 
     Attributes:

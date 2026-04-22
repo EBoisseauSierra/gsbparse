@@ -19,7 +19,7 @@ class BetDataOrigin(IntEnum):
 
 
 @dataclass(frozen=True)
-class BetHistoricalSection(GsbFileSection):
+class BetHistorical(GsbFileSection):
     """Historical budget data used by the budget-estimate module.
 
     One element per checked category/budget division.

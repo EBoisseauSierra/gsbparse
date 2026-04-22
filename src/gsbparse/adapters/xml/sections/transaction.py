@@ -1,4 +1,4 @@
-"""XML adapter: parse a ``<Transaction>`` element into a ``TransactionSection``."""
+"""XML adapter: parse a ``<Transaction>`` element into a ``Transaction``."""
 
 import xml.etree.ElementTree as ET
 
@@ -10,22 +10,22 @@ from gsbparse.adapters.xml.parsers import (
     parse_null,
     parse_nullable_str,
 )
-from gsbparse.domain.sections.transaction import TransactionMarkedState, TransactionSection
+from gsbparse.domain.sections.transaction import Transaction, TransactionMarkedState
 
 _parse_nullable_date = parse_null(parse_date)
 
 
-def parse_transaction_section(element: ET.Element) -> TransactionSection:
-    """Parse a ``<Transaction>`` XML element into a :class:`TransactionSection`.
+def parse_transaction_section(element: ET.Element) -> Transaction:
+    """Parse a ``<Transaction>`` XML element into a :class:`Transaction`.
 
     Args:
         element: The ``<Transaction>`` XML element.
 
     Returns:
-        A fully populated :class:`TransactionSection`.
+        A fully populated :class:`Transaction`.
     """
     a = element.attrib
-    return TransactionSection(
+    return Transaction(
         Ac=parse_int(a["Ac"]),
         Nb=parse_int(a["Nb"]),
         Id=parse_nullable_str(a["Id"]),

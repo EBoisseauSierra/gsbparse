@@ -1,24 +1,24 @@
-"""XML adapter: parse a ``<Bet_transfert>`` element into a ``BetTransfertSection``."""
+"""XML adapter: parse a ``<Bet_transfert>`` element into a ``BetTransfert``."""
 
 import xml.etree.ElementTree as ET
 
 from gsbparse.adapters.xml.parsers import parse_bool, parse_date, parse_int, parse_null
-from gsbparse.domain.sections.bet_transfert import BetTransfertAccountType, BetTransfertSection
+from gsbparse.domain.sections.bet_transfert import BetTransfert, BetTransfertAccountType
 
 _parse_nullable_date = parse_null(parse_date)
 
 
-def parse_bet_transfert_section(element: ET.Element) -> BetTransfertSection:
-    """Parse a ``<Bet_transfert>`` XML element into a :class:`BetTransfertSection`.
+def parse_bet_transfert_section(element: ET.Element) -> BetTransfert:
+    """Parse a ``<Bet_transfert>`` XML element into a :class:`BetTransfert`.
 
     Args:
         element: The ``<Bet_transfert>`` XML element.
 
     Returns:
-        A fully populated :class:`BetTransfertSection`.
+        A fully populated :class:`BetTransfert`.
     """
     a = element.attrib
-    return BetTransfertSection(
+    return BetTransfert(
         Nb=parse_int(a["Nb"]),
         Dt=_parse_nullable_date(a["Dt"]),
         Ac=parse_int(a["Ac"]),

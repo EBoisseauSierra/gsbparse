@@ -30,7 +30,7 @@ def detailed(gsb):
     return gsb.detailed_transactions
 
 
-class TestGeneralSection:
+class TestGeneral:
     def test_file_version(self, gsb):
         assert gsb.general is not None
         assert gsb.general.File_version == "2.0.0"
@@ -124,7 +124,7 @@ class TestDetailedTransactions:
         # All transactions use the same currency object (Nb=1)
         assert detailed is not None
         currencies = {id(tx.Cu) for tx in detailed}
-        assert len(currencies) == 1  # all share the same CurrencySection instance
+        assert len(currencies) == 1  # all share the same Currency instance
 
     def test_account_currency_resolves(self, detailed):
         # All accounts use GBP (Currency=1). Verify via the first transaction (Nb=15, Ac=4).
@@ -157,7 +157,7 @@ class TestDetailedTransactions:
         assert tx_127.Re.Acc.Name == "Delayed Debit card [liabilities]"
 
     def test_shared_detailed_account_identity(self, detailed):
-        # Transactions on the same account share the same DetailedAccountSection instance.
+        # Transactions on the same account share the same DetailedAccount instance.
         assert detailed is not None
         account_1_txs = [tx for tx in detailed if tx.Ac.Number == 1]
         assert len(account_1_txs) > 1  # sanity check

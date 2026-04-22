@@ -19,7 +19,7 @@ class SpecialLineAction(IntEnum):
 
 
 @dataclass(frozen=True)
-class SpecialLineSection(GsbFileSection):
+class SpecialLine(GsbFileSection):
     """A special-condition line attached to a CSV import rule.
 
     Attributes:

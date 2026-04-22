@@ -6,7 +6,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class RgbaSection(GsbFileSection):
+class Rgba(GsbFileSection):
     """Colour preferences stored in the Grisbi file.
 
     All values are CSS-style RGB strings, e.g. ``"rgb(215,215,255)"``.

@@ -7,7 +7,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class TextComparisonSection(GsbFileSection):
+class TextComparison(GsbFileSection):
     """A text-comparison filter rule attached to a report.
 
     Attributes:

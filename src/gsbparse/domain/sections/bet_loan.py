@@ -8,7 +8,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class BetLoanSection(GsbFileSection):
+class BetLoan(GsbFileSection):
     """A loan amortisation schedule defined in the Grisbi file.
 
     Attributes:

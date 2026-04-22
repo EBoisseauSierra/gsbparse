@@ -1,4 +1,4 @@
-"""XML adapter: parse a ``<Bet_future>`` element into a ``BetFutureSection``."""
+"""XML adapter: parse a ``<Bet_future>`` element into a ``BetFuture``."""
 
 import xml.etree.ElementTree as ET
 
@@ -10,22 +10,22 @@ from gsbparse.adapters.xml.parsers import (
     parse_null,
     parse_nullable_str,
 )
-from gsbparse.domain.sections.bet_future import BetFutureSection
+from gsbparse.domain.sections.bet_future import BetFuture
 
 _parse_nullable_date = parse_null(parse_date)
 
 
-def parse_bet_future_section(element: ET.Element) -> BetFutureSection:
-    """Parse a ``<Bet_future>`` XML element into a :class:`BetFutureSection`.
+def parse_bet_future_section(element: ET.Element) -> BetFuture:
+    """Parse a ``<Bet_future>`` XML element into a :class:`BetFuture`.
 
     Args:
         element: The ``<Bet_future>`` XML element.
 
     Returns:
-        A fully populated :class:`BetFutureSection`.
+        A fully populated :class:`BetFuture`.
     """
     a = element.attrib
-    return BetFutureSection(
+    return BetFuture(
         Nb=parse_int(a["Nb"]),
         Dt=_parse_nullable_date(a["Dt"]),
         Ac=parse_int(a["Ac"]),

@@ -1,22 +1,22 @@
-"""XML adapter: parse an ``<Import_rule>`` element into an ``ImportRuleSection``."""
+"""XML adapter: parse an ``<Import_rule>`` element into an ``ImportRule``."""
 
 import xml.etree.ElementTree as ET
 
 from gsbparse.adapters.xml.parsers import parse_bool, parse_int, parse_str
-from gsbparse.domain.sections.import_rule import ImportRuleSection
+from gsbparse.domain.sections.import_rule import ImportRule
 
 
-def parse_import_rule_section(element: ET.Element) -> ImportRuleSection:
-    """Parse an ``<Import_rule>`` XML element into an :class:`ImportRuleSection`.
+def parse_import_rule_section(element: ET.Element) -> ImportRule:
+    """Parse an ``<Import_rule>`` XML element into an :class:`ImportRule`.
 
     Args:
         element: The ``<Import_rule>`` XML element.
 
     Returns:
-        A fully populated :class:`ImportRuleSection`.
+        A fully populated :class:`ImportRule`.
     """
     a = element.attrib
-    return ImportRuleSection(
+    return ImportRule(
         Nb=parse_int(a["Nb"]),
         Na=parse_str(a["Na"]),
         Acc=parse_int(a["Acc"]),

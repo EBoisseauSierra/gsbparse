@@ -8,11 +8,11 @@ from typing import TYPE_CHECKING
 from gsbparse.domain.sections._base import GsbFileSection
 
 if TYPE_CHECKING:
-    from gsbparse.domain.sections.budgetary import BudgetarySection
+    from gsbparse.domain.sections.budgetary import Budgetary
 
 
 @dataclass(frozen=True)
-class SubBudgetarySection(GsbFileSection):
+class SubBudgetary(GsbFileSection):
     """A budget sub-line defined in the Grisbi file.
 
     Attributes:
@@ -27,7 +27,7 @@ class SubBudgetarySection(GsbFileSection):
 
 
 @dataclass(frozen=True)
-class DetailedSubBudgetarySection(GsbFileSection):
+class DetailedSubBudgetary(GsbFileSection):
     """A budget sub-line with its parent budgetary resolved.
 
     Attributes:
@@ -36,6 +36,6 @@ class DetailedSubBudgetarySection(GsbFileSection):
         Na: Display name.
     """
 
-    Nbb: BudgetarySection
+    Nbb: Budgetary
     Nb: int
     Na: str

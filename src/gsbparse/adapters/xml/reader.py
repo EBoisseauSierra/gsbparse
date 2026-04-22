@@ -10,36 +10,36 @@ import defusedxml.ElementTree as ET
 from gsbparse.adapters.xml._dispatch import ELEMENT_TAG_TO_PARSER
 from gsbparse.domain.errors import InvalidGsbFileError, InvalidGsbFileRootError
 from gsbparse.domain.file import GsbFile
-from gsbparse.domain.sections.account import AccountSection
-from gsbparse.domain.sections.amount_comparison import AmountComparisonSection
-from gsbparse.domain.sections.archive import ArchiveSection
-from gsbparse.domain.sections.bank import BankSection
-from gsbparse.domain.sections.bet import BetSection
-from gsbparse.domain.sections.bet_future import BetFutureSection
-from gsbparse.domain.sections.bet_graph import BetGraphSection
-from gsbparse.domain.sections.bet_historical import BetHistoricalSection
-from gsbparse.domain.sections.bet_loan import BetLoanSection
-from gsbparse.domain.sections.bet_transfert import BetTransfertSection
-from gsbparse.domain.sections.budgetary import BudgetarySection
-from gsbparse.domain.sections.category import CategorySection
-from gsbparse.domain.sections.currency import CurrencySection
-from gsbparse.domain.sections.currency_link import CurrencyLinkSection
-from gsbparse.domain.sections.financial_year import FinancialYearSection
-from gsbparse.domain.sections.general import GeneralSection
-from gsbparse.domain.sections.import_rule import ImportRuleSection
-from gsbparse.domain.sections.partial_balance import PartialBalanceSection
-from gsbparse.domain.sections.party import PartySection
-from gsbparse.domain.sections.payment import PaymentSection
-from gsbparse.domain.sections.print import PrintSection
-from gsbparse.domain.sections.reconcile import ReconcileSection
-from gsbparse.domain.sections.report import ReportSection
-from gsbparse.domain.sections.rgba import RgbaSection
-from gsbparse.domain.sections.scheduled import ScheduledSection
-from gsbparse.domain.sections.special_line import SpecialLineSection
-from gsbparse.domain.sections.sub_budgetary import SubBudgetarySection
-from gsbparse.domain.sections.sub_category import SubCategorySection
-from gsbparse.domain.sections.text_comparison import TextComparisonSection
-from gsbparse.domain.sections.transaction import TransactionSection
+from gsbparse.domain.sections.account import Account
+from gsbparse.domain.sections.amount_comparison import AmountComparison
+from gsbparse.domain.sections.archive import Archive
+from gsbparse.domain.sections.bank import Bank
+from gsbparse.domain.sections.bet import Bet
+from gsbparse.domain.sections.bet_future import BetFuture
+from gsbparse.domain.sections.bet_graph import BetGraph
+from gsbparse.domain.sections.bet_historical import BetHistorical
+from gsbparse.domain.sections.bet_loan import BetLoan
+from gsbparse.domain.sections.bet_transfert import BetTransfert
+from gsbparse.domain.sections.budgetary import Budgetary
+from gsbparse.domain.sections.category import Category
+from gsbparse.domain.sections.currency import Currency
+from gsbparse.domain.sections.currency_link import CurrencyLink
+from gsbparse.domain.sections.financial_year import FinancialYear
+from gsbparse.domain.sections.general import General
+from gsbparse.domain.sections.import_rule import ImportRule
+from gsbparse.domain.sections.partial_balance import PartialBalance
+from gsbparse.domain.sections.party import Party
+from gsbparse.domain.sections.payment import Payment
+from gsbparse.domain.sections.print import Print
+from gsbparse.domain.sections.reconcile import Reconcile
+from gsbparse.domain.sections.report import Report
+from gsbparse.domain.sections.rgba import Rgba
+from gsbparse.domain.sections.scheduled import Scheduled
+from gsbparse.domain.sections.special_line import SpecialLine
+from gsbparse.domain.sections.sub_budgetary import SubBudgetary
+from gsbparse.domain.sections.sub_category import SubCategory
+from gsbparse.domain.sections.text_comparison import TextComparison
+from gsbparse.domain.sections.transaction import Transaction
 
 _log = logging.getLogger(__name__)
 
@@ -75,36 +75,36 @@ def read_gsb_file(path: str | Path) -> GsbFile:
         raise InvalidGsbFileRootError(f"Expected root element <{_GSB_ROOT_TAG}>, got <{root.tag}>")
 
     # Collect parsed sections by type.
-    general: GeneralSection | None = None
-    rgba: RgbaSection | None = None
-    print_settings: PrintSection | None = None
-    currencies: list[CurrencySection] = []
-    accounts: list[AccountSection] = []
-    banks: list[BankSection] = []
-    parties: list[PartySection] = []
-    payment_methods: list[PaymentSection] = []
-    transactions: list[TransactionSection] = []
-    scheduled: list[ScheduledSection] = []
-    categories: list[CategorySection] = []
-    sub_categories: list[SubCategorySection] = []
-    budgetaries: list[BudgetarySection] = []
-    sub_budgetaries: list[SubBudgetarySection] = []
-    currency_links: list[CurrencyLinkSection] = []
-    financial_years: list[FinancialYearSection] = []
-    archives: list[ArchiveSection] = []
-    reconciles: list[ReconcileSection] = []
-    import_rules: list[ImportRuleSection] = []
-    special_lines: list[SpecialLineSection] = []
-    partial_balances: list[PartialBalanceSection] = []
-    bet: BetSection | None = None
-    bet_graphs: list[BetGraphSection] = []
-    bet_historicals: list[BetHistoricalSection] = []
-    bet_futures: list[BetFutureSection] = []
-    bet_transferts: list[BetTransfertSection] = []
-    bet_loans: list[BetLoanSection] = []
-    reports: list[ReportSection] = []
-    text_comparisons: list[TextComparisonSection] = []
-    amount_comparisons: list[AmountComparisonSection] = []
+    general: General | None = None
+    rgba: Rgba | None = None
+    print_settings: Print | None = None
+    currencies: list[Currency] = []
+    accounts: list[Account] = []
+    banks: list[Bank] = []
+    parties: list[Party] = []
+    payment_methods: list[Payment] = []
+    transactions: list[Transaction] = []
+    scheduled: list[Scheduled] = []
+    categories: list[Category] = []
+    sub_categories: list[SubCategory] = []
+    budgetaries: list[Budgetary] = []
+    sub_budgetaries: list[SubBudgetary] = []
+    currency_links: list[CurrencyLink] = []
+    financial_years: list[FinancialYear] = []
+    archives: list[Archive] = []
+    reconciles: list[Reconcile] = []
+    import_rules: list[ImportRule] = []
+    special_lines: list[SpecialLine] = []
+    partial_balances: list[PartialBalance] = []
+    bet: Bet | None = None
+    bet_graphs: list[BetGraph] = []
+    bet_historicals: list[BetHistorical] = []
+    bet_futures: list[BetFuture] = []
+    bet_transferts: list[BetTransfert] = []
+    bet_loans: list[BetLoan] = []
+    reports: list[Report] = []
+    text_comparisons: list[TextComparison] = []
+    amount_comparisons: list[AmountComparison] = []
 
     for element in root:
         tag = element.tag
@@ -116,65 +116,65 @@ def read_gsb_file(path: str | Path) -> GsbFile:
         section = parser(element)
 
         match section:
-            case GeneralSection():
+            case General():
                 general = section
-            case RgbaSection():
+            case Rgba():
                 rgba = section
-            case PrintSection():
+            case Print():
                 print_settings = section
-            case CurrencySection():
+            case Currency():
                 currencies.append(section)
-            case AccountSection():
+            case Account():
                 accounts.append(section)
-            case BankSection():
+            case Bank():
                 banks.append(section)
-            case PartySection():
+            case Party():
                 parties.append(section)
-            case PaymentSection():
+            case Payment():
                 payment_methods.append(section)
-            case TransactionSection():
+            case Transaction():
                 transactions.append(section)
-            case ScheduledSection():
+            case Scheduled():
                 scheduled.append(section)
-            case CategorySection():
+            case Category():
                 categories.append(section)
-            case SubCategorySection():
+            case SubCategory():
                 sub_categories.append(section)
-            case BudgetarySection():
+            case Budgetary():
                 budgetaries.append(section)
-            case SubBudgetarySection():
+            case SubBudgetary():
                 sub_budgetaries.append(section)
-            case CurrencyLinkSection():
+            case CurrencyLink():
                 currency_links.append(section)
-            case FinancialYearSection():
+            case FinancialYear():
                 financial_years.append(section)
-            case ArchiveSection():
+            case Archive():
                 archives.append(section)
-            case ReconcileSection():
+            case Reconcile():
                 reconciles.append(section)
-            case ImportRuleSection():
+            case ImportRule():
                 import_rules.append(section)
-            case SpecialLineSection():
+            case SpecialLine():
                 special_lines.append(section)
-            case PartialBalanceSection():
+            case PartialBalance():
                 partial_balances.append(section)
-            case BetSection():
+            case Bet():
                 bet = section
-            case BetGraphSection():
+            case BetGraph():
                 bet_graphs.append(section)
-            case BetHistoricalSection():
+            case BetHistorical():
                 bet_historicals.append(section)
-            case BetFutureSection():
+            case BetFuture():
                 bet_futures.append(section)
-            case BetTransfertSection():
+            case BetTransfert():
                 bet_transferts.append(section)
-            case BetLoanSection():
+            case BetLoan():
                 bet_loans.append(section)
-            case ReportSection():
+            case Report():
                 reports.append(section)
-            case TextComparisonSection():
+            case TextComparison():
                 text_comparisons.append(section)
-            case AmountComparisonSection():
+            case AmountComparison():
                 amount_comparisons.append(section)
 
     def _none_if_empty[T](lst: list[T]) -> list[T] | None:

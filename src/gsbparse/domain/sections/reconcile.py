@@ -10,11 +10,11 @@ from typing import TYPE_CHECKING
 from gsbparse.domain.sections._base import GsbFileSection
 
 if TYPE_CHECKING:
-    from gsbparse.domain.sections.account import AccountSection
+    from gsbparse.domain.sections.account import Account
 
 
 @dataclass(frozen=True)
-class ReconcileSection(GsbFileSection):
+class Reconcile(GsbFileSection):
     """A reconciliation record defined in the Grisbi file.
 
     Attributes:
@@ -37,7 +37,7 @@ class ReconcileSection(GsbFileSection):
 
 
 @dataclass(frozen=True)
-class DetailedReconcileSection(GsbFileSection):
+class DetailedReconcile(GsbFileSection):
     """A reconciliation record with its account resolved.
 
     Attributes:
@@ -52,7 +52,7 @@ class DetailedReconcileSection(GsbFileSection):
 
     Nb: int
     Na: str
-    Acc: AccountSection
+    Acc: Account
     Idate: date | None
     Fdate: date | None
     Ibal: Decimal

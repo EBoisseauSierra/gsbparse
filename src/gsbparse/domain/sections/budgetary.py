@@ -7,7 +7,7 @@ from gsbparse.domain.sections.category import CategoryKind
 
 
 @dataclass(frozen=True)
-class BudgetarySection(GsbFileSection):
+class Budgetary(GsbFileSection):
     """A top-level budget line defined in the Grisbi file.
 
     Attributes:

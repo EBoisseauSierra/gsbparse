@@ -1,77 +1,77 @@
 """Re-exports every concrete section class for convenient import."""
 
 from gsbparse.domain.sections._base import GsbFileSection
-from gsbparse.domain.sections.account import AccountKind, AccountSection, DetailedAccountSection
-from gsbparse.domain.sections.amount_comparison import AmountComparisonSection
-from gsbparse.domain.sections.archive import ArchiveSection
-from gsbparse.domain.sections.bank import BankSection
-from gsbparse.domain.sections.bet import BetSection
-from gsbparse.domain.sections.bet_future import BetFutureSection
-from gsbparse.domain.sections.bet_graph import BetGraphSection
-from gsbparse.domain.sections.bet_historical import BetDataOrigin, BetHistoricalSection
-from gsbparse.domain.sections.bet_loan import BetLoanSection
-from gsbparse.domain.sections.bet_transfert import BetTransfertAccountType, BetTransfertSection
-from gsbparse.domain.sections.budgetary import BudgetarySection
-from gsbparse.domain.sections.category import CategoryKind, CategorySection
-from gsbparse.domain.sections.currency import CurrencySection
-from gsbparse.domain.sections.currency_link import CurrencyLinkSection
-from gsbparse.domain.sections.financial_year import FinancialYearSection
-from gsbparse.domain.sections.general import GeneralSection
-from gsbparse.domain.sections.import_rule import ImportRuleSection
-from gsbparse.domain.sections.partial_balance import PartialBalanceSection
-from gsbparse.domain.sections.party import PartySection
-from gsbparse.domain.sections.payment import PaymentSection
-from gsbparse.domain.sections.print import PrintSection
-from gsbparse.domain.sections.reconcile import DetailedReconcileSection, ReconcileSection
-from gsbparse.domain.sections.report import ReportSection
-from gsbparse.domain.sections.rgba import RgbaSection
-from gsbparse.domain.sections.scheduled import ScheduledSection
-from gsbparse.domain.sections.special_line import SpecialLineAction, SpecialLineSection
-from gsbparse.domain.sections.sub_budgetary import DetailedSubBudgetarySection, SubBudgetarySection
-from gsbparse.domain.sections.sub_category import DetailedSubCategorySection, SubCategorySection
-from gsbparse.domain.sections.text_comparison import TextComparisonSection
-from gsbparse.domain.sections.transaction import TransactionMarkedState, TransactionSection
+from gsbparse.domain.sections.account import Account, AccountKind, DetailedAccount
+from gsbparse.domain.sections.amount_comparison import AmountComparison
+from gsbparse.domain.sections.archive import Archive
+from gsbparse.domain.sections.bank import Bank
+from gsbparse.domain.sections.bet import Bet
+from gsbparse.domain.sections.bet_future import BetFuture
+from gsbparse.domain.sections.bet_graph import BetGraph
+from gsbparse.domain.sections.bet_historical import BetDataOrigin, BetHistorical
+from gsbparse.domain.sections.bet_loan import BetLoan
+from gsbparse.domain.sections.bet_transfert import BetTransfert, BetTransfertAccountType
+from gsbparse.domain.sections.budgetary import Budgetary
+from gsbparse.domain.sections.category import Category, CategoryKind
+from gsbparse.domain.sections.currency import Currency
+from gsbparse.domain.sections.currency_link import CurrencyLink
+from gsbparse.domain.sections.financial_year import FinancialYear
+from gsbparse.domain.sections.general import General
+from gsbparse.domain.sections.import_rule import ImportRule
+from gsbparse.domain.sections.partial_balance import PartialBalance
+from gsbparse.domain.sections.party import Party
+from gsbparse.domain.sections.payment import Payment
+from gsbparse.domain.sections.print import Print
+from gsbparse.domain.sections.reconcile import DetailedReconcile, Reconcile
+from gsbparse.domain.sections.report import Report
+from gsbparse.domain.sections.rgba import Rgba
+from gsbparse.domain.sections.scheduled import Scheduled
+from gsbparse.domain.sections.special_line import SpecialLine, SpecialLineAction
+from gsbparse.domain.sections.sub_budgetary import DetailedSubBudgetary, SubBudgetary
+from gsbparse.domain.sections.sub_category import DetailedSubCategory, SubCategory
+from gsbparse.domain.sections.text_comparison import TextComparison
+from gsbparse.domain.sections.transaction import Transaction, TransactionMarkedState
 
 __all__ = [
     "AccountKind",
-    "AccountSection",
-    "AmountComparisonSection",
-    "ArchiveSection",
-    "BankSection",
+    "Account",
+    "AmountComparison",
+    "Archive",
+    "Bank",
     "BetDataOrigin",
-    "BetFutureSection",
-    "BetGraphSection",
-    "BetHistoricalSection",
-    "BetLoanSection",
-    "BetSection",
+    "BetFuture",
+    "BetGraph",
+    "BetHistorical",
+    "BetLoan",
+    "Bet",
     "BetTransfertAccountType",
-    "BetTransfertSection",
-    "BudgetarySection",
+    "BetTransfert",
+    "Budgetary",
     "CategoryKind",
-    "CategorySection",
-    "CurrencyLinkSection",
-    "CurrencySection",
-    "DetailedAccountSection",
-    "DetailedReconcileSection",
-    "DetailedSubBudgetarySection",
-    "DetailedSubCategorySection",
-    "FinancialYearSection",
-    "GeneralSection",
+    "Category",
+    "CurrencyLink",
+    "Currency",
+    "DetailedAccount",
+    "DetailedReconcile",
+    "DetailedSubBudgetary",
+    "DetailedSubCategory",
+    "FinancialYear",
+    "General",
     "GsbFileSection",
-    "ImportRuleSection",
-    "PartialBalanceSection",
-    "PartySection",
-    "PaymentSection",
-    "PrintSection",
-    "ReconcileSection",
-    "ReportSection",
-    "RgbaSection",
-    "ScheduledSection",
+    "ImportRule",
+    "PartialBalance",
+    "Party",
+    "Payment",
+    "Print",
+    "Reconcile",
+    "Report",
+    "Rgba",
+    "Scheduled",
     "SpecialLineAction",
-    "SpecialLineSection",
-    "SubBudgetarySection",
-    "SubCategorySection",
-    "TextComparisonSection",
+    "SpecialLine",
+    "SubBudgetary",
+    "SubCategory",
+    "TextComparison",
     "TransactionMarkedState",
-    "TransactionSection",
+    "Transaction",
 ]

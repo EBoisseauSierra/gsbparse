@@ -7,7 +7,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class GeneralSection(GsbFileSection):
+class General(GsbFileSection):
     """Global settings stored at the top of a Grisbi file.
 
     Attribute names follow the XML attribute names from the file exactly,

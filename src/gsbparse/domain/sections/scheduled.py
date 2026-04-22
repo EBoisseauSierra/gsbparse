@@ -8,7 +8,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class ScheduledSection(GsbFileSection):
+class Scheduled(GsbFileSection):
     """A scheduled (recurring) transaction defined in the Grisbi file.
 
     Attributes:

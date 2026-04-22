@@ -6,7 +6,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class BetSection(GsbFileSection):
+class Bet(GsbFileSection):
     """Global budget-estimate options.
 
     Note: The format spec lists ``Bdte`` but the example file uses ``Ddte``.

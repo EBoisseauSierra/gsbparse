@@ -6,7 +6,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class PartySection(GsbFileSection):
+class Party(GsbFileSection):
     """A party (payee or payer) defined in the Grisbi file.
 
     Attributes:

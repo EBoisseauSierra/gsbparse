@@ -6,7 +6,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class ReportSection(GsbFileSection):
+class Report(GsbFileSection):
     """A saved report defined in the Grisbi file.
 
     Attributes:

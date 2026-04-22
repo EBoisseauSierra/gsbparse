@@ -6,7 +6,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class ImportRuleSection(GsbFileSection):
+class ImportRule(GsbFileSection):
     """An import rule for automatic transaction import.
 
     Attributes:

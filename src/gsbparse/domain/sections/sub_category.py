@@ -8,11 +8,11 @@ from typing import TYPE_CHECKING
 from gsbparse.domain.sections._base import GsbFileSection
 
 if TYPE_CHECKING:
-    from gsbparse.domain.sections.category import CategorySection
+    from gsbparse.domain.sections.category import Category
 
 
 @dataclass(frozen=True)
-class SubCategorySection(GsbFileSection):
+class SubCategory(GsbFileSection):
     """A transaction sub-category defined in the Grisbi file.
 
     Attributes:
@@ -27,7 +27,7 @@ class SubCategorySection(GsbFileSection):
 
 
 @dataclass(frozen=True)
-class DetailedSubCategorySection(GsbFileSection):
+class DetailedSubCategory(GsbFileSection):
     """A transaction sub-category with its parent category resolved.
 
     Attributes:
@@ -36,6 +36,6 @@ class DetailedSubCategorySection(GsbFileSection):
         Na: Display name.
     """
 
-    Nbc: CategorySection
+    Nbc: Category
     Nb: int
     Na: str

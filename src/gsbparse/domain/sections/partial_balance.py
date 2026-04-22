@@ -6,7 +6,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class PartialBalanceSection(GsbFileSection):
+class PartialBalance(GsbFileSection):
     """A partial (grouped) balance defined in the Grisbi file.
 
     Attributes:

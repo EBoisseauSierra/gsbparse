@@ -44,7 +44,7 @@ These apply to every change in this repo. Re-read before planning or committing.
 - Test relevant *behaviours*, not lines. Do not bloat tests to chase coverage.
 - Structure each test with **Arrange, Act, Assert** (AAA).
 - Use `pytest.mark.parametrize` when multiple inputs exercise the same behaviour.
-- **Test orthogonality**: a behaviour is tested in *exactly one* place. No two tests assert the same thing. If Layer 2 asserts "every field of `CurrencySection` is wired correctly from XML", no Layer 3/4/5 test re-asserts it.
+- **Test orthogonality**: a behaviour is tested in *exactly one* place. No two tests assert the same thing. If Layer 2 asserts "every field of `Currency` is wired correctly from XML", no Layer 3/4/5 test re-asserts it.
 - **No magic numbers / strings in tests.** Extract every input value into a `dummy_*` local at the top of the Arrange block (`dummy_currency_iso_code = "EUR"`) and reuse the same name in both the input construction and the expected-result construction. Reads like a story; assertion failures point at a labelled value.
 - **E2E tests assert on precise values** from `Example_3.0-en.gsb`, not on structural invariants ("non-empty", "FK resolved to *some* account"). The lower layers tell you *where* a break is; the E2E layer tells you *that* the pipeline-as-a-whole still produces the right output. Bake real values from the example file into the assertions; freeze them; treat any future diff as a regression to investigate.
 
@@ -70,7 +70,7 @@ These apply to every change in this repo. Re-read before planning or committing.
 
 - **Trunk-based development.** Short-lived branches, frequent integration into `main`. Avoid long-lived feature branches. Prefer small, independently-mergeable commits.
 - **Conventional Commits** — enforced by `conventional-pre-commit` on the `commit-msg` stage.
-- **Capitalized descriptions.** House style: the description after `type(scope):` starts with a capital letter. E.g. `feat(domain): Add CurrencySection`, not `feat(domain): add CurrencySection`. `conventional-pre-commit` doesn't enforce this — it's a review-time rule.
+- **Capitalized descriptions.** House style: the description after `type(scope):` starts with a capital letter. E.g. `feat(domain): Add Currency`, not `feat(domain): add Currency`. `conventional-pre-commit` doesn't enforce this — it's a review-time rule.
 - **Scopes are directory-based** and match the hexagonal layout: `domain`, `domain/sections`, `adapters/xml`, `adapters/xml/sections`, `adapters/pandas`, `ports`, `lint`, etc. Omit the scope for repo-wide chores and top-level shim changes.
 - **Plain commits only**: `git commit -m "..."`. Never `--no-verify`, never GPG-related flags (`--no-gpg-sign`, `-S`, etc.) unless the user explicitly asks.
 - **One commit = one concern.** A commit message must never use "and" or ";" to join two distinct changes. If there are two concerns, make two commits.
@@ -146,7 +146,7 @@ These are agreed with the user and must be honoured by every subsequent change.
 
 - **Typed-first.** Every piece of data has a frozen dataclass representation. DataFrames are an adapter-layer concern.
 - **Section dataclasses keep Grisbi attribute codes** as field names (`Nb`, `Na`, `Co`, `Ac`, etc.) — faithful to the format spec and consistent with the existing `gsbparse2` code.
-- **`DetailedTransaction` has nested, resolved foreign-key fields.** Not flat. The `Ac` field is an `AccountSection` instance, `Cu` is a `CurrencySection`, `Pa` is `PartySection | None`, etc. This is the richest information-preserving domain representation: no data is discarded at domain level, and shared identity (`tx_a.Ac is tx_b.Ac` when both transactions reference the same account) is preserved.
+- **`DetailedTransaction` has nested, resolved foreign-key fields.** Not flat. The `Ac` field is an `Account` instance, `Cu` is a `Currency`, `Pa` is `Party | None`, etc. This is the richest information-preserving domain representation: no data is discarded at domain level, and shared identity (`tx_a.Ac is tx_b.Ac` when both transactions reference the same account) is preserved.
 - **Pandas column names come from `DetailedTransactionColumn` specs**, not from section field names. Domain uses Grisbi codes; pandas columns get descriptive names. Both are correct in their layer.
 
 ### Column projection for the detailed transactions DataFrame
@@ -179,8 +179,8 @@ class DetailedTransactionColumn:
 
 ```python
 gsb_file = gsbparse.read_gsb("my.gsb")     # thin alias for GsbFile.from_file
-gsb_file.accounts                           # list[AccountSection] | None
-gsb_file.currencies                         # list[CurrencySection] | None
+gsb_file.accounts                           # list[Account] | None
+gsb_file.currencies                         # list[Currency] | None
 gsb_file.detailed_transactions              # list[DetailedTransaction] | None
 for tx in gsb_file.detailed_transactions:
     print(tx.Ac.Name, tx.Am)                 # typed nested access via resolved FKs
@@ -238,7 +238,7 @@ src/gsbparse/
     │   │                       #   + @parse_null / @parse_optional decorators
     │   ├── _dispatch.py        # _ELEMENT_TAG_TO_PARSER table
     │   └── sections/
-    │       ├── account.py      # parse_account_section(element) → AccountSection
+    │       ├── account.py      # parse_account_section(element) → Account
     │       └── …               # one file per section
     └── pandas/
         ├── __init__.py         # exports to_df
@@ -250,7 +250,7 @@ Key properties:
 
 - **`src/` layout.** Prevents accidental imports of the in-tree package during tests.
 - **Public import paths decoupled from physical layout.** `src/gsbparse/pandas.py` and `src/gsbparse/xml.py` are one-line shims that re-export from `adapters/`. Users write `from gsbparse.pandas import to_df`; the `adapters/` hierarchy never leaks. Swapping adapters (future `gsbparse.polars`) is still a one-line import change on the caller side.
-- **`from_xml` is NOT on domain section classes.** Domain `*Section` dataclasses are pure — zero XML imports, zero parser logic. All XML-to-section parsing lives in `adapters/xml/sections/<name>.py` as free functions (`parse_currency_section(element) → CurrencySection`). This is the biggest divergence from the current `gsbparse2` layout and is required for a genuinely pure domain.
+- **`from_xml` is NOT on domain section classes.** Domain `*Section` dataclasses are pure — zero XML imports, zero parser logic. All XML-to-section parsing lives in `adapters/xml/sections/<name>.py` as free functions (`parse_currency_section(element) → Currency`). This is the biggest divergence from the current `gsbparse2` layout and is required for a genuinely pure domain.
 - **Parser helpers live in the XML adapter.** `parse_int`, `parse_bool`, `parse_date`, `parse_amount`, `parse_str`, `parse_list_int`, and the `@parse_null` / `@parse_optional` decorators encode Grisbi's XML conventions (`"(null)"` sentinel, `%m/%d/%Y` date format, `"0"`/`"1"` booleans, comma-decimal amounts). These are input-format concerns and belong in `adapters/xml/parsers.py`, not in `domain/sections/_base.py`.
 - **`_ELEMENT_TAG_TO_PARSER` lives in the XML adapter**, not in domain. Maps `"Currency" → parse_currency_section`. Domain has no reason to know XML tag names exist.
 - **Import direction enforced by `import-linter` in CI.** Contracts: `domain/` imports stdlib only; `ports/` imports from `domain/` only; `adapters/` import from `domain/` and `ports/` only; nothing imports from `adapters/` except the top-level shims and `__init__.py`.

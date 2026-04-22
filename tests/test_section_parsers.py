@@ -51,7 +51,7 @@ def _el(tag: str, **attrib: str) -> ET.Element:
     return element
 
 
-class TestParseCurrencySection:
+class TestParseCurrency:
     def test_all_fields_wired(self):
         dummy_nb = "3"
         dummy_na = "US Dollar"
@@ -69,7 +69,7 @@ class TestParseCurrencySection:
         assert section.Fl == int(dummy_fl)
 
 
-class TestParsePartySection:
+class TestParseParty:
     def test_all_fields_wired(self):
         dummy_nb = "5"
         dummy_na = "Supermarket"
@@ -93,7 +93,7 @@ class TestParsePartySection:
         assert section.UseRegex is False
 
 
-class TestParseCategorySection:
+class TestParseCategory:
     def test_all_fields_wired(self):
         dummy_nb = "10"
         dummy_na = "Food"
@@ -107,7 +107,7 @@ class TestParseCategorySection:
         assert section.Kd == CategoryKind(int(dummy_kd))
 
 
-class TestParseSubCategorySection:
+class TestParseSubCategory:
     def test_all_fields_wired(self):
         dummy_nbc = "10"
         dummy_nb = "2"
@@ -121,7 +121,7 @@ class TestParseSubCategorySection:
         assert section.Na == dummy_na
 
 
-class TestParseBudgetarySection:
+class TestParseBudgetary:
     def test_all_fields_wired(self):
         dummy_nb = "1"
         dummy_na = "Essentials"
@@ -135,7 +135,7 @@ class TestParseBudgetarySection:
         assert section.Kd == CategoryKind(int(dummy_kd))
 
 
-class TestParseSubBudgetarySection:
+class TestParseSubBudgetary:
     def test_all_fields_wired(self):
         dummy_nbb = "1"
         dummy_nb = "3"
@@ -149,7 +149,7 @@ class TestParseSubBudgetarySection:
         assert section.Na == dummy_na
 
 
-class TestParseAccountSection:
+class TestParseAccount:
     def test_all_fields_wired(self):
         dummy_name = "Current Account"
         dummy_number = "3"
@@ -242,7 +242,7 @@ class TestParseAccountSection:
         assert section.Bet_use_budget == int(dummy_bet_use_budget)
 
 
-class TestParseTransactionSection:
+class TestParseTransaction:
     def test_all_fields_wired(self):
         dummy_ac = "2"
         dummy_nb = "7"
@@ -379,7 +379,7 @@ class TestParseTransactionSection:
         assert section.Dt is None
 
 
-class TestParseScheduledSection:
+class TestParseScheduled:
     def test_nullable_date_field(self):
         element = _el(
             "Scheduled",
@@ -417,7 +417,7 @@ class TestParseScheduledSection:
         assert section.Am == Decimal("-50.00")
 
 
-class TestParseGeneralSection:
+class TestParseGeneral:
     def test_required_fields_wired(self):
         dummy_file_version = "2.0"
         dummy_grisbi_version = "3.0.0"
@@ -580,7 +580,7 @@ class TestParseGeneralSection:
         assert section.Force_credit_before_debit is True
 
 
-class TestParseArchiveSectionNullableDates:
+class TestParseArchiveNullableDates:
     def test_null_dates_become_none(self):
         element = _el(
             "Archive",

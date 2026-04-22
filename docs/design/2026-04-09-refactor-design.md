@@ -145,7 +145,7 @@ src/gsbparse/
     │   ├── _dispatch.py        # _ELEMENT_TAG_TO_PARSER dispatch table
     │   └── sections/
     │       ├── __init__.py
-    │       ├── account.py      # parse_account_section(element) → AccountSection
+    │       ├── account.py      # parse_account_section(element) → Account
     │       ├── currency.py
     │       └── …               # one file per section
     └── pandas/
@@ -159,7 +159,7 @@ src/gsbparse/
 **`from_xml` is NOT on domain section classes.** Domain `*Section`
 dataclasses are pure — zero XML imports, zero parser logic. All
 XML-to-section parsing lives in `adapters/xml/sections/<name>.py` as free
-functions: `parse_currency_section(element) -> CurrencySection`. This is the
+functions: `parse_currency_section(element) -> Currency`. This is the
 biggest divergence from the current `gsbparse2` layout and is required for a
 genuinely pure domain.
 
@@ -221,7 +221,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class CurrencySection(GsbFileSection):
+class Currency(GsbFileSection):
     """A currency defined in the Grisbi file."""
     Nb: int
     Na: str
@@ -243,11 +243,11 @@ distinction.
 # domain/file.py
 @dataclass(frozen=True)
 class GsbFile:
-    general: GeneralSection | None
-    currencies: list[CurrencySection] | None
-    accounts: list[AccountSection] | None
-    parties: list[PartySection] | None
-    categories: list[CategorySection] | None
+    general: General | None
+    currencies: list[Currency] | None
+    accounts: list[Account] | None
+    parties: list[Party] | None
+    categories: list[Category] | None
     # … one field per section type
 
     @property
@@ -259,8 +259,8 @@ class GsbFile:
 ### 4.3 `DetailedTransaction` — the rich representation
 
 `DetailedTransaction` has **nested, resolved foreign-key fields.** Not flat.
-The `Ac` field is an `AccountSection` instance, `Cu` is a `CurrencySection`,
-`Pa` is `PartySection | None`, etc.
+The `Ac` field is an `Account` instance, `Cu` is a `Currency`,
+`Pa` is `Party | None`, etc.
 
 This is the richest information-preserving domain representation: no data is
 discarded at the domain level, and shared identity
@@ -278,15 +278,15 @@ class DetailedTransaction:
     # … other direct fields
 
     # Foreign keys resolved to typed section objects (nested, lossless)
-    Ac: AccountSection
-    Cu: CurrencySection
-    Pa: PartySection | None
-    Ca: CategorySection | None
-    Sc: SubCategorySection | None
-    Bu: BudgetarySection | None
-    Sb: SubBudgetarySection | None
-    Fy: FinancialYearSection | None
-    Pn: PaymentSection | None
+    Ac: Account
+    Cu: Currency
+    Pa: Party | None
+    Ca: Category | None
+    Sc: SubCategory | None
+    Bu: Budgetary | None
+    Sb: SubBudgetary | None
+    Fy: FinancialYear | None
+    Pn: Payment | None
     # … other FKs
 ```
 
@@ -415,8 +415,8 @@ class MixedSectionsError(GsbParseError, TypeError):
 import gsbparse
 
 gsb_file = gsbparse.read_gsb("my.gsb")      # thin alias for read_gsb_file
-gsb_file.accounts                            # list[AccountSection] | None
-gsb_file.currencies                          # list[CurrencySection] | None
+gsb_file.accounts                            # list[Account] | None
+gsb_file.currencies                          # list[Currency] | None
 gsb_file.detailed_transactions               # list[DetailedTransaction] | None
 
 for tx in gsb_file.detailed_transactions:
@@ -542,7 +542,7 @@ def test_parse_currency_section_returns_fully_populated_instance():
         f'Co="{dummy_currency_code}" Ico="{dummy_currency_iso_code}" '
         f'Fl="{dummy_currency_fraction_digits}" />'
     )
-    expected_result = CurrencySection(
+    expected_result = Currency(
         Nb=dummy_currency_id,
         Na=dummy_currency_name,
         Co=dummy_currency_code,
@@ -1048,8 +1048,8 @@ ci: Enforce conventional commits via pre-commit
 # 4. Domain scaffolding
 feat(domain): Add GsbParseError hierarchy
 feat(domain/sections): Add GsbFileSection base dataclass
-feat(domain/sections): Add CurrencySection
-feat(domain/sections): Add AccountSection
+feat(domain/sections): Add Currency
+feat(domain/sections): Add Account
 # … one commit per section
 
 # 5. XML adapter
@@ -1079,8 +1079,8 @@ chore: Release 1.0.0
 ### 10.2 Commit conventions
 
 - **Format:** Conventional Commits — `type(scope): Description`.
-- **Capitalized description** (house style): `feat(domain): Add CurrencySection`,
-  not `feat(domain): add CurrencySection`. `conventional-pre-commit` doesn't
+- **Capitalized description** (house style): `feat(domain): Add Currency`,
+  not `feat(domain): add Currency`. `conventional-pre-commit` doesn't
   enforce casing — it's a review-time rule.
 - **Scopes mirror directories:** `domain`, `domain/sections`, `adapters/xml`,
   `adapters/xml/sections`, `adapters/pandas`, `ports`, `lint`, etc. Omit

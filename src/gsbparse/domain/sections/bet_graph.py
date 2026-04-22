@@ -6,7 +6,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class BetGraphSection(GsbFileSection):
+class BetGraph(GsbFileSection):
     """Graph display preferences for the budget-estimate module.
 
     Multiple ``<Bet_graph>`` elements may appear in a file — one for the

@@ -1,4 +1,4 @@
-"""XML adapter: parse an ``<Archive>`` element into an ``ArchiveSection``."""
+"""XML adapter: parse an ``<Archive>`` element into an ``Archive``."""
 
 import xml.etree.ElementTree as ET
 
@@ -9,22 +9,22 @@ from gsbparse.adapters.xml.parsers import (
     parse_nullable_str,
     parse_str,
 )
-from gsbparse.domain.sections.archive import ArchiveSection
+from gsbparse.domain.sections.archive import Archive
 
 _parse_nullable_date = parse_null(parse_date)
 
 
-def parse_archive_section(element: ET.Element) -> ArchiveSection:
-    """Parse an ``<Archive>`` XML element into an :class:`ArchiveSection`.
+def parse_archive_section(element: ET.Element) -> Archive:
+    """Parse an ``<Archive>`` XML element into an :class:`Archive`.
 
     Args:
         element: The ``<Archive>`` XML element.
 
     Returns:
-        A fully populated :class:`ArchiveSection`.
+        A fully populated :class:`Archive`.
     """
     a = element.attrib
-    return ArchiveSection(
+    return Archive(
         Nb=parse_int(a["Nb"]),
         Na=parse_str(a["Na"]),
         Bdte=_parse_nullable_date(a["Bdte"]),

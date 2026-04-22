@@ -34,7 +34,7 @@ class TransactionMarkedState(IntEnum):
 
 
 @dataclass(frozen=True)
-class TransactionSection(GsbFileSection):
+class Transaction(GsbFileSection):
     """A transaction stored in the Grisbi file.
 
     Foreign-key fields (``Ac``, ``Cu``, ``Pa``, etc.) hold raw integer

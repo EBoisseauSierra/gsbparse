@@ -6,7 +6,7 @@ from gsbparse.domain.sections._base import GsbFileSection
 
 
 @dataclass(frozen=True)
-class PrintSection(GsbFileSection):
+class Print(GsbFileSection):
     """Print/report rendering preferences stored in the Grisbi file.
 
     Attributes:
