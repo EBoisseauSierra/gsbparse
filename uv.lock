@@ -304,6 +304,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "conventional-pre-commit" },
+    { name = "coverage" },
     { name = "import-linter" },
     { name = "mypy" },
     { name = "myst-parser" },
@@ -326,6 +327,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "conventional-pre-commit", specifier = ">=3.4" },
+    { name = "coverage", extras = ["toml"], specifier = ">=7.6" },
     { name = "import-linter", specifier = ">=2.0" },
     { name = "mypy", specifier = ">=1.11" },
     { name = "myst-parser", specifier = ">=4" },
