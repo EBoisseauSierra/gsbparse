@@ -350,6 +350,16 @@ class TestValidateColumns:
         with pytest.raises(UnknownDetailedTransactionPathError):
             validate_columns(cols)
 
+    def test_invalid_deep_path_raises(self):
+        """A typo in a nested segment must raise the typed error, not raw AttributeError."""
+        cols = [DetailedTransactionColumn("Ac.NonExistent", "x")]
+        with pytest.raises(UnknownDetailedTransactionPathError):
+            validate_columns(cols)
+
+    def test_valid_triple_nested_path_accepted(self):
+        cols = [DetailedTransactionColumn("Trt.Ac.Name", "transfer_account")]
+        validate_columns(cols)  # should not raise
+
 
 class TestDetailedTransactionViaProperty:
     def test_gsb_file_property_delegates_correctly(self):
