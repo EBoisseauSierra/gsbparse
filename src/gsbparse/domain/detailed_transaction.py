@@ -11,8 +11,8 @@ a parsed :class:`~gsbparse.domain.file.GsbFile`.
 from __future__ import annotations
 
 import dataclasses
-import functools
 import logging
+import typing
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
@@ -151,36 +151,68 @@ DEFAULT_DETAILED_TRANSACTION_COLUMNS: list[DetailedTransactionColumn] = [
 ]
 
 
-def _resolve_path(tx: DetailedTransaction, path: str) -> object:
-    """Walk a dotted attribute path on *tx*, returning ``None`` for any missing step."""
-    try:
-        return functools.reduce(getattr, path.split("."), tx)
-    except AttributeError as exc:
-        raise UnknownDetailedTransactionPathError(
-            f"Path {path!r} does not exist on DetailedTransaction: {exc}"
-        ) from exc
+def _unwrap_optional_type(tp: object) -> object:
+    """Strip ``X | None`` / ``Optional[X]`` → ``X``.
+
+    Returns the first non-``None`` type argument when *tp* is a two-argument
+    Union/Optional type.  Returns *tp* unchanged for all other inputs.
+    """
+    args = typing.get_args(tp)
+    if args:
+        non_none = [a for a in args if a is not type(None)]
+        if len(non_none) == 1:
+            return non_none[0]
+    return tp
 
 
 def validate_columns(columns: list[DetailedTransactionColumn]) -> None:
-    """Validate that every path in *columns* exists on :class:`DetailedTransaction`.
+    """Validate that every dotted path in *columns* exists on :class:`DetailedTransaction`.
+
+    Walks each path segment-by-segment through the type-hint hierarchy so that
+    deep typos (e.g. ``"Ac.Nme"`` instead of ``"Ac.Name"``) are caught at
+    validation time, before the DataFrame is built.
 
     Args:
         columns: Column specs to validate.
 
     Raises:
-        UnknownDetailedTransactionPathError: A path references a non-existent attribute.
+        UnknownDetailedTransactionPathError: A path segment references a
+            non-existent attribute at any depth.
     """
-    import dataclasses
-
-    # Build a dummy instance to walk attribute paths without real data.
-    # We only need to validate the first segment (top-level field names).
-    field_names = {f.name for f in dataclasses.fields(DetailedTransaction)}
     for col in columns:
-        top = col.path.split(".")[0]
-        if top not in field_names:
+        _validate_path(col.path)
+
+
+def _validate_path(path: str) -> None:
+    """Raise :exc:`UnknownDetailedTransactionPathError` if *path* is invalid."""
+    import sys
+
+    segments = path.split(".")
+    current_type: object = DetailedTransaction
+    # This module imports all domain section types at runtime, while some of
+    # those section classes guard their cross-references behind TYPE_CHECKING to
+    # avoid circular imports.  Merging each class's module globals with this
+    # module's globals makes those TYPE_CHECKING-guarded symbols visible during
+    # annotation resolution.
+    this_module_ns = vars(sys.modules[__name__])
+    for i, segment in enumerate(segments):
+        if not dataclasses.is_dataclass(current_type):
+            type_name = getattr(current_type, "__name__", repr(current_type))
             raise UnknownDetailedTransactionPathError(
-                f"Path {col.path!r} references unknown field {top!r} on DetailedTransaction"
+                f"Path {path!r}: cannot navigate into non-dataclass type "
+                f"{type_name!r} at segment {segment!r}"
             )
+        cls_module = sys.modules.get(getattr(current_type, "__module__", ""), None)
+        merged_ns = {**(vars(cls_module) if cls_module is not None else {}), **this_module_ns}
+        hints = typing.get_type_hints(current_type, localns=merged_ns)
+        field_names = {f.name for f in dataclasses.fields(current_type)}
+        if segment not in field_names:
+            type_name = getattr(current_type, "__name__", repr(current_type))
+            raise UnknownDetailedTransactionPathError(
+                f"Path {path!r} references unknown field {segment!r} on {type_name}"
+            )
+        if i < len(segments) - 1:
+            current_type = _unwrap_optional_type(hints[segment])
 
 
 def build_detailed_transactions(gsb_file: GsbFile) -> list[DetailedTransaction] | None:
