@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import enum as _enum
+from datetime import datetime as _datetime
 
 import pandas as pd
 
@@ -74,4 +75,8 @@ def _resolve_nullable_path(tx: DetailedTransaction, path: str) -> object:
         if obj is None:
             return None
         obj = getattr(obj, attr)
+    # datetime is a subclass of date; normalize to date so the DataFrame column
+    # never inadvertently contains datetime objects.
+    if isinstance(obj, _datetime):
+        return obj.date()
     return obj

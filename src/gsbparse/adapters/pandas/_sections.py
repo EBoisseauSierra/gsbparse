@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import dataclasses
+from datetime import datetime as _datetime
 
 import pandas as pd
 
@@ -34,4 +35,13 @@ def sections_to_df(sections: list[GsbFileSection]) -> pd.DataFrame:
     if len(types) > 1:
         raise MixedSectionsError(list(types))
 
-    return pd.DataFrame([dataclasses.asdict(s) for s in sections])
+    return pd.DataFrame([_section_to_row(s) for s in sections])
+
+
+def _section_to_row(section: GsbFileSection) -> dict[str, object]:
+    """Serialize *section* to a plain dict, normalizing ``datetime`` → ``date``."""
+    row: dict[str, object] = {}
+    for field in dataclasses.fields(section):
+        val = getattr(section, field.name)
+        row[field.name] = val.date() if isinstance(val, _datetime) else val
+    return row
