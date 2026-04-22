@@ -42,6 +42,7 @@ from gsbparse.adapters.xml.sections.text_comparison import parse_text_comparison
 from gsbparse.adapters.xml.sections.transaction import parse_transaction_section
 from gsbparse.domain.sections.account import AccountKind
 from gsbparse.domain.sections.category import CategoryKind
+from gsbparse.domain.sections.transaction import TransactionMarkedState
 
 
 def _el(tag: str, **attrib: str) -> ET.Element:
@@ -151,40 +152,60 @@ class TestParseSubBudgetarySection:
 class TestParseAccountSection:
     def test_all_fields_wired(self):
         dummy_name = "Current Account"
-        dummy_number = "1"
-        dummy_currency = "1"
+        dummy_number = "3"
+        dummy_owner = "Alice"
+        dummy_kind = "0"  # BANK
+        dummy_currency = "2"
+        dummy_path_icon = "icons/bank.png"
+        dummy_bank = "5"
+        dummy_bank_branch_code = "00199"
+        dummy_bank_account_number = "9876543210"
+        dummy_key = "7"
+        dummy_bank_account_iban = "GB29NWBK60161331926819"
+        dummy_initial_balance = "1500,75"
+        dummy_minimum_wanted_balance = "200,00"
+        dummy_minimum_authorised_balance = "-300,50"
+        dummy_lines_per_transaction = "2"
+        dummy_comment = "Main account"
+        dummy_owner_address = "42 Rue de la Paix"
+        dummy_default_debit_method = "3"
+        dummy_default_credit_method = "4"
+        dummy_sort_order = "asc"
+        dummy_column_sort = "1"
+        dummy_sorting_kind_column = "date"
+        dummy_bet_use_budget = "1"
         element = _el(
             "Account",
             Name=dummy_name,
             Id="(null)",
             Number=dummy_number,
-            Owner="Alice",
-            Kind="0",
+            Owner=dummy_owner,
+            Kind=dummy_kind,
             Currency=dummy_currency,
-            Path_icon="icons/account.png",
-            Bank="1",
-            Bank_branch_code="001",
-            Bank_account_number="12345",
-            Key="0",
-            Bank_account_IBAN="GB01XXXX",
-            Initial_balance="1000,00",
-            Minimum_wanted_balance="100,00",
-            Minimum_authorised_balance="-500,00",
-            Closed_account="0",
-            Show_marked="0",
-            Show_archives_lines="0",
-            Lines_per_transaction="1",
-            Comment="",
-            Owner_address="",
-            Default_debit_method="1",
-            Default_credit_method="2",
-            Sort_by_method="0",
-            Neutrals_inside_method="0",
-            Sort_order="",
-            Ascending_sort="1",
-            Column_sort="2",
-            Sorting_kind_column="",
-            Bet_use_budget="0",
+            Path_icon=dummy_path_icon,
+            Bank=dummy_bank,
+            Bank_branch_code=dummy_bank_branch_code,
+            Bank_account_number=dummy_bank_account_number,
+            Key=dummy_key,
+            Bank_account_IBAN=dummy_bank_account_iban,
+            Initial_balance=dummy_initial_balance,
+            Minimum_wanted_balance=dummy_minimum_wanted_balance,
+            Minimum_authorised_balance=dummy_minimum_authorised_balance,
+            Closed_account="1",
+            Show_marked="1",
+            Show_archives_lines="1",
+            Lines_per_transaction=dummy_lines_per_transaction,
+            Comment=dummy_comment,
+            Owner_address=dummy_owner_address,
+            Default_debit_method=dummy_default_debit_method,
+            Default_credit_method=dummy_default_credit_method,
+            Sort_by_method="1",
+            Neutrals_inside_method="1",
+            Sort_order=dummy_sort_order,
+            Ascending_sort="0",
+            Column_sort=dummy_column_sort,
+            Sorting_kind_column=dummy_sorting_kind_column,
+            Bet_use_budget=dummy_bet_use_budget,
         )
 
         section = parse_account_section(element)
@@ -192,14 +213,122 @@ class TestParseAccountSection:
         assert section.Name == dummy_name
         assert section.Id is None
         assert section.Number == int(dummy_number)
-        assert section.Kind == AccountKind.BANK
+        assert section.Owner == dummy_owner
+        assert section.Kind == AccountKind(int(dummy_kind))
         assert section.Currency == int(dummy_currency)
-        assert section.Initial_balance == Decimal("1000.00")
-        assert section.Closed_account is False
-        assert section.Ascending_sort is True
+        assert section.Path_icon == dummy_path_icon
+        assert section.Bank == int(dummy_bank)
+        assert section.Bank_branch_code == dummy_bank_branch_code
+        assert section.Bank_account_number == dummy_bank_account_number
+        assert section.Key == dummy_key
+        assert section.Bank_account_IBAN == dummy_bank_account_iban
+        assert section.Initial_balance == Decimal("1500.75")
+        assert section.Minimum_wanted_balance == Decimal("200.00")
+        assert section.Minimum_authorised_balance == Decimal("-300.50")
+        assert section.Closed_account is True
+        assert section.Show_marked is True
+        assert section.Show_archives_lines is True
+        assert section.Lines_per_transaction == int(dummy_lines_per_transaction)
+        assert section.Comment == dummy_comment
+        assert section.Owner_address == dummy_owner_address
+        assert section.Default_debit_method == int(dummy_default_debit_method)
+        assert section.Default_credit_method == int(dummy_default_credit_method)
+        assert section.Sort_by_method is True
+        assert section.Neutrals_inside_method is True
+        assert section.Sort_order == dummy_sort_order
+        assert section.Ascending_sort is False
+        assert section.Column_sort == int(dummy_column_sort)
+        assert section.Sorting_kind_column == dummy_sorting_kind_column
+        assert section.Bet_use_budget == int(dummy_bet_use_budget)
 
 
 class TestParseTransactionSection:
+    def test_all_fields_wired(self):
+        dummy_ac = "2"
+        dummy_nb = "7"
+        dummy_dt = "03/20/2024"
+        dummy_am = "99,99"
+        dummy_cu = "3"
+        dummy_exr = "1,25"
+        dummy_exf = "0,50"
+        dummy_pa = "4"
+        dummy_ca = "5"
+        dummy_sca = "6"
+        dummy_pn = "8"
+        dummy_pc = "CHQ-0042"
+        dummy_ma = "3"  # RECONCILED
+        dummy_ar = "9"
+        dummy_re = "10"
+        dummy_fi = "11"
+        dummy_bu = "12"
+        dummy_sbu = "13"
+        dummy_vo = "VOUCH-007"
+        dummy_ba = "BANK-REF"
+        dummy_trt = "99"
+        dummy_mo = "0"
+        element = _el(
+            "Transaction",
+            Ac=dummy_ac,
+            Nb=dummy_nb,
+            Id="(null)",
+            Dt=dummy_dt,
+            Dv="(null)",
+            Am=dummy_am,
+            Cu=dummy_cu,
+            Exb="1",
+            Exr=dummy_exr,
+            Exf=dummy_exf,
+            Pa=dummy_pa,
+            Ca=dummy_ca,
+            Sca=dummy_sca,
+            Br="1",
+            No="(null)",
+            Pn=dummy_pn,
+            Pc=dummy_pc,
+            Ma=dummy_ma,
+            Ar=dummy_ar,
+            Au="1",
+            Re=dummy_re,
+            Fi=dummy_fi,
+            Bu=dummy_bu,
+            Sbu=dummy_sbu,
+            Vo=dummy_vo,
+            Ba=dummy_ba,
+            Trt=dummy_trt,
+            Mo=dummy_mo,
+        )
+
+        section = parse_transaction_section(element)
+
+        assert section.Ac == int(dummy_ac)
+        assert section.Nb == int(dummy_nb)
+        assert section.Id is None
+        assert section.Dt == date(2024, 3, 20)
+        assert section.Dv is None
+        assert section.Am == Decimal("99.99")
+        assert section.Cu == int(dummy_cu)
+        assert section.Exb is True
+        assert section.Exr == Decimal("1.25")
+        assert section.Exf == Decimal("0.50")
+        assert section.Pa == int(dummy_pa)
+        assert section.Ca == int(dummy_ca)
+        assert section.Sca == int(dummy_sca)
+        assert section.Br is True
+        assert section.No is None
+        assert section.Pn == int(dummy_pn)
+        assert section.Pc == dummy_pc
+        assert section.Ma == TransactionMarkedState.RECONCILED
+        assert section.Ar == int(dummy_ar)
+        assert section.Au is True
+        assert section.Re == int(dummy_re)
+        assert section.Fi == int(dummy_fi)
+        assert section.Bu == int(dummy_bu)
+        assert section.Sbu == int(dummy_sbu)
+        assert section.Vo == dummy_vo
+        assert section.Ba == dummy_ba
+        assert section.Trt == int(dummy_trt)
+        assert section.Mo == int(dummy_mo)
+
     def _make_transaction_element(self, **overrides: str) -> ET.Element:
         defaults = dict(
             Ac="1",
